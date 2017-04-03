@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">RacePlanner</string>
+
+    <string-array name="race_type">
+        <item>5k</item>
+        <item>10k</item>
+        <item>Half-Marathon</item>
+        <item>Marathon</item>
+    </string-array>
+
+    <string-array name="experience">
+        <item>Beginner</item>
+        <item>Intermediate</item>
+        <item>Expert</item>
+    </string-array>
+
+</resources>
