@@ -65,16 +65,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             // not sure what scope these variables need to be, might need to make them global
             // also displays toasts to confirm spinner selection
             // might be able to remove duplicate code for the toasts
+            // need to also change spinner XML ids to match their variable names
 
             case R.id.spinner:
                 raceType = (String) parent.getItemAtPosition(pos);
-                toast = Toast.makeText(MainActivity.this, parent.getItemAtPosition(pos).toString(), Toast.LENGTH_LONG);
+                toast = Toast.makeText(MainActivity.this, raceType, Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.TOP, 0, 0);
                 toast.show();
                 break;
             case R.id.expSpinner:
                 experienceLevel = (String) parent.getItemAtPosition(pos);
-                toast = Toast.makeText(MainActivity.this, parent.getItemAtPosition(pos).toString(), Toast.LENGTH_LONG);
+                toast = Toast.makeText(MainActivity.this, experienceLevel, Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.TOP, 0, 0);
                 toast.show();
                 break;
@@ -83,9 +84,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> adapterView)
+    public void onNothingSelected(AdapterView<?> parent)
     {
-        // TODO: 4/4/17
+        // TODO
     }
 
 
