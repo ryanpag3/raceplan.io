@@ -9,8 +9,12 @@ import android.view.View;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import java.util.Calendar;
 
 /**
  * TODO:
@@ -36,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         // adapter for raceType spinner
         raceTypeSpinner = (Spinner) findViewById(R.id.spinner);
-        ArrayAdapter<CharSequence> raceAdapt = ArrayAdapter.createFromResource(this, R.array.race_type, android.R.layout.simple_spinner_item);
+        final ArrayAdapter<CharSequence> raceAdapt = ArrayAdapter.createFromResource(this, R.array.race_type, android.R.layout.simple_spinner_item);
         raceAdapt.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         raceTypeSpinner.setAdapter(raceAdapt);
         raceTypeSpinner.setOnItemSelectedListener(this);
@@ -48,10 +52,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         experienceLevelSpinner.setAdapter(expAdapt);
         experienceLevelSpinner.setOnItemSelectedListener(this);
 
-        // debug log, checking spinner id's
-        Log.w("rts id: ", Integer.toString(raceTypeSpinner.getId()));
-        Log.w("els id: ", Integer.toString(experienceLevelSpinner.getId()));
+        // grabbing reference to datepicker widget
+        DatePicker datePicker = (DatePicker) findViewById(R.id.datepicker);
+        final Calendar c = Calendar.getInstance();
+        datePicker.init(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH), new MyOnDateChangedListener());
 
+        // button generation
+        Button button = (Button) findViewById(R.id.generateButton);
+        button.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                // checks to make sure values have been set
+                if (raceType != null && experienceLevel != null && dateOfRace != null)
+                {
+                    String currentSettings = "Your race type is " + raceType + " and your experience level is " + experienceLevel + " and your race is on " + dateOfRace;
+                    Toast toast = Toast.makeText(MainActivity.this, currentSettings, Toast.LENGTH_LONG);
+                    toast.show();
+                }
+            }
+        });
 
     }
 
@@ -59,34 +79,39 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id)
     {
         Toast toast;
+        if (pos != 0)
+        {
         switch (parent.getId())
         {
             // assigns spinner selection to variable
             // not sure what scope these variables need to be, might need to make them global
-            // also displays toasts to confirm spinner selection
-            // might be able to remove duplicate code for the toasts
             // need to also change spinner XML ids to match their variable names
 
-            case R.id.spinner:
-                raceType = (String) parent.getItemAtPosition(pos);
-                toast = Toast.makeText(MainActivity.this, raceType, Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.TOP, 0, 0);
-                toast.show();
-                break;
-            case R.id.expSpinner:
-                experienceLevel = (String) parent.getItemAtPosition(pos);
-                toast = Toast.makeText(MainActivity.this, experienceLevel, Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.TOP, 0, 0);
-                toast.show();
-                break;
+                case R.id.spinner:
+                    raceType = (String) parent.getItemAtPosition(pos);
+                    break;
 
+                case R.id.expSpinner:
+                    experienceLevel = (String) parent.getItemAtPosition(pos);
+                    break;
+            }
         }
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent)
     {
-        // TODO
+        // TODO...?
+    }
+
+    // Listener class for DatePicker widget
+    private class MyOnDateChangedListener implements DatePicker.OnDateChangedListener
+    {
+        @Override
+        public void onDateChanged(DatePicker parent, int year, int month, int day)
+        {
+            dateOfRace = (month+1) + "-" + day + "-" + year;
+        }
     }
 
 

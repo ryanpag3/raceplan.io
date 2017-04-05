@@ -2,6 +2,7 @@
     <string name="app_name">RacePlanner</string>
 
     <string-array name="race_type">
+        <item>Please Select Item</item>
         <item>5k</item>
         <item>10k</item>
         <item>Half-Marathon</item>
@@ -9,6 +10,7 @@
     </string-array>
 
     <string-array name="experience">
+        <item>Please Select Item</item>
         <item>Beginner</item>
         <item>Intermediate</item>
         <item>Expert</item>
