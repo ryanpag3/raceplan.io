@@ -1,16 +1,14 @@
 package com.example.ryan.raceplanner;
 
-import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -18,7 +16,6 @@ import java.util.Calendar;
 
 /**
  * TODO:
- * Figure out how to assign variable/object through the datePicker
  * Develop calendar generator using raceType, experienceLevel, dateOfRace
  * Push to google calendar API
  */
@@ -26,11 +23,29 @@ import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener
 {
+    public static final String EXTRA_MESSAGE = "com.example.RacePlanner.MESSAGE";
     Spinner raceTypeSpinner;
     Spinner experienceLevelSpinner;
     String raceType;
     String experienceLevel;
     String dateOfRace;
+
+    // getters
+    public String returnRaceType()
+    {
+        return this.raceType;
+    }
+
+    public String returnExperienceLevel()
+    {
+        return this.experienceLevel;
+    }
+
+    public String returnDateOfRace()
+    {
+        return this.dateOfRace;
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -39,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setContentView(R.layout.activity_main);
 
         // adapter for raceType spinner
+
         raceTypeSpinner = (Spinner) findViewById(R.id.spinner);
         final ArrayAdapter<CharSequence> raceAdapt = ArrayAdapter.createFromResource(this, R.array.race_type, android.R.layout.simple_spinner_item);
         raceAdapt.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -66,9 +82,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 // checks to make sure values have been set
                 if (raceType != null && experienceLevel != null && dateOfRace != null)
                 {
-                    String currentSettings = "Your race type is " + raceType + " and your experience level is " + experienceLevel + " and your race is on " + dateOfRace;
-                    Toast toast = Toast.makeText(MainActivity.this, currentSettings, Toast.LENGTH_LONG);
-                    toast.show();
+                    Intent intent = new Intent(MainActivity.this, GenerateTrainingPlan.class);
+                    startActivity(intent);
                 }
             }
         });
@@ -81,21 +96,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Toast toast;
         if (pos != 0)
         {
-        switch (parent.getId())
-        {
-            // assigns spinner selection to variable
-            // not sure what scope these variables need to be, might need to make them global
-            // need to also change spinner XML ids to match their variable names
+            switch (parent.getId())
+            {
+                // assigns spinner selection to variable
+                // not sure what scope these variables need to be, might need to make them global
+                // need to also change spinner XML ids to match their variable names
 
-                case R.id.spinner:
-                    raceType = (String) parent.getItemAtPosition(pos);
-                    break;
+                    case R.id.spinner:
+                        raceType = (String) parent.getItemAtPosition(pos);
+                        break;
 
-                case R.id.expSpinner:
-                    experienceLevel = (String) parent.getItemAtPosition(pos);
-                    break;
+                    case R.id.expSpinner:
+                        experienceLevel = (String) parent.getItemAtPosition(pos);
+                        break;
+                }
             }
-        }
     }
 
     @Override
@@ -110,9 +125,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         @Override
         public void onDateChanged(DatePicker parent, int year, int month, int day)
         {
+            // I dont think we will need to convert these values to a string and then back.
+            // Probably will just be a method call to Calendar or some shit for the google api
             dateOfRace = (month+1) + "-" + day + "-" + year;
         }
     }
-
-
 }

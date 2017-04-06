@@ -36,7 +36,7 @@
         android:gravity="center"
         android:text="Select Date of Race"
         android:textSize="16sp" />
-tor
+
     <DatePicker
         android:id="@+id/datepicker"
         android:layout_width="wrap_content"
