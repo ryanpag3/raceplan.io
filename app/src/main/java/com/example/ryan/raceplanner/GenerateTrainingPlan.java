@@ -68,6 +68,7 @@ public class GenerateTrainingPlan extends AppCompatActivity
         textView.setText(builder);
 
     }
+    // test
 
     private class CalendarInfo
     {
