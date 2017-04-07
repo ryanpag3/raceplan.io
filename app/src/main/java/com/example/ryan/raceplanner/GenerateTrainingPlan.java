@@ -2,35 +2,50 @@ package com.example.ryan.raceplanner;
 
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.Application;
 import android.content.ContentResolver;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.CalendarContract.*;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.AdapterView.*;
+import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import com.example.ryan.raceplanner.MainActivity.*;
 
 /**
  *  See Trello for TO-DO
  */
 
-public class GenerateTrainingPlan extends AppCompatActivity implements OnItemSelectedListener
+public class GenerateTrainingPlan extends AppCompatActivity
 {
     private static final int MY_PERMISSIONS_REQUEST_READ_CALENDAR = 1;
+    private static final int MY_PERMISSIONS_REQUEST_WRITE_CALENDAR = 2;
+    List<CalendarInfo> result = new ArrayList<>();
+    List<String> namesOfCalendars = new ArrayList<>();
+    Date date = (Date) getIntent().getExtras().get(GlobalVariables.DATE_OF_RACE_ID);
+    Long calID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_generate_training_plan);
 
@@ -40,6 +55,13 @@ public class GenerateTrainingPlan extends AppCompatActivity implements OnItemSel
             ActivityCompat.requestPermissions(GenerateTrainingPlan.this,
                     new String[]{Manifest.permission.READ_CALENDAR},
                     MY_PERMISSIONS_REQUEST_READ_CALENDAR);
+        }
+
+        if (ContextCompat.checkSelfPermission(GenerateTrainingPlan.this, Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(GenerateTrainingPlan.this,
+                    new String[]{Manifest.permission.WRITE_CALENDAR},
+                    MY_PERMISSIONS_REQUEST_WRITE_CALENDAR);
         }
 
         // See "Querying a Calendar"
@@ -57,8 +79,6 @@ public class GenerateTrainingPlan extends AppCompatActivity implements OnItemSel
         ContentResolver cr = getContentResolver();
         Uri uri = Calendars.CONTENT_URI;
         Cursor calCursor = cr.query(uri, projection, null, null, null);
-        List<CalendarInfo> result = new ArrayList<>();
-        List<String> namesOfCalendars = new ArrayList<>();
 
         // iterate through query
         while(calCursor.moveToNext())
@@ -69,10 +89,68 @@ public class GenerateTrainingPlan extends AppCompatActivity implements OnItemSel
         calCursor.close();
 
         // create spinner and add calendars to it for selection
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(GenerateTrainingPlan.this, android.R.layout.simple_spinner_item, namesOfCalendars);
+        generateCalendarSelectSpinner();
+
+        // button generation
+        generateCalendarConfirmButton();
+
+    }
+
+    private void generateCalendarSelectSpinner()
+    {
+        // create spinner and add calendars to it for selection
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, namesOfCalendars);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         Spinner calendarSelect = (Spinner) findViewById(R.id.calendarSelect);
         calendarSelect.setAdapter(adapter);
+        calendarSelect.setOnItemSelectedListener(new OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+            {
+                // set calendar to be edited with training plan
+                switch (parent.getId())
+                {
+                    case R.id.calendarSelect:
+                    {
+                        TextView textView = (TextView) findViewById(R.id.textView);
+                        textView.setText(result.get(position).id.toString() + " | " + result.get(position).name);
+                        calID = result.get(position).id;
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent)
+            {
+
+            }
+        });
+    }
+
+    private void generateCalendarConfirmButton()
+    {
+        // button generation
+        Button confirmCalendarButton = (Button) findViewById(R.id.confirmCalendar);
+        confirmCalendarButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                // create dummy event for testing
+
+            }
+        });
+    }
+
+
+    public void createEvent(Activity curActivity, long id, long startM, long endM, Date date)
+    {
+        long calID = id;
+        long startMillis = startM;
+        long endMillis = endM;
+        Date dateOfEvent = date;
+        Calendar beginTime = Calendar.getInstance();
 
     }
 
@@ -89,17 +167,5 @@ public class GenerateTrainingPlan extends AppCompatActivity implements OnItemSel
             this.name = n;
             this.color = c;
         }
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View v, int pos, long id)
-    {
-        // set calendar to be edited with training plan
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent)
-    {
-        // TODO?
     }
 }
