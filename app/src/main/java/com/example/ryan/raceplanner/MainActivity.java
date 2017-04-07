@@ -117,6 +117,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 if (raceType != null && experienceLevel != null && dateOfRace != null)
                 {
                     Intent intent = new Intent(MainActivity.this, GenerateTrainingPlan.class);
+                    // BUG: Need to find way to pass dateOfRace from this activity to next.
+                    // Cannot cast object as parceable or serializable for some reason
                     intent.putExtra(GlobalVariables.DATE_OF_RACE_ID,(Serializable) dateOfRace);
                     startActivity(intent);
                 }
