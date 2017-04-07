@@ -16,7 +16,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ *
+ */
 public class GenerateTrainingPlan extends AppCompatActivity
 {
     private static final int MY_PERMISSIONS_REQUEST_READ_CALENDAR = 1;
@@ -60,7 +62,7 @@ public class GenerateTrainingPlan extends AppCompatActivity
         StringBuilder builder = new StringBuilder();
         for (CalendarInfo c : result)
         {
-            builder.append(c.name + ", ");
+            builder.append(c.name + "\n");
         }
 
         // pushes calendar names to dummy textView for debug purposes
@@ -68,8 +70,7 @@ public class GenerateTrainingPlan extends AppCompatActivity
         textView.setText(builder);
 
     }
-    // test
-
+    // test for slack
     private class CalendarInfo
     {
         private Long id;
