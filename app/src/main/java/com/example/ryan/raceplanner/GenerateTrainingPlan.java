@@ -11,15 +11,20 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.TextView;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.AdapterView.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ *  See Trello for TO-DO
  */
-public class GenerateTrainingPlan extends AppCompatActivity
+
+public class GenerateTrainingPlan extends AppCompatActivity implements OnItemSelectedListener
 {
     private static final int MY_PERMISSIONS_REQUEST_READ_CALENDAR = 1;
 
@@ -46,31 +51,32 @@ public class GenerateTrainingPlan extends AppCompatActivity
                 Calendars.ACCOUNT_TYPE
         };
 
+        // ContentResolver receives a URI to a specific Content Provider
+        // Content Providers provide an interface to query content
+        // Cursors use ContentResolvers to iterate through
         ContentResolver cr = getContentResolver();
         Uri uri = Calendars.CONTENT_URI;
         Cursor calCursor = cr.query(uri, projection, null, null, null);
         List<CalendarInfo> result = new ArrayList<>();
+        List<String> namesOfCalendars = new ArrayList<>();
 
-
+        // iterate through query
         while(calCursor.moveToNext())
         {
             result.add(new CalendarInfo(calCursor.getLong(0), calCursor.getString(1), calCursor.getInt(3)));
+            namesOfCalendars.add(calCursor.getString(1));
         }
-
         calCursor.close();
 
-        StringBuilder builder = new StringBuilder();
-        for (CalendarInfo c : result)
-        {
-            builder.append(c.name + "\n");
-        }
-
-        // pushes calendar names to dummy textView for debug purposes
-        TextView textView = (TextView) findViewById(R.id.textView);
-        textView.setText(builder);
+        // create spinner and add calendars to it for selection
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(GenerateTrainingPlan.this, android.R.layout.simple_spinner_item, namesOfCalendars);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        Spinner calendarSelect = (Spinner) findViewById(R.id.calendarSelect);
+        calendarSelect.setAdapter(adapter);
 
     }
-    // test for slack
+
+    // Idk if there's a better way to do this.
     private class CalendarInfo
     {
         private Long id;
@@ -83,5 +89,17 @@ public class GenerateTrainingPlan extends AppCompatActivity
             this.name = n;
             this.color = c;
         }
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View v, int pos, long id)
+    {
+        // set calendar to be edited with training plan
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent)
+    {
+        // TODO?
     }
 }

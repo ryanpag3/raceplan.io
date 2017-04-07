@@ -5,12 +5,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.example.ryan.raceplanner.GenerateTrainingPlan">
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="activity loaded"/>
+        android:text="Please select the calendar you would like to export to"/>
 
+    <Spinner
+        android:id="@+id/calendarSelect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:spinnerMode="dropdown"/>
 </LinearLayout>
