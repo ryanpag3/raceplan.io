@@ -5,6 +5,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.Application;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -24,6 +25,7 @@ import android.widget.Spinner;
 import android.widget.AdapterView.*;
 import android.widget.TextView;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -39,7 +41,7 @@ public class GenerateTrainingPlan extends AppCompatActivity
     private static final int MY_PERMISSIONS_REQUEST_WRITE_CALENDAR = 2;
     List<CalendarInfo> result = new ArrayList<>();
     List<String> namesOfCalendars = new ArrayList<>();
-    Date date = (Date) getIntent().getExtras().get(GlobalVariables.DATE_OF_RACE_ID);
+    Date date;
     Long calID;
 
     @Override
@@ -63,6 +65,8 @@ public class GenerateTrainingPlan extends AppCompatActivity
                     new String[]{Manifest.permission.WRITE_CALENDAR},
                     MY_PERMISSIONS_REQUEST_WRITE_CALENDAR);
         }
+
+        date = (Date) getIntent().getExtras().getParcelable(GlobalVariables.DATE_OF_RACE_ID);
 
         // See "Querying a Calendar"
         // https://developer.android.com/guide/topics/providers/calendar-provider.html
@@ -130,7 +134,6 @@ public class GenerateTrainingPlan extends AppCompatActivity
 
     private void generateCalendarConfirmButton()
     {
-        // button generation
         Button confirmCalendarButton = (Button) findViewById(R.id.confirmCalendar);
         confirmCalendarButton.setOnClickListener(new View.OnClickListener()
         {
@@ -138,7 +141,7 @@ public class GenerateTrainingPlan extends AppCompatActivity
             public void onClick(View v)
             {
                 // create dummy event for testing
-
+                createEvent(GenerateTrainingPlan.this, calID, 0, 0, date);
             }
         });
     }
@@ -151,6 +154,28 @@ public class GenerateTrainingPlan extends AppCompatActivity
         long endMillis = endM;
         Date dateOfEvent = date;
         Calendar beginTime = Calendar.getInstance();
+        beginTime.set(date.getYear(), date.getMonth(), date.getDay(), 0,0);
+        startMillis = beginTime.getTimeInMillis();
+        Calendar endTime= Calendar.getInstance();
+        endTime.set(date.getYear(), date.getMonth(), date.getDay(), 0, 0);
+        endMillis = endTime.getTimeInMillis();
+
+        ContentResolver cr = getContentResolver();
+        ContentValues values = new ContentValues();
+        values.put(Events.DTSTART, startMillis);
+        values.put(Events.DTEND, endMillis);
+        values.put(Events.TITLE, "Test Event");
+        values.put(Events.DESCRIPTION, "Test Description");
+        values.put(Events.CALENDAR_ID, calID);
+        values.put(Events.EVENT_TIMEZONE, "America/Los_Angeles");
+        try
+        {
+            Uri uri = cr.insert(Events.CONTENT_URI, values);
+        } catch (SecurityException e)
+        {
+            Log.e("PermissionDenied", "Permission Denied");
+        }
+        Log.i("createEvent", "Event Created");
 
     }
 

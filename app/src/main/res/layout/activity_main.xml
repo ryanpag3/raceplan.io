@@ -9,10 +9,10 @@
     <TextView
         android:id="@+id/title_placeholder"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_weight="2"
         android:gravity="center"
-        android:text="TO DO: INSERT TITLE IMAGE"
+        android:text="@string/main_todo_title"
         android:textSize="24sp" />
 
     <TextView
@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:calendarViewShown="false"
-        android:datePickerMode="spinner"></DatePicker>
+        android:datePickerMode="spinner"/>
 
     <TextView
         android:layout_width="match_parent"

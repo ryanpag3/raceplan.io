@@ -1,19 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
     <string name="app_name">RacePlanner</string>
 
-    <string-array name="race_type">
+    <string-array name="main_experience_spinner_strings">
+        <item>Please Select Item</item>
+        <item>Beginner</item>
+        <item>Intermediate</item>
+        <item>Expert</item>
+    </string-array>
+    <string-array name="main_race_type_spinner_strings">
         <item>Please Select Item</item>
         <item>5k</item>
         <item>10k</item>
         <item>Half-Marathon</item>
         <item>Marathon</item>
     </string-array>
-
-    <string-array name="experience">
-        <item>Please Select Item</item>
-        <item>Beginner</item>
-        <item>Intermediate</item>
-        <item>Expert</item>
-    </string-array>
-
+    <string name="main_todo_title">TO DO: INSERT TITLE IMAGE</string>
+    
 </resources>
