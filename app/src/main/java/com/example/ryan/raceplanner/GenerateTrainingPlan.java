@@ -1,44 +1,31 @@
 package com.example.ryan.raceplanner;
 
 
-import android.Manifest;
 import android.app.Activity;
-import android.app.Application;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-import android.provider.CalendarContract.*;
-import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.provider.CalendarContract.Calendars;
+import android.provider.CalendarContract.Events;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.AdapterView.*;
 import android.widget.TextView;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import com.example.ryan.raceplanner.MainActivity.*;
-
-/**
- *  See Trello for TO-DO
- */
 
 public class GenerateTrainingPlan extends AppCompatActivity
 {
-    private static final int MY_PERMISSIONS_REQUEST_READ_CALENDAR = 1;
-    private static final int MY_PERMISSIONS_REQUEST_WRITE_CALENDAR = 2;
+    private static final String TAG = GenerateTrainingPlan.class.getName();
     List<CalendarInfo> result = new ArrayList<>();
     List<String> namesOfCalendars = new ArrayList<>();
     Date date;
@@ -51,46 +38,11 @@ public class GenerateTrainingPlan extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_generate_training_plan);
 
-        // Get READ_CALENDAR permissions
-        if (ContextCompat.checkSelfPermission(GenerateTrainingPlan.this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED)
-        {
-            ActivityCompat.requestPermissions(GenerateTrainingPlan.this,
-                    new String[]{Manifest.permission.READ_CALENDAR},
-                    MY_PERMISSIONS_REQUEST_READ_CALENDAR);
-        }
-
-        if (ContextCompat.checkSelfPermission(GenerateTrainingPlan.this, Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED)
-        {
-            ActivityCompat.requestPermissions(GenerateTrainingPlan.this,
-                    new String[]{Manifest.permission.WRITE_CALENDAR},
-                    MY_PERMISSIONS_REQUEST_WRITE_CALENDAR);
-        }
-
+        // grab date info from MainActivity
         date = (Date) getIntent().getExtras().getParcelable(GlobalVariables.DATE_OF_RACE_ID);
 
-        // See "Querying a Calendar"
-        // https://developer.android.com/guide/topics/providers/calendar-provider.html
-        String[] projection = new String[]{
-                Calendars._ID,
-                Calendars.NAME,
-                Calendars.ACCOUNT_NAME,
-                Calendars.ACCOUNT_TYPE
-        };
-
-        // ContentResolver receives a URI to a specific Content Provider
-        // Content Providers provide an interface to query content
-        // Cursors use ContentResolvers to iterate through
-        ContentResolver cr = getContentResolver();
-        Uri uri = Calendars.CONTENT_URI;
-        Cursor calCursor = cr.query(uri, projection, null, null, null);
-
-        // iterate through query
-        while(calCursor.moveToNext())
-        {
-            result.add(new CalendarInfo(calCursor.getLong(0), calCursor.getString(1), calCursor.getInt(3)));
-            namesOfCalendars.add(calCursor.getString(1));
-        }
-        calCursor.close();
+        // query list of calendars on device
+        getCalendars();
 
         // create spinner and add calendars to it for selection
         generateCalendarSelectSpinner();
@@ -98,6 +50,39 @@ public class GenerateTrainingPlan extends AppCompatActivity
         // button generation
         generateCalendarConfirmButton();
 
+    }
+
+    public void getCalendars()
+    {
+        try
+        {
+            // See "Querying a Calendar"
+            // https://developer.android.com/guide/topics/providers/calendar-provider.html
+            String[] projection = new String[]{
+                    Calendars._ID,
+                    Calendars.NAME,
+                    Calendars.ACCOUNT_NAME,
+                    Calendars.ACCOUNT_TYPE
+            };
+
+            // ContentResolver receives a URI to a specific Content Provider
+            // Content Providers provide an interface to query content
+            // Cursors use ContentResolvers to iterate through
+            ContentResolver cr = getContentResolver();
+            Uri uri = Calendars.CONTENT_URI;
+            Cursor calCursor = cr.query(uri, projection, null, null, null);
+
+            // iterate through query
+            while (calCursor.moveToNext())
+            {
+                result.add(new CalendarInfo(calCursor.getLong(0), calCursor.getString(1), calCursor.getInt(3)));
+                namesOfCalendars.add(calCursor.getString(1));
+            }
+            calCursor.close();
+        } catch (SecurityException e)
+        {
+            Log.e(TAG, "Permission Denied. Did you set permissions?");
+        }
     }
 
     private void generateCalendarSelectSpinner()
@@ -146,7 +131,8 @@ public class GenerateTrainingPlan extends AppCompatActivity
         });
     }
 
-
+    // this method needs to be on an asynchronous thread
+    // see: https://developer.android.com/reference/android/content/AsyncQueryHandler.html
     public void createEvent(Activity curActivity, long id, long startM, long endM, Date date)
     {
         long calID = id;
@@ -154,9 +140,9 @@ public class GenerateTrainingPlan extends AppCompatActivity
         long endMillis = endM;
         Date dateOfEvent = date;
         Calendar beginTime = Calendar.getInstance();
-        beginTime.set(date.getYear(), date.getMonth(), date.getDay(), 0,0);
+        beginTime.set(date.getYear(), date.getMonth(), date.getDay(), 0, 0);
         startMillis = beginTime.getTimeInMillis();
-        Calendar endTime= Calendar.getInstance();
+        Calendar endTime = Calendar.getInstance();
         endTime.set(date.getYear(), date.getMonth(), date.getDay(), 0, 0);
         endMillis = endTime.getTimeInMillis();
 
@@ -170,13 +156,14 @@ public class GenerateTrainingPlan extends AppCompatActivity
         values.put(Events.EVENT_TIMEZONE, "America/Los_Angeles");
         try
         {
-            Uri uri = cr.insert(Events.CONTENT_URI, values);
+            // commented out to avoid unnecessary event additions
+            //Uri uri = cr.insert(Events.CONTENT_URI, values);
+            Log.e(TAG, "Event Created");
+
         } catch (SecurityException e)
         {
-            Log.e("PermissionDenied", "Permission Denied");
+            Log.e(TAG, "Permission Denied");
         }
-        Log.i("createEvent", "Event Created");
-
     }
 
     // Idk if there's a better way to do this.

@@ -9,4 +9,6 @@ import android.app.Application;
 public class GlobalVariables extends Application
 {
     public static final String DATE_OF_RACE_ID = "dateOfRace";
+    public static final int MY_PERMISSIONS_REQUEST_READ_CALENDAR = 1;
+    public static final int MY_PERMISSIONS_REQUEST_WRITE_CALENDAR = 2;
 }

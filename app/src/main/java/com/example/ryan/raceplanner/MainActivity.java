@@ -1,8 +1,12 @@
 package com.example.ryan.raceplanner;
 
+import android.Manifest;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -13,6 +17,8 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.Calendar;
+
+import static com.example.ryan.raceplanner.GlobalVariables.*;
 
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener
@@ -29,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        requestPermissions();
         generateRaceTypeSpinner();
         generateExperienceLevelSpinner();
         generateDatePickerWidget();
@@ -47,15 +54,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 // not sure what scope these variables need to be, might need to make them global
                 // need to also change spinner XML ids to match their variable names
 
-                    case R.id.spinner:
-                        raceType = (String) parent.getItemAtPosition(pos);
-                        break;
+                case R.id.spinner:
+                    raceType = (String) parent.getItemAtPosition(pos);
+                    break;
 
-                    case R.id.expSpinner:
-                        experienceLevel = (String) parent.getItemAtPosition(pos);
-                        break;
-                }
+                case R.id.expSpinner:
+                    experienceLevel = (String) parent.getItemAtPosition(pos);
+                    break;
             }
+        }
     }
 
     @Override
@@ -116,10 +123,27 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 } else
                 {
                     Toast toast = Toast.makeText(MainActivity.this, "Please select all three options", Toast.LENGTH_SHORT);
-                    toast.setGravity(Gravity.TOP|Gravity.CENTER, 0, 172);
+                    toast.setGravity(Gravity.TOP | Gravity.CENTER, 0, 172);
                     toast.show();
                 }
             }
         });
+    }
+
+    private void requestPermissions()
+    {
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{Manifest.permission.READ_CALENDAR},
+                    MY_PERMISSIONS_REQUEST_READ_CALENDAR);
+        }
+
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{Manifest.permission.WRITE_CALENDAR},
+                    MY_PERMISSIONS_REQUEST_WRITE_CALENDAR);
+        }
     }
 }

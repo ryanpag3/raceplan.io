@@ -72,7 +72,7 @@ public class Date implements Parcelable
 
     public void writeToParcel(Parcel out, int flags)
     {
-        out.writeIntArray(new int[] {this.year, this.month, this.day});
+        out.writeIntArray(new int[]{this.year, this.month, this.day});
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator()
