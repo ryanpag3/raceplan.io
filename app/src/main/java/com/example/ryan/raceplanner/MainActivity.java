@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -23,6 +24,8 @@ import static com.example.ryan.raceplanner.GlobalVariables.*;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener
 {
+    private static final String TAG = GenerateTrainingPlan.class.getName();
+    private boolean createNewCalendar = false;
     Spinner raceTypeSpinner;
     Spinner experienceLevelSpinner;
     String raceType;
@@ -36,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setContentView(R.layout.activity_main);
 
         requestPermissions();
+        requestAPIAuthorization();
         generateRaceTypeSpinner();
         generateExperienceLevelSpinner();
         generateDatePickerWidget();
@@ -43,6 +47,49 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
+
+    /**
+     * This method checks for permissions for the internal calendar API to write and read. This
+     * is all that is necessary to run the app if the user does not wish to create a new Calendar
+     * to host their training plan on.
+     */
+    private void requestPermissions()
+    {
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{Manifest.permission.READ_CALENDAR},
+                    MY_PERMISSIONS_REQUEST_READ_CALENDAR);
+        }
+
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{Manifest.permission.WRITE_CALENDAR},
+                    MY_PERMISSIONS_REQUEST_WRITE_CALENDAR);
+        }
+    }
+
+    private void requestAPIAuthorization()
+    {
+        if (createNewCalendar)
+        {
+
+        } else
+        {
+
+        }
+    }
+
+
+    /**
+     * This method will set the race type and experience level based on the users choice. It
+     * handles both spinners using a switch.
+     * @param parent this is the SpinnerView
+     * @param view Unused parameter. Defines the individual list item selected.
+     * @param pos Position of list item in SpinnerView with [0] being the first location.
+     * @param id The row id of the item selected.
+     */
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id)
     {
@@ -50,28 +97,30 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         {
             switch (parent.getId())
             {
-                // assigns spinner selection to variable
-                // not sure what scope these variables need to be, might need to make them global
-                // need to also change spinner XML ids to match their variable names
-
                 case R.id.spinner:
                     raceType = (String) parent.getItemAtPosition(pos);
+                    Log.i(TAG, "View: " + view.toString());
                     break;
 
                 case R.id.expSpinner:
                     experienceLevel = (String) parent.getItemAtPosition(pos);
+                    Log.i(TAG, view.toString());
                     break;
             }
         }
     }
 
+    /**
+     * Unused
+     * @param parent
+     */
     @Override
-    public void onNothingSelected(AdapterView<?> parent)
-    {
-        // TODO...?
-    }
+    public void onNothingSelected(AdapterView<?> parent) { }
 
-    // Listener class for DatePicker widget
+    /**
+     * Listener class for DatePicker widget. Assigns dateOfRace object to currently selected date
+     * on the spinner.
+     */
     private class MyOnDateChangedListener implements DatePicker.OnDateChangedListener
     {
         @Override
@@ -79,8 +128,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         {
             dateOfRace = new Date(year, month, day);
         }
+
     }
 
+    /**
+     * Generates the spinner UI element for selecting race type.
+     */
     private void generateRaceTypeSpinner()
     {
         raceTypeSpinner = (Spinner) findViewById(R.id.spinner);
@@ -91,6 +144,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
+    /**
+     * Generates the spinner UI element for selecting experience level.
+     */
     private void generateExperienceLevelSpinner()
     {
         experienceLevelSpinner = (Spinner) findViewById(R.id.expSpinner);
@@ -100,6 +156,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         experienceLevelSpinner.setOnItemSelectedListener(this);
     }
 
+    /**
+     * Generates the spinner UI element for selecting the date.
+     */
     private void generateDatePickerWidget()
     {
         DatePicker datePicker = (DatePicker) findViewById(R.id.datepicker);
@@ -107,6 +166,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         datePicker.init(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH), new MyOnDateChangedListener());
     }
 
+    /**
+     * Generates the button UI element.
+     * When the button is pressed and onClick is called, it checks to make sure all selections have
+     * been made and then assigns an intent object to be passed to the GenerateTrainingPlan class.
+     * Then it starts that activity.
+     *
+     * If all selections have not been made, it presents a toast to the user to make sure all
+     * are selected.
+     */
     private void generateGoButton()
     {
         Button button = (Button) findViewById(R.id.generateButton);
@@ -128,22 +196,5 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }
         });
-    }
-
-    private void requestPermissions()
-    {
-        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED)
-        {
-            ActivityCompat.requestPermissions(MainActivity.this,
-                    new String[]{Manifest.permission.READ_CALENDAR},
-                    MY_PERMISSIONS_REQUEST_READ_CALENDAR);
-        }
-
-        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED)
-        {
-            ActivityCompat.requestPermissions(MainActivity.this,
-                    new String[]{Manifest.permission.WRITE_CALENDAR},
-                    MY_PERMISSIONS_REQUEST_WRITE_CALENDAR);
-        }
     }
 }

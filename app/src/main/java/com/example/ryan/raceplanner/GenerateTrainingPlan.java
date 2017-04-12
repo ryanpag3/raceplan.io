@@ -52,6 +52,10 @@ public class GenerateTrainingPlan extends AppCompatActivity
 
     }
 
+    /**
+     *  Generates a list of CalendarInfo objects to be used if the user does not want to make a new
+     *  calendar for their training plan.
+     */
     public void getCalendars()
     {
         try
@@ -72,7 +76,6 @@ public class GenerateTrainingPlan extends AppCompatActivity
             Uri uri = Calendars.CONTENT_URI;
             Cursor calCursor = cr.query(uri, projection, null, null, null);
 
-            // iterate through query
             while (calCursor.moveToNext())
             {
                 result.add(new CalendarInfo(calCursor.getLong(0), calCursor.getString(1), calCursor.getInt(3)));
@@ -85,6 +88,9 @@ public class GenerateTrainingPlan extends AppCompatActivity
         }
     }
 
+    /**
+     * Generates the spinner to select which calendar to export to.
+     */
     private void generateCalendarSelectSpinner()
     {
         // create spinner and add calendars to it for selection
@@ -117,6 +123,9 @@ public class GenerateTrainingPlan extends AppCompatActivity
         });
     }
 
+    /**
+     * Generates button that when selected will create the events.
+     */
     private void generateCalendarConfirmButton()
     {
         Button confirmCalendarButton = (Button) findViewById(R.id.confirmCalendar);
@@ -131,8 +140,15 @@ public class GenerateTrainingPlan extends AppCompatActivity
         });
     }
 
-    // this method needs to be on an asynchronous thread
-    // see: https://developer.android.com/reference/android/content/AsyncQueryHandler.html
+    /**
+     * This creates a new event for the selected calendar. This should be put on an asyncronous
+     * thread for optimization.
+     * @param curActivity current activity
+     * @param id this is the id of the calendar we are creating the event for
+     * @param startM this is the start time of the event in Milliseconds
+     * @param endM this is the end time of the event in Milliseconds
+     * @param date this is the date of the event
+     */
     public void createEvent(Activity curActivity, long id, long startM, long endM, Date date)
     {
         long calID = id;
@@ -158,7 +174,7 @@ public class GenerateTrainingPlan extends AppCompatActivity
         {
             // commented out to avoid unnecessary event additions
             //Uri uri = cr.insert(Events.CONTENT_URI, values);
-            Log.e(TAG, "Event Created");
+            Log.i(TAG, "Event Created");
 
         } catch (SecurityException e)
         {
@@ -166,7 +182,9 @@ public class GenerateTrainingPlan extends AppCompatActivity
         }
     }
 
-    // Idk if there's a better way to do this.
+    /**
+     * Object to hold the info of the calendars on the phone.
+     */
     private class CalendarInfo
     {
         private Long id;
