@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setContentView(R.layout.activity_main);
 
         requestPermissions();
-        requestAPIAuthorization();
         generateRaceTypeSpinner();
         generateExperienceLevelSpinner();
         generateDatePickerWidget();
@@ -67,17 +66,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             ActivityCompat.requestPermissions(MainActivity.this,
                     new String[]{Manifest.permission.WRITE_CALENDAR},
                     MY_PERMISSIONS_REQUEST_WRITE_CALENDAR);
-        }
-    }
-
-    private void requestAPIAuthorization()
-    {
-        if (createNewCalendar)
-        {
-
-        } else
-        {
-
         }
     }
 

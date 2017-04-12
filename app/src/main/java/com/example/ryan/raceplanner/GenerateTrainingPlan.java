@@ -2,6 +2,9 @@ package com.example.ryan.raceplanner;
 
 
 import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -23,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class GenerateTrainingPlan extends AppCompatActivity
+public class GenerateTrainingPlan extends AppCompatActivity implements CalendarAPIFragment.OnFragmentInteractionListener
 {
     private static final String TAG = GenerateTrainingPlan.class.getName();
     List<CalendarInfo> result = new ArrayList<>();
@@ -38,8 +41,19 @@ public class GenerateTrainingPlan extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_generate_training_plan);
 
+        // TODO:
+        // Prompt user if they would like to create a new Calendar for their training plan.
+        // If they select yes, call the CalendarAPIFragment to request authorization and create Calendar
+        // If no, do nothing and continue by selecting currently available Calendars in the internal API.
+        // (This can all be done inside the CalendarAPIFragment I think, so here would just call the Fragment)
+        Fragment fr = new CalendarAPIFragment();
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fm.beginTransaction();
+        fragmentTransaction.replace(R.id.activity_generate_training_plan, fr);
+        fragmentTransaction.commit();
+
         // grab date info from MainActivity
-        date = (Date) getIntent().getExtras().getParcelable(GlobalVariables.DATE_OF_RACE_ID);
+        date = getIntent().getExtras().getParcelable(GlobalVariables.DATE_OF_RACE_ID);
 
         // query list of calendars on device
         getCalendars();
@@ -180,6 +194,15 @@ public class GenerateTrainingPlan extends AppCompatActivity
         {
             Log.e(TAG, "Permission Denied");
         }
+    }
+
+    /**
+     * Required implementation for fragment instantiation, used for communicating between fragments
+     */
+    public void onFragmentInteraction()
+    {
+        // nothing to see here
+        Log.i(TAG, "WE MADE IT");
     }
 
     /**
