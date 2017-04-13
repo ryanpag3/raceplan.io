@@ -7,6 +7,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class GenerateTrainingPlan extends AppCompatActivity implements CalendarAPIFragment.OnFragmentInteractionListener
+public class GenerateTrainingPlan extends AppCompatActivity
 {
     private static final String TAG = GenerateTrainingPlan.class.getName();
     List<CalendarInfo> result = new ArrayList<>();
@@ -41,16 +42,9 @@ public class GenerateTrainingPlan extends AppCompatActivity implements CalendarA
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_generate_training_plan);
 
-        // TODO:
-        // Prompt user if they would like to create a new Calendar for their training plan.
-        // If they select yes, call the CalendarAPIFragment to request authorization and create Calendar
-        // If no, do nothing and continue by selecting currently available Calendars in the internal API.
-        // (This can all be done inside the CalendarAPIFragment I think, so here would just call the Fragment)
-        Fragment fr = new CalendarAPIFragment();
-        FragmentManager fm = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fm.beginTransaction();
-        fragmentTransaction.replace(R.id.activity_generate_training_plan, fr);
-        fragmentTransaction.commit();
+        // check position in code, moved up for debugging purposes
+        Intent intent = new Intent(GenerateTrainingPlan.this, AuthenticateCalendarAPI.class);
+        startActivity(intent);
 
         // grab date info from MainActivity
         date = getIntent().getExtras().getParcelable(GlobalVariables.DATE_OF_RACE_ID);
@@ -158,10 +152,10 @@ public class GenerateTrainingPlan extends AppCompatActivity implements CalendarA
      * This creates a new event for the selected calendar. This should be put on an asyncronous
      * thread for optimization.
      * @param curActivity current activity
-     * @param id this is the id of the calendar we are creating the event for
-     * @param startM this is the start time of the event in Milliseconds
-     * @param endM this is the end time of the event in Milliseconds
-     * @param date this is the date of the event
+     * @param id the id of the calendar we are creating the event for
+     * @param startM the start time of the event in Milliseconds
+     * @param endM the end time of the event in Milliseconds
+     * @param date the date of the event
      */
     public void createEvent(Activity curActivity, long id, long startM, long endM, Date date)
     {
@@ -197,16 +191,7 @@ public class GenerateTrainingPlan extends AppCompatActivity implements CalendarA
     }
 
     /**
-     * Required implementation for fragment instantiation, used for communicating between fragments
-     */
-    public void onFragmentInteraction()
-    {
-        // nothing to see here
-        Log.i(TAG, "WE MADE IT");
-    }
-
-    /**
-     * Object to hold the info of the calendars on the phone.
+     * holds the info of the calendars on the phone.
      */
     private class CalendarInfo
     {
