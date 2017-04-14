@@ -12,6 +12,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -32,14 +33,11 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecovera
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.DateTime;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.calendar.CalendarScopes;
-import com.google.api.services.calendar.model.Event;
-import com.google.api.services.calendar.model.Events;
+import com.google.api.services.calendar.Calendar;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -52,8 +50,8 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
 
     GoogleAccountCredential mCredential;
     private TextView mOutputText;
-    private Button mCallApiButton;
     ProgressDialog mProgress;
+    String calID;
 
     static final int REQUEST_ACCOUNT_PICKER = 1000;
     static final int REQUEST_AUTHORIZATION = 1001;
@@ -62,44 +60,51 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
 
     private static final String BUTTON_TEXT = "Call Google Calendar API";
     private static final String PREF_ACCOUNT_NAME = "accountName";
-    private static final String[] SCOPES = { CalendarScopes.CALENDAR_READONLY };
+    private static final String[] SCOPES = { CalendarScopes.CALENDAR };
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        LinearLayout activityLayout = new LinearLayout(this);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        activityLayout.setLayoutParams(lp);
-        activityLayout.setOrientation(LinearLayout.VERTICAL);
-        activityLayout.setPadding(16, 16, 16, 16);
+        setContentView(R.layout.activity_authenticate_calendar_api);
 
-        ViewGroup.LayoutParams tlp = new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-
-        mOutputText = new TextView(this);
-        mOutputText.setLayoutParams(tlp);
-        mOutputText.setPadding(16, 16, 16, 16);
-        mOutputText.setVerticalScrollBarEnabled(true);
+        mOutputText = (TextView) findViewById(R.id.mOutputText);
         mOutputText.setMovementMethod(new ScrollingMovementMethod());
         mOutputText.setText(
                 "Click the \'" + BUTTON_TEXT +"\' button to test the API.");
-        activityLayout.addView(mOutputText);
 
         mProgress = new ProgressDialog(this);
         mProgress.setMessage("Calling Google Calendar API ...");
-
-        setContentView(activityLayout);
 
         // Initialize credentials and service object.
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
 
-        getResultsFromApi();
+        final Button buttonCreateCal = (Button) findViewById(R.id.button_create_calendar);
+        final Button buttonDeleteCal = (Button) findViewById(R.id.button_delete_calendar);
+        buttonCreateCal.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                getResultsFromApi();
+
+            }
+        });
+
+        buttonDeleteCal.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                deleteResultsFromAPI();
+            }
+        });
+
+
+
+
     }
 
     /**
@@ -109,7 +114,8 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
      * of the preconditions are not satisfied, the app will prompt the user as
      * appropriate.
      */
-    private void getResultsFromApi() {
+    private void getResultsFromApi()
+    {
         if (! isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
         } else if (mCredential.getSelectedAccountName() == null) {
@@ -117,8 +123,22 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         } else if (! isDeviceOnline()) {
             mOutputText.setText("No network connection available.");
         } else {
-            new MakeRequestTask(mCredential).execute();
-            Log.i(TAG, "Calendar API authenticated.");
+            new MakeCalendarTask(mCredential).execute(R.id.button_create_calendar);
+            mOutputText.setText("Calendar created");
+        }
+    }
+
+    private void deleteResultsFromAPI()
+    {
+        if (! isGooglePlayServicesAvailable()) {
+            acquireGooglePlayServices();
+        } else if (mCredential.getSelectedAccountName() == null) {
+            chooseAccount();
+        } else if (! isDeviceOnline()) {
+            mOutputText.setText("No network connection available.");
+        } else {
+            new MakeCalendarTask(mCredential).execute(R.id.button_delete_calendar);
+            mOutputText.setText("Calendar deleted");
         }
     }
 
@@ -305,28 +325,37 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
      * Placing the API calls in their own task ensures the UI stays responsive.
      */
 
-    private class MakeRequestTask extends AsyncTask<Void, Void, Void>
+    private class MakeCalendarTask extends AsyncTask<Integer, Integer, Void>
     {
         private com.google.api.services.calendar.Calendar mService = null;
         private Exception mLastError = null;
 
-        MakeRequestTask(GoogleAccountCredential credential) {
+        MakeCalendarTask(GoogleAccountCredential credential) {
             HttpTransport transport = AndroidHttp.newCompatibleTransport();
             JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
             mService = new com.google.api.services.calendar.Calendar.Builder(
                     transport, jsonFactory, credential)
-                    .setApplicationName("Google Calendar API Android Quickstart")
+                    .setApplicationName("race-planner")
                     .build();
         }
 
         /**
          * Background task to call Google Calendar API.
-         * @param params no parameters needed for this task.
          */
         @Override
-        protected Void doInBackground(Void... params) {
+        protected Void doInBackground(Integer... id) {
             try {
-                setDataInApi();
+                switch (id[0])
+                {
+                    case R.id.button_create_calendar:
+                        createCalendarInAPI();
+                        Log.i(TAG, id[0].toString());
+                        break;
+                    case R.id.button_delete_calendar:
+                        deleteCalendarFromAPI();
+                        Log.i(TAG, id[0].toString());
+                        break;
+                }
             } catch (Exception e) {
                 mLastError = e;
                 cancel(true);
@@ -335,36 +364,52 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         }
 
         /**
-         * Fetch a list of the next 10 events from the primary calendar.
-         * @return List of Strings describing returned events.
+         * Creates new Calendar for events to be placed in.
+         * @throws IOException throws exception if input is missing
+         */
+        private void createCalendarInAPI() throws IOException {
+
+                HttpTransport transport = AndroidHttp.newCompatibleTransport();
+                JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+                mService = new Calendar.Builder(transport, jsonFactory, mCredential).setApplicationName("Race Planner").build();
+
+                // BUG: when removing library definition and adding an import, calls the wrong constructor
+                // WORKAROUND: defined all manually
+                com.google.api.services.calendar.model.Calendar calendar = new com.google.api.services.calendar.model.Calendar();
+                calendar.setSummary("Calendar for RacePlanner app");
+                calendar.setTimeZone("America/Los_Angeles");
+                com.google.api.services.calendar.model.Calendar createdCalendar = mService.calendars().insert(calendar).execute();
+
+                calID = createdCalendar.getId();
+                Log.i(TAG, createdCalendar.getId());
+        }
+
+        /**
+         * Deletes the created Calendar if
          * @throws IOException
          */
-        private void setDataInApi() throws IOException {
-                // todo
-            mOutputText.setText("SUCCESSFULLY AUTHENTICATED API");
-            Log.i(TAG, "API CALLED");
+        private void deleteCalendarFromAPI() throws IOException
+        {
+                mService.calendars().delete(calID).execute();
         }
 
 
         @Override
-        protected void onPreExecute() {
+        protected void onPreExecute()
+        {
             mOutputText.setText("");
             mProgress.show();
         }
 
         @Override
-        protected void onPostExecute(Void output) {
+        protected void onPostExecute(Void output)
+        {
             mProgress.hide();
-//            if (output == null || output.size() == 0) {
-//                mOutputText.setText("No results returned.");
-//            } else {
-//                output.add(0, "Data retrieved using the Google Calendar API:");
-//                mOutputText.setText(TextUtils.join("\n", output));
-//            }
         }
 
         @Override
-        protected void onCancelled() {
+        protected void onCancelled()
+        {
             mProgress.hide();
             if (mLastError != null) {
                 if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
@@ -376,8 +421,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),
                             AuthenticateCalendarAPI.REQUEST_AUTHORIZATION);
                 } else {
-                    mOutputText.setText("The following error occurred:\n"
-                            + mLastError.getMessage());
+                    mOutputText.setText("The following error occurred:\n" + mLastError.getMessage());
                 }
             } else {
                 mOutputText.setText("Request cancelled.");

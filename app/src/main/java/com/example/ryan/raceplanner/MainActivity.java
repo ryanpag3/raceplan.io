@@ -170,12 +170,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         {
             public void onClick(View v)
             {
+                // moved out of if statement for debugging purposes
+                Intent intent = new Intent(MainActivity.this, GenerateTrainingPlan.class);
+                intent.putExtra(GlobalVariables.DATE_OF_RACE_ID, dateOfRace);
+                startActivity(intent);
 
                 if (raceType != null && experienceLevel != null && dateOfRace != null)
                 {
-                    Intent intent = new Intent(MainActivity.this, GenerateTrainingPlan.class);
-                    intent.putExtra(GlobalVariables.DATE_OF_RACE_ID, dateOfRace);
-                    startActivity(intent);
+
                 } else
                 {
                     Toast toast = Toast.makeText(MainActivity.this, "Please select all three options", Toast.LENGTH_SHORT);
