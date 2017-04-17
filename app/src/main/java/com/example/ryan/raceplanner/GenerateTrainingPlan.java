@@ -21,6 +21,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ public class GenerateTrainingPlan extends AppCompatActivity
         setContentView(R.layout.activity_generate_training_plan);
 
         // check position in code, moved up for debugging purposes
+        // IF a boolean is set to true on GenerateTrainingPlan, call this activity
         Intent intent = new Intent(GenerateTrainingPlan.this, AuthenticateCalendarAPI.class);
         startActivity(intent);
 
@@ -54,6 +56,9 @@ public class GenerateTrainingPlan extends AppCompatActivity
 
         // create spinner and add calendars to it for selection
         generateCalendarSelectSpinner();
+
+        // create switch and listener
+        generateNewCalendarSwitch();
 
         // button generation
         generateCalendarConfirmButton();

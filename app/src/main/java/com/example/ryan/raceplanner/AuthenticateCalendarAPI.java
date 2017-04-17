@@ -68,6 +68,9 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authenticate_calendar_api);
 
+        int buttonCreateID = R.id.button_create_calendar;
+        int buttonDeleteID = R.id.button_delete_calendar;
+
         mOutputText = (TextView) findViewById(R.id.mOutputText);
         mOutputText.setMovementMethod(new ScrollingMovementMethod());
         mOutputText.setText(
@@ -81,24 +84,26 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
 
-        final Button buttonCreateCal = (Button) findViewById(R.id.button_create_calendar);
-        final Button buttonDeleteCal = (Button) findViewById(R.id.button_delete_calendar);
+        Button buttonCreateCal = (Button) findViewById(buttonCreateID);
         buttonCreateCal.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
                 getResultsFromApi();
+                Log.i(TAG, "Button create called.");
 
             }
         });
 
+        Button buttonDeleteCal = (Button) findViewById(buttonDeleteID);
         buttonDeleteCal.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
                 deleteResultsFromAPI();
+                Log.i(TAG, "Button delete called.");
             }
         });
 
@@ -132,8 +137,6 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
     {
         if (! isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
-        } else if (mCredential.getSelectedAccountName() == null) {
-            chooseAccount();
         } else if (! isDeviceOnline()) {
             mOutputText.setText("No network connection available.");
         } else {
@@ -347,6 +350,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             try {
                 switch (id[0])
                 {
+                    // commented out API calls to avoid getting timed out
                     case R.id.button_create_calendar:
                         createCalendarInAPI();
                         Log.i(TAG, id[0].toString());
@@ -376,7 +380,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                 // BUG: when removing library definition and adding an import, calls the wrong constructor
                 // WORKAROUND: defined all manually
                 com.google.api.services.calendar.model.Calendar calendar = new com.google.api.services.calendar.model.Calendar();
-                calendar.setSummary("Calendar for RacePlanner app");
+                calendar.setSummary("race-planner");
                 calendar.setTimeZone("America/Los_Angeles");
                 com.google.api.services.calendar.model.Calendar createdCalendar = mService.calendars().insert(calendar).execute();
 
@@ -385,12 +389,19 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         }
 
         /**
-         * Deletes the created Calendar if
+         * Deletes the created Calendar
          * @throws IOException
          */
         private void deleteCalendarFromAPI() throws IOException
         {
+            if (calID != null){
                 mService.calendars().delete(calID).execute();
+                Log.i(TAG, calID);
+            }
+            else
+            {
+                mOutputText.setText("No calendar to delete.");
+            }
         }
 
 

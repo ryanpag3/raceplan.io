@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import java.util.Calendar;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         generateRaceTypeSpinner();
         generateExperienceLevelSpinner();
         generateDatePickerWidget();
+        generateNewCalendarSwitch();
         generateGoButton();
 
     }
@@ -155,6 +157,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     /**
+     *
+     */
+    private void generateNewCalendarSwitch(){
+        Switch switchNewCalendar = (Switch) findViewById(R.id.main_switch_new_calendar);
+    }
+
+    /**
      * Generates the button UI element.
      * When the button is pressed and onClick is called, it checks to make sure all selections have
      * been made and then assigns an intent object to be passed to the GenerateTrainingPlan class.
@@ -171,6 +180,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             public void onClick(View v)
             {
                 // moved out of if statement for debugging purposes
+                // TODO: add if statement and switch to main page if user wants to create new calendar
+                // TODO: call AuthenticateCalendarAPI before GenerateTrainingPlan
+                // TODO: AuthenticateCalendarAPI will create the new calendar, and
+                // TODO: GenerateTrainingPlan will either
+                //   1. create a dropdown spinner for user to select their own calendar or
+                //   2. create the training plan automatically on the new calendar.
+
                 Intent intent = new Intent(MainActivity.this, GenerateTrainingPlan.class);
                 intent.putExtra(GlobalVariables.DATE_OF_RACE_ID, dateOfRace);
                 startActivity(intent);
