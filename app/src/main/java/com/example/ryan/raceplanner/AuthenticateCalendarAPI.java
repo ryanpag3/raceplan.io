@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -52,6 +53,8 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
     private TextView mOutputText;
     ProgressDialog mProgress;
     String calID;
+    Boolean buttonPressed = false;
+    Boolean calCreated = false;
 
     static final int REQUEST_ACCOUNT_PICKER = 1000;
     static final int REQUEST_AUTHORIZATION = 1001;
@@ -68,9 +71,6 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authenticate_calendar_api);
 
-        int buttonCreateID = R.id.button_create_calendar;
-        int buttonDeleteID = R.id.button_delete_calendar;
-
         mOutputText = (TextView) findViewById(R.id.mOutputText);
         mOutputText.setMovementMethod(new ScrollingMovementMethod());
         mOutputText.setText(
@@ -84,26 +84,46 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
 
-        Button buttonCreateCal = (Button) findViewById(buttonCreateID);
+        final Button buttonCreateCal = (Button) findViewById(R.id.button_create_calendar);
         buttonCreateCal.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
                 getResultsFromApi();
+                buttonPressed = true;
                 Log.i(TAG, "Button create called.");
 
             }
         });
 
-        Button buttonDeleteCal = (Button) findViewById(buttonDeleteID);
+        Button buttonDeleteCal = (Button) findViewById(R.id.button_delete_calendar);
         buttonDeleteCal.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
                 deleteResultsFromAPI();
+                buttonPressed = true;
                 Log.i(TAG, "Button delete called.");
+            }
+        });
+
+        Button buttonFinishActivity = (Button) findViewById(R.id.button_finish_authenticate_api);
+        buttonFinishActivity.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if (buttonPressed)
+                {
+                    Intent intent = new Intent(AuthenticateCalendarAPI.this, GenerateTrainingPlan.class);
+                    intent.putExtra(GlobalVariables.RACER_INFO_ID, getIntent().getExtras().getParcelable(GlobalVariables.RACER_INFO_ID));
+                    intent.putExtra(GlobalVariables.CALENDAR_CREATED_ID, calCreated);
+                    startActivity(intent);
+                } else {
+                    Log.i(TAG, "calendar not created yet");
+                }
             }
         });
 
@@ -370,8 +390,11 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         /**
          * Creates new Calendar for events to be placed in.
          * @throws IOException throws exception if input is missing
+         * TODO: calID can only check for
          */
         private void createCalendarInAPI() throws IOException {
+            if (calID == null)
+            {
 
                 HttpTransport transport = AndroidHttp.newCompatibleTransport();
                 JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
@@ -383,9 +406,14 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                 calendar.setSummary("race-planner");
                 calendar.setTimeZone("America/Los_Angeles");
                 com.google.api.services.calendar.model.Calendar createdCalendar = mService.calendars().insert(calendar).execute();
+                calCreated = true;
 
                 calID = createdCalendar.getId();
                 Log.i(TAG, createdCalendar.getId());
+            } else
+            {
+                mOutputText.setText("Calendar already created.");
+            }
         }
 
         /**
@@ -396,6 +424,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         {
             if (calID != null){
                 mService.calendars().delete(calID).execute();
+                calCreated = false;
                 Log.i(TAG, calID);
             }
             else

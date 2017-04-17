@@ -33,8 +33,9 @@ public class GenerateTrainingPlan extends AppCompatActivity
     private static final String TAG = GenerateTrainingPlan.class.getName();
     List<CalendarInfo> result = new ArrayList<>();
     List<String> namesOfCalendars = new ArrayList<>();
-    Date date;
+    RacerInfo racerInfo;
     Long calID;
+    private boolean calCreated;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -43,26 +44,35 @@ public class GenerateTrainingPlan extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_generate_training_plan);
 
-        // check position in code, moved up for debugging purposes
-        // IF a boolean is set to true on GenerateTrainingPlan, call this activity
-        Intent intent = new Intent(GenerateTrainingPlan.this, AuthenticateCalendarAPI.class);
-        startActivity(intent);
+//        // check position in code, moved up for debugging purposes
+//        // IF a boolean is set to true on GenerateTrainingPlan, call this activity
+//        Intent intent = new Intent(GenerateTrainingPlan.this, AuthenticateCalendarAPI.class);
+//        startActivity(intent);
 
-        // grab date info from MainActivity
-        date = getIntent().getExtras().getParcelable(GlobalVariables.DATE_OF_RACE_ID);
+        // grab data from previous activity
+        racerInfo = getIntent().getExtras().getParcelable(GlobalVariables.RACER_INFO_ID);
+        calCreated = getIntent().getExtras().getBoolean(GlobalVariables.CALENDAR_CREATED_ID);
+        if (calCreated)
+        {
+            TextView textView = (TextView) findViewById(R.id.textView);
+            textView.setText("Your race type is: " + racerInfo.raceType + '\n'
+                    + "Your experience level is: " + racerInfo.experienceLevel + '\n'
+                    + "The date of your race is: " + racerInfo.year + "/" + racerInfo.month + "/" + racerInfo.day);
+            Spinner spinner = (Spinner) findViewById(R.id.spinner_calendar_select);
+            spinner.setVisibility(View.GONE);
+            generateCalendarConfirmButton();
+        }
+        else
+        {
+            // query list of calendars on device
+            getCalendars();
 
-        // query list of calendars on device
-        getCalendars();
+            // create spinner and add calendars to it for selection
+            generateCalendarSelectSpinner();
 
-        // create spinner and add calendars to it for selection
-        generateCalendarSelectSpinner();
-
-        // create switch and listener
-        generateNewCalendarSwitch();
-
-        // button generation
-        generateCalendarConfirmButton();
-
+            // button generation
+            generateCalendarConfirmButton();
+        }
     }
 
     /**
@@ -109,7 +119,7 @@ public class GenerateTrainingPlan extends AppCompatActivity
         // create spinner and add calendars to it for selection
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, namesOfCalendars);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        Spinner calendarSelect = (Spinner) findViewById(R.id.calendarSelect);
+        Spinner calendarSelect = (Spinner) findViewById(R.id.spinner_calendar_select);
         calendarSelect.setAdapter(adapter);
         calendarSelect.setOnItemSelectedListener(new OnItemSelectedListener()
         {
@@ -119,7 +129,7 @@ public class GenerateTrainingPlan extends AppCompatActivity
                 // set calendar to be edited with training plan
                 switch (parent.getId())
                 {
-                    case R.id.calendarSelect:
+                    case R.id.spinner_calendar_select:
                     {
                         TextView textView = (TextView) findViewById(R.id.textView);
                         textView.setText(result.get(position).id.toString() + " | " + result.get(position).name);
@@ -131,7 +141,7 @@ public class GenerateTrainingPlan extends AppCompatActivity
             @Override
             public void onNothingSelected(AdapterView<?> parent)
             {
-
+                // nothing to see here
             }
         });
     }
@@ -148,7 +158,7 @@ public class GenerateTrainingPlan extends AppCompatActivity
             public void onClick(View v)
             {
                 // create dummy event for testing
-                createEvent(GenerateTrainingPlan.this, calID, 0, 0, date);
+                createEvent(GenerateTrainingPlan.this, calID, 0, 0, racerInfo);
             }
         });
     }
@@ -160,19 +170,19 @@ public class GenerateTrainingPlan extends AppCompatActivity
      * @param id the id of the calendar we are creating the event for
      * @param startM the start time of the event in Milliseconds
      * @param endM the end time of the event in Milliseconds
-     * @param date the date of the event
+     * @param racerInfo the date of the event
      */
-    public void createEvent(Activity curActivity, long id, long startM, long endM, Date date)
+    public void createEvent(Activity curActivity, long id, long startM, long endM, RacerInfo racerInfo)
     {
         long calID = id;
         long startMillis = startM;
         long endMillis = endM;
-        Date dateOfEvent = date;
+        RacerInfo dateOfEvent = racerInfo;
         Calendar beginTime = Calendar.getInstance();
-        beginTime.set(date.getYear(), date.getMonth(), date.getDay(), 0, 0);
+        beginTime.set(racerInfo.getYear(), racerInfo.getMonth(), racerInfo.getDay(), 0, 0);
         startMillis = beginTime.getTimeInMillis();
         Calendar endTime = Calendar.getInstance();
-        endTime.set(date.getYear(), date.getMonth(), date.getDay(), 0, 0);
+        endTime.set(racerInfo.getYear(), racerInfo.getMonth(), racerInfo.getDay(), 0, 0);
         endMillis = endTime.getTimeInMillis();
 
         ContentResolver cr = getContentResolver();

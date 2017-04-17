@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -29,9 +30,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private boolean createNewCalendar = false;
     Spinner raceTypeSpinner;
     Spinner experienceLevelSpinner;
-    String raceType;
-    String experienceLevel;
-    Date dateOfRace;
+    RacerInfo racerInfo = new RacerInfo();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -88,12 +87,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             switch (parent.getId())
             {
                 case R.id.spinner:
-                    raceType = (String) parent.getItemAtPosition(pos);
+                    racerInfo.raceType = (String) parent.getItemAtPosition(pos);
                     Log.i(TAG, "View: " + view.toString());
                     break;
 
                 case R.id.expSpinner:
-                    experienceLevel = (String) parent.getItemAtPosition(pos);
+                    racerInfo.experienceLevel = (String) parent.getItemAtPosition(pos);
                     Log.i(TAG, view.toString());
                     break;
             }
@@ -116,7 +115,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         @Override
         public void onDateChanged(DatePicker parent, int year, int month, int day)
         {
-            dateOfRace = new Date(year, month, day);
+            racerInfo.year = year;
+            racerInfo.month = month + 1; // zero based index for month
+            racerInfo.day = day;
         }
 
     }
@@ -161,6 +162,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      */
     private void generateNewCalendarSwitch(){
         Switch switchNewCalendar = (Switch) findViewById(R.id.main_switch_new_calendar);
+        switchNewCalendar.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        {
+                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+                 {
+                     if(isChecked)
+                     {
+                         createNewCalendar = true;
+                     } else
+                     {
+                         createNewCalendar = false;
+                     }
+                 }
+        });
     }
 
     /**
@@ -179,20 +193,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         {
             public void onClick(View v)
             {
-                // moved out of if statement for debugging purposes
-                // TODO: add if statement and switch to main page if user wants to create new calendar
-                // TODO: call AuthenticateCalendarAPI before GenerateTrainingPlan
-                // TODO: AuthenticateCalendarAPI will create the new calendar, and
-                // TODO: GenerateTrainingPlan will either
-                //   1. create a dropdown spinner for user to select their own calendar or
-                //   2. create the training plan automatically on the new calendar.
-
-                Intent intent = new Intent(MainActivity.this, GenerateTrainingPlan.class);
-                intent.putExtra(GlobalVariables.DATE_OF_RACE_ID, dateOfRace);
-                startActivity(intent);
-
-                if (raceType != null && experienceLevel != null && dateOfRace != null)
+                // check for correct selections
+                if (/*racerInfo.isComplete()*/ true)
                 {
+                    if(createNewCalendar)
+                    {
+                        Intent intent = new Intent(MainActivity.this, AuthenticateCalendarAPI.class);
+                        intent.putExtra(GlobalVariables.RACER_INFO_ID, racerInfo);
+                        startActivity(intent);
+                    } else
+                    {
+                        Intent intent = new Intent(MainActivity.this, GenerateTrainingPlan.class);
+                        intent.putExtra(GlobalVariables.RACER_INFO_ID, racerInfo);
+                        startActivity(intent);
+                    }
 
                 } else
                 {

@@ -8,7 +8,8 @@ import android.app.Application;
 
 public class GlobalVariables extends Application
 {
-    public static final String DATE_OF_RACE_ID = "dateOfRace";
+    public static final String RACER_INFO_ID = "RACER_INFO_ID";
+    public static final String CALENDAR_CREATED_ID = "CALENDAR_CREATED_ID";
     public static final int MY_PERMISSIONS_REQUEST_READ_CALENDAR = 1;
     public static final int MY_PERMISSIONS_REQUEST_WRITE_CALENDAR = 2;
 }
