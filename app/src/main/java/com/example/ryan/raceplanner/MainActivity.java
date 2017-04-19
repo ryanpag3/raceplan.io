@@ -68,6 +68,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     new String[]{Manifest.permission.WRITE_CALENDAR},
                     MY_PERMISSIONS_REQUEST_WRITE_CALENDAR);
         }
+
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_SYNC_SETTINGS) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{Manifest.permission.READ_SYNC_SETTINGS},
+                    MY_PERMISSIONS_REQUEST_READ_SYNC_SETTINGS);
+        }
     }
 
 

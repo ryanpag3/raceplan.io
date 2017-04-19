@@ -1,16 +1,19 @@
 package com.example.ryan.raceplanner;
 
 import android.Manifest;
+import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.provider.CalendarContract;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
@@ -91,6 +94,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             public void onClick(View v)
             {
                 getResultsFromApi();
+                requestCalendarSync();
                 buttonPressed = true;
                 Log.i(TAG, "Button create called.");
 
@@ -104,6 +108,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             public void onClick(View v)
             {
                 deleteResultsFromAPI();
+                requestCalendarSync();
                 buttonPressed = true;
                 Log.i(TAG, "Button delete called.");
             }
@@ -120,18 +125,34 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                     Intent intent = new Intent(AuthenticateCalendarAPI.this, GenerateTrainingPlan.class);
                     intent.putExtra(GlobalVariables.RACER_INFO_ID, getIntent().getExtras().getParcelable(GlobalVariables.RACER_INFO_ID));
                     intent.putExtra(GlobalVariables.CALENDAR_CREATED_ID, calCreated);
+                    intent.putExtra(GlobalVariables.CALENDAR_ID, calID);
                     startActivity(intent);
                 } else {
                     Log.i(TAG, "calendar not created yet");
                 }
             }
         });
-
-
-
-
     }
 
+    private void requestCalendarSync()
+    {
+        AccountManager accManagager = AccountManager.get(this);
+        Account[] accounts = accManagager.getAccounts();
+
+        for (Account account : accounts)
+        {
+            int isSyncable = ContentResolver.getIsSyncable(account, CalendarContract.AUTHORITY);
+
+            if (isSyncable > 1)
+            {
+                Bundle extras = new Bundle();
+                extras.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+                // the code example i used pulls only the first account (accounts[0])
+                // might need to change to account
+                ContentResolver.requestSync(account, CalendarContract.AUTHORITY, extras);
+            }
+        }
+    }
     /**
      * Attempt to call the API, after verifying that all the preconditions are
      * satisfied. The preconditions are: Google Play Services installed, an

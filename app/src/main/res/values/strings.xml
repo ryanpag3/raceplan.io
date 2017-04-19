@@ -17,7 +17,7 @@
     </string-array>
     <string name="main_todo_title">PRE-ALPHA BUILD</string>
 
-    <string name="generate_event_button">CREATE EVENT</string>
+    <string name="generate_event_button">FINISH</string>
 
     <string name="main_switch_sidetext">Would you like to create a new calendar?</string>
 

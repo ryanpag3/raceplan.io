@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
 
     <!--  -->
     <application
@@ -31,6 +32,17 @@
         <activity android:name=".AuthenticateCalendarAPI"
                   android:screenOrientation="portrait">
         </activity>
+
+        <!--<service android:name=".sync.mySyncService" android:exported="true">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.content.SyncAdapter"/>-->
+            <!--</intent-filter>-->
+            <!--<meta-data-->
+                <!--android:name="android.content.SyncAdapter"-->
+                <!--android:resource-->
+
+        <!--</service>-->
     </application>
+
 
 </manifest>
