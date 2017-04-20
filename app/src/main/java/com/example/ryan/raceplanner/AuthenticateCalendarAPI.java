@@ -20,6 +20,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.format.DateFormat;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -37,13 +38,18 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecovera
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.DateTime;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventDateTime;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -94,7 +100,6 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             public void onClick(View v)
             {
                 getResultsFromApi();
-                requestCalendarSync();
                 buttonPressed = true;
                 Log.i(TAG, "Button create called.");
 
@@ -108,9 +113,19 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             public void onClick(View v)
             {
                 deleteResultsFromAPI();
-                requestCalendarSync();
                 buttonPressed = true;
                 Log.i(TAG, "Button delete called.");
+            }
+        });
+
+        Button buttonCreateEvent = (Button) findViewById(R.id.button_create_event);
+        buttonCreateEvent.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                createEventsInAPI();
+                Log.i(TAG, "event creator called");
             }
         });
 
@@ -134,25 +149,6 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         });
     }
 
-    private void requestCalendarSync()
-    {
-        AccountManager accManagager = AccountManager.get(this);
-        Account[] accounts = accManagager.getAccounts();
-
-        for (Account account : accounts)
-        {
-            int isSyncable = ContentResolver.getIsSyncable(account, CalendarContract.AUTHORITY);
-
-            if (isSyncable > 1)
-            {
-                Bundle extras = new Bundle();
-                extras.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-                // the code example i used pulls only the first account (accounts[0])
-                // might need to change to account
-                ContentResolver.requestSync(account, CalendarContract.AUTHORITY, extras);
-            }
-        }
-    }
     /**
      * Attempt to call the API, after verifying that all the preconditions are
      * satisfied. The preconditions are: Google Play Services installed, an
@@ -184,6 +180,11 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             new MakeCalendarTask(mCredential).execute(R.id.button_delete_calendar);
             mOutputText.setText("Calendar deleted");
         }
+    }
+
+    private void createEventsInAPI()
+    {
+        new MakeCalendarTask(mCredential).execute(R.id.button_create_event);
     }
 
     /**
@@ -400,6 +401,9 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                         deleteCalendarFromAPI();
                         Log.i(TAG, id[0].toString());
                         break;
+                    case R.id.button_create_event:
+                        createEventInAPI();
+                        Log.i(TAG, id[0].toString());
                 }
             } catch (Exception e) {
                 mLastError = e;
@@ -452,6 +456,28 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             {
                 mOutputText.setText("No calendar to delete.");
             }
+        }
+
+        private void createEventInAPI() throws IOException
+        {
+            Event event = new Event()
+                    .setSummary("Test Event")
+                    .setDescription("Test Description");
+
+            DateTime startDateTime = new DateTime("2017-04-20T00:00:00-07:00");
+            EventDateTime start = new EventDateTime()
+                    .setDateTime(startDateTime)
+                    .setTimeZone("America/Los_Angeles");
+            event.setStart(start);
+
+            DateTime endDateTime = new DateTime("2017-04-20T00:00:00-07:00");
+            EventDateTime end = new EventDateTime()
+                    .setDateTime(endDateTime)
+                    .setTimeZone("America/Los_Angeles");
+            event.setEnd(end);
+
+            event = mService.events().insert(calID, event).execute();
+
         }
 
 

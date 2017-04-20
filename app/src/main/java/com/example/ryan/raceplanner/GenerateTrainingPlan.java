@@ -38,10 +38,10 @@ import java.util.List;
 public class GenerateTrainingPlan extends AppCompatActivity
 {
     private static final String TAG = GenerateTrainingPlan.class.getName();
-    List<CalendarInfo> result = new ArrayList<>();
     List<String> namesOfCalendars = new ArrayList<>();
     RacerInfo racerInfo;
-    Long calID;
+    String calName;
+    Long id;
     private boolean calCreated;
 
     @Override
@@ -60,6 +60,12 @@ public class GenerateTrainingPlan extends AppCompatActivity
         racerInfo  = getIntent().getExtras().getParcelable(GlobalVariables.RACER_INFO_ID);
         calCreated = getIntent().getExtras().getBoolean(GlobalVariables.CALENDAR_CREATED_ID);
 
+        List<CalendarInfo> calendars = getCalendarList();
+        for (CalendarInfo c : calendars)
+        {
+            Log.i(TAG, c.name + " " + c.id);
+        }
+
         if (calCreated)
         {
             TextView textView = (TextView) findViewById(R.id.textView);
@@ -67,28 +73,68 @@ public class GenerateTrainingPlan extends AppCompatActivity
                     + "Your experience level is: " + racerInfo.experienceLevel + '\n'
                     + "The date of your race is: " + racerInfo.year + "/" + racerInfo.month + "/" + racerInfo.day);
             Spinner spinner = (Spinner) findViewById(R.id.spinner_calendar_select);
-            spinner.setVisibility(View.GONE);
+            //spinner.setVisibility(View.GONE);
+            id = getCalendar("race-planner");
+            Log.i(TAG, "calCreated called...");
+            generateCalendarSelectSpinner(calendars);
             generateCalendarConfirmButton();
         }
         else
         {
-            // query list of calendars on device
-            getCalendars();
+
 
             // create spinner and add calendars to it for selection
-            generateCalendarSelectSpinner();
+            generateCalendarSelectSpinner(calendars);
 
             // button generation
             generateCalendarConfirmButton();
         }
     }
 
+    public List<CalendarInfo> getCalendarList()
+    {
+        List<CalendarInfo> result = new ArrayList<>();
+        namesOfCalendars = new ArrayList<>();
+        try
+        {
+            // See "Querying a Calendar"
+            // https://developer.android.com/guide/topics/providers/calendar-provider.html
+            String[] projection = new String[]{
+                    Calendars._ID,
+                    Calendars.NAME,
+                    Calendars.ACCOUNT_NAME,
+                    Calendars.ACCOUNT_TYPE
+            };
+
+            // ContentResolver receives a URI to a specific Content Provider
+            // Content Providers provide an interface to query content
+            // Cursors use ContentResolvers to iterate through
+            ContentResolver cr = getContentResolver();
+            Uri uri = Calendars.CONTENT_URI;
+            Cursor calCursor;
+            calCursor = cr.query(uri, projection, null, null, null);
+
+            while (calCursor.moveToNext())
+            {
+                result.add(new CalendarInfo(calCursor.getLong(0), calCursor.getString(1)));
+                namesOfCalendars.add(calCursor.getString(1));
+            }
+            calCursor.close();
+        } catch (SecurityException e)
+        {
+            Log.e(TAG, "Permission Denied. Did you set permissions?");
+        }
+        return result;
+    }
+
+
     /**
      *  Generates a list of CalendarInfo objects to be used if the user does not want to make a new
      *  calendar for their training plan.
      */
-    public void getCalendars()
+    public long getCalendar(String calName)
     {
+        long ID = -1;
         try
         {
             // See "Querying a Calendar"
@@ -109,42 +155,27 @@ public class GenerateTrainingPlan extends AppCompatActivity
 
             while (calCursor.moveToNext())
             {
-                result.add(new CalendarInfo(calCursor.getLong(0), calCursor.getString(1)));
-                namesOfCalendars.add(calCursor.getString(1));
+                String temp = calCursor.getString(1);
+                if (calCursor.getString(1).equals(calName))
+                {
+                    ID = calCursor.getLong(0);
+                    break;
+                }
             }
             calCursor.close();
         } catch (SecurityException e)
         {
             Log.e(TAG, "Permission Denied. Did you set permissions?");
         }
+        return ID;
     }
 
-    private void requestCalendarSync()
-    {
-        AccountManager accManagager = AccountManager.get(this);
-        Account[] accounts = accManagager.getAccounts();
-
-        for (Account account : accounts)
-        {
-            int isSyncable = ContentResolver.getIsSyncable(account, CalendarContract.AUTHORITY);
-
-            if (isSyncable > 1)
-            {
-                Bundle extras = new Bundle();
-                extras.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-                // the code example i used pulls only the first account (accounts[0])
-                // might need to change to account
-                ContentResolver.requestSync(account, CalendarContract.AUTHORITY, extras);
-            }
-        }
-    }
 
     /**
      * Generates the spinner to select which calendar to export to.
      */
-    private void generateCalendarSelectSpinner()
+    private void generateCalendarSelectSpinner(final List<CalendarInfo> calendars)
     {
-
         // create spinner and add calendars to it for selection
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, namesOfCalendars);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -161,8 +192,9 @@ public class GenerateTrainingPlan extends AppCompatActivity
                     case R.id.spinner_calendar_select:
                     {
                         TextView textView = (TextView) findViewById(R.id.textView);
-                        textView.setText(result.get(position).id + " | " + result.get(position).name);
-                        calID = result.get(position).id;
+                        textView.setText(calendars.get(position).id + " | " + calendars.get(position).name);
+                        //calID = calendars.get(position).id;
+                        calName = namesOfCalendars.get(position);
                     }
                 }
             }
@@ -186,10 +218,9 @@ public class GenerateTrainingPlan extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                getCalendars();
+                id = getCalendar(calName);
                 // create dummy event for testing
-                new MakeTrainingPlanTask(racerInfo).execute();
-                requestCalendarSync();
+                new MakeTrainingPlanTask(racerInfo, id).execute();
 
             }
         });
@@ -218,39 +249,34 @@ public class GenerateTrainingPlan extends AppCompatActivity
         }
     }
 
-    private class MakeTrainingPlanTask extends AsyncTask<Void, Void, Void>
+    private class MakeTrainingPlanTask extends AsyncTask<Long, Void, Void>
     {
         private int year;
         private int month;
         private int day;
+        private Long id;
         private String raceType;
         private String experienceLevel;
 
-        MakeTrainingPlanTask(RacerInfo racerInfo)
+        MakeTrainingPlanTask(RacerInfo racerInfo, Long i)
         {
             year = racerInfo.year;
             month = racerInfo.month;
             day = racerInfo.day;
             raceType = racerInfo.raceType;
             experienceLevel = racerInfo.experienceLevel;
+            id = i;
         }
 
         @Override
-        public Void doInBackground(Void... params)
+        public Void doInBackground(Long... params)
         {
-            for (int i = 0; i < result.size(); i++)
-            {
-                if (result.get(i).name.equals("race-planner"))
-                {
-                    calID = result.get(i).id;
-                }
-            }
-            createEvent(GenerateTrainingPlan.this, racerInfo);
+            createEvent(id, racerInfo);
             return null;
         }
     }
 
-    public void createEvent(Activity curActivity, RacerInfo racerInfo)
+    public void createEvent(Long calID, RacerInfo racerInfo)
     {
         Calendar beginTime = Calendar.getInstance();
         beginTime.set(racerInfo.getYear(), racerInfo.getMonth() - 1, racerInfo.getDay(), 0, 0);
@@ -273,6 +299,20 @@ public class GenerateTrainingPlan extends AppCompatActivity
         {
             // commented out to avoid unnecessary event additions
             Uri uri = cr.insert(Events.CONTENT_URI, values);
+
+            // Force a sync
+            Bundle extras = new Bundle();
+            extras.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+            extras.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+            AccountManager am = AccountManager.get(this);
+            Account[] acc = am.getAccountsByType("com.google");
+            Account account = null;
+            if (acc.length>0) {
+                account=acc[0];
+                ContentResolver.requestSync(account, "com.android.calendar", extras);
+                Log.i(TAG, account.toString());
+            }
+
             Log.i(TAG, calID.toString());
             Log.i(TAG, "Event Created");
 
