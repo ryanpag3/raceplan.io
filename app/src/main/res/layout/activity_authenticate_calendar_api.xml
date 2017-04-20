@@ -23,14 +23,16 @@
         android:layout_above="@+id/button_delete_calendar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="press to create calendar"/>
+        android:text="press to create calendar"
+        android:layout_centerHorizontal="true"/>
     <Button
         android:id="@+id/button_delete_calendar"
         android:layout_above="@+id/button_finish_authenticate_api"
-        android:layout_marginBottom="72dp"
+        android:layout_marginBottom="16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="press to delete calendar"/>
+        android:text="press to delete calendar"
+        android:layout_centerHorizontal="true"/>
     <Button
         android:id="@+id/button_finish_authenticate_api"
         android:layout_alignParentBottom="true"
@@ -38,10 +40,12 @@
         android:layout_height="wrap_content"
         android:text="finish"/>
     <Button
-        android:id="@+id/button_create_event"
+        android:id="@+id/button_create_training_plan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="create event"
+        android:text="create training plan"
+        android:layout_above="@+id/button_create_calendar"
+        android:layout_marginBottom="16dp"
         />
 
 

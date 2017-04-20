@@ -1,8 +1,13 @@
 package com.example.ryan.raceplanner;
 
 
+import android.icu.util.Calendar;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by ryan on 4/7/17.
@@ -12,15 +17,15 @@ public class RacerInfo implements Parcelable
 {
     String raceType;
     String experienceLevel;
+    Date date;
     int year;
     int month;
     int day;
 
     RacerInfo(int y, int m, int d, String r, String e)
     {
-        year = y;
-        month = m;
-        day = d;
+
+        date = new Date(y, m, d);
         raceType = r;
         experienceLevel = e;
     }
