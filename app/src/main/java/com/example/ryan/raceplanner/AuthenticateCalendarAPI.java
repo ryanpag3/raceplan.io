@@ -39,6 +39,7 @@ import com.google.api.services.calendar.model.EventDateTime;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -65,6 +66,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
     RacerInfo racerInfo;
     Date raceDate;
     private TextView mOutputText;
+    List<List<String>> trainingPlans;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -101,7 +103,6 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             {
                 createCalendar();
                 buttonPressed = true;
-                Log.i(TAG, "Button create called.");
 
             }
         });
@@ -114,7 +115,6 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             {
                 deleteCalendar();
                 buttonPressed = true;
-                Log.i(TAG, "Button delete called.");
             }
         });
 
@@ -124,8 +124,17 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             @Override
             public void onClick(View v)
             {
-                createEvent();
-                Log.i(TAG, "event creator called");
+                createTrainingPlan();
+            }
+        });
+
+        Button buttonDeleteTrainingPlan = (Button) findViewById(R.id.button_delete_training_plan);
+        buttonDeleteTrainingPlan.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                deleteTrainingPlan();
             }
         });
 
@@ -149,6 +158,19 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         });
     }
 
+    private boolean meetsPreReqs()
+    {
+        if (!isGooglePlayServicesAvailable()) {
+            acquireGooglePlayServices();
+        } else if (mCredential.getSelectedAccountName() == null) {
+            chooseAccount();
+        } else if (!isDeviceOnline()) {
+            mOutputText.setText("No network connection available.");
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Attempt to call the API, after verifying that all the preconditions are
      * satisfied. The preconditions are: Google Play Services installed, an
@@ -158,13 +180,8 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
      */
     private void createCalendar()
     {
-        if (! isGooglePlayServicesAvailable()) {
-            acquireGooglePlayServices();
-        } else if (mCredential.getSelectedAccountName() == null) {
-            chooseAccount(1);
-        } else if (! isDeviceOnline()) {
-            mOutputText.setText("No network connection available.");
-        } else {
+        if (meetsPreReqs())
+        {
             new MakeCalendarTask(mCredential).execute(R.id.button_create_calendar);
             mOutputText.setText("Calendar created");
         }
@@ -172,31 +189,29 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
 
     private void deleteCalendar()
     {
-        if (! isGooglePlayServicesAvailable()) {
-            acquireGooglePlayServices();
-        } else if (mCredential.getSelectedAccountName() == null) {
-            chooseAccount(2);
-        } else if (! isDeviceOnline()) {
-            mOutputText.setText("No network connection available.");
-        } else {
+        if (meetsPreReqs())
+        {
             new MakeCalendarTask(mCredential).execute(R.id.button_delete_calendar);
             mOutputText.setText("Calendar deleted");
         }
     }
 
-    private void createEvent()
+    private void createTrainingPlan()
     {
-        if (! isGooglePlayServicesAvailable()) {
-            acquireGooglePlayServices();
-        } else if (mCredential.getSelectedAccountName() == null) {
-            chooseAccount(3);
-        } else if (! isDeviceOnline()) {
-            mOutputText.setText("No network connection available.");
-        } else {
+        if (meetsPreReqs())
+        {
             new MakeCalendarTask(mCredential).execute(R.id.button_create_training_plan);
             mOutputText.setText("Training plan created.");
         }
+    }
 
+    private void deleteTrainingPlan()
+    {
+        if (meetsPreReqs())
+        {
+            new MakeCalendarTask(mCredential).execute(R.id.button_delete_training_plan);
+            mOutputText.setText("Training plan events deleted.");
+        }
     }
 
     /**
@@ -210,26 +225,14 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
      * is granted.
      */
     @AfterPermissionGranted(REQUEST_PERMISSION_GET_ACCOUNTS)
-    private void chooseAccount(int i) {
+    private void chooseAccount() {
         if (EasyPermissions.hasPermissions(
                 this, Manifest.permission.GET_ACCOUNTS)) {
             String accountName = getPreferences(Context.MODE_PRIVATE)
                     .getString(PREF_ACCOUNT_NAME, null);
             if (accountName != null) {
                 mCredential.setSelectedAccountName(accountName);
-                // i = identifier for calling original method
-                switch (i)
-                {
-                    case 1:
-                        createCalendar();
-                        break;
-                    case 2:
-                        deleteCalendar();
-                        break;
-                    case 3:
-                        createEvent();
-                        break;
-                }
+                meetsPreReqs();
             } else {
                 // Start a dialog from which the user can choose an account
                 startActivityForResult(
@@ -414,9 +417,9 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         @Override
         protected Void doInBackground(Integer... id) {
             try {
+                trainingPlans = new ArrayList<>();
                 switch (id[0])
                 {
-                    // commented out API calls to avoid getting timed out
                     case R.id.button_create_calendar:
                         createCalendarInAPI();
                         Log.i(TAG, id[0].toString());
@@ -444,7 +447,9 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                         }
                         Log.i(TAG, id[0].toString());
                     }
-
+                    case R.id.button_delete_training_plan:
+                        deleteTrainingPlanTask();
+                        break;
                 }
             } catch (Exception e) {
                 mLastError = e;
@@ -470,7 +475,6 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                 calCreated = true;
 
                 calID = createdCalendar.getId();
-                Log.i(TAG, createdCalendar.getId());
             } else
             {
                 //mOutputText.setText("Calendar already created.");
@@ -486,12 +490,27 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             if (isRacePlannerCalendarCreated()){
                 mService.calendars().delete(calID).execute();
                 calCreated = false;
-                Log.i(TAG, calID);
             }
             else
             {
                 mOutputText.setText("No calendar to delete.");
             }
+        }
+
+        private void deleteTrainingPlanTask() throws IOException
+        {
+            for (List<String> l : trainingPlans)
+            {
+                for (int i = 1; i < l.size(); i++)
+                {
+                    deleteEventByID(l.get(i));
+                }
+            }
+        }
+
+        private void deleteEventByID(String ID) throws IOException
+        {
+            mService.events().delete(calID, ID).execute();
         }
 
         private boolean isRacePlannerCalendarCreated() throws IOException
@@ -500,7 +519,6 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             String pageToken = null;
             do
             {
-                Log.i(TAG, mCredential.toString());
                 CalendarList calendarList = mService.calendarList().list().setPageToken(pageToken).execute();
                 List<CalendarListEntry> items = calendarList.getItems();
 
@@ -513,8 +531,6 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                         Log.i(TAG, "isRacePlannerCalendarCreated returned true");
                         return true;
                     }
-                    Log.i(TAG, "Summary: " + calendarListEntry.getSummary());
-                    Log.i(TAG, "ID: " + calendarListEntry.getId());
                 }
                 pageToken = calendarList.getNextPageToken();
             } while (pageToken != null);
@@ -536,7 +552,8 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             Date startDate = new Date(raceDate.getTime() - (604800000L * weeksOfTraining)); // amount of millis in a week * 8 weeks
             Date tuesday = startDate;
             SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
-            Log.i(TAG, startDate + " " + raceDate);
+            List<String> eventIDs = new ArrayList<>();
+            eventIDs.add("5k");
 
             switch (racerInfo.experienceLevel)
             {
@@ -561,7 +578,6 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             while (!sdf.format(tuesday).equals("Tuesday"))
             {
                 tuesday = new Date(tuesday.getTime() + 86400000);
-                Log.i(TAG,"START DATE: " + startDate.toString() + " " + sdf.format(startDate));
             }
 
             Date wednesday = new Date(tuesday.getTime() + dayInMillis);
@@ -573,41 +589,38 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             wednesdayMiles = startingMiles + 1;
             thursdayMiles = startingMiles;
 
-            // iterate and create events
             for (int i = 0; i < weeksOfTraining; i++)
             {
-                Log.i(TAG, tuesday.toString());
-                Log.i(TAG, wednesday.toString());
-                Log.i(TAG, thursday.toString());
-                Log.i(TAG, sunday.toString());
-
-                // i dont really like the way this looks but it works
-                if (tuesday.getTime()   < raceDate.getTime())createEventInAPI(tuesday,   Double.toString(tuesdayMiles));
-                if (wednesday.getTime() < raceDate.getTime())createEventInAPI(wednesday, Double.toString(wednesdayMiles));
-                if (thursday.getTime()  < raceDate.getTime())createEventInAPI(thursday,  Double.toString(thursdayMiles));
-
-                // changes name for halfway point practice race
-                if (i == (weeksOfTraining / 2) - 2)
-                {
-                    createEventInAPI(sunday, racerInfo.raceType + " Practice!");
-                } else
-                {
-                    if (sunday.getTime() < raceDate.getTime())createEventInAPI(sunday, Double.toString(sundayMiles));
-                }
+                if (tuesday.getTime()   < raceDate.getTime())eventIDs.add(createEventInAPI(tuesday, Double.toString(tuesdayMiles)));
+                if (tuesdayMiles < goalMiles) { tuesdayMiles = tuesdayMiles + bumpMileageUp; }
                 tuesday   = getOneWeekLater(tuesday);
-                wednesday = getOneWeekLater(wednesday);
-                thursday  = getOneWeekLater(thursday);
-                sunday    = getOneWeekLater(sunday);
-
-                if (sundayMiles < goalMiles)
-                {
-                tuesdayMiles = tuesdayMiles + bumpMileageUp;
-                wednesdayMiles = wednesdayMiles + bumpMileageUp;
-                thursdayMiles = thursdayMiles + bumpMileageUp;
-                sundayMiles = sundayMiles + bumpMileageUp;
-                }
+                if (tuesday.getTime() > raceDate.getTime()) break;
             }
 
+            for (int i = 0; i < weeksOfTraining; i++)
+            {
+                if (wednesday.getTime()   < raceDate.getTime())eventIDs.add(createEventInAPI(wednesday, Double.toString(wednesdayMiles)));
+                if (wednesdayMiles < goalMiles) { wednesdayMiles = wednesdayMiles + bumpMileageUp; }
+                wednesday   = getOneWeekLater(wednesday);
+                if (wednesday.getTime() > raceDate.getTime()) break;
+            }
+
+            for (int i = 0; i < weeksOfTraining; i++)
+            {
+                if (thursday.getTime()   < raceDate.getTime())eventIDs.add(createEventInAPI(thursday, Double.toString(thursdayMiles)));
+                if (thursdayMiles < goalMiles) { thursdayMiles = thursdayMiles + bumpMileageUp; }
+                thursday   = getOneWeekLater(thursday);
+                if (thursday.getTime() > raceDate.getTime()) break;
+            }
+
+            for (int i = 0; i < weeksOfTraining; i++)
+            {
+                if (sunday.getTime()   < raceDate.getTime())eventIDs.add(createEventInAPI(sunday, Double.toString(sundayMiles)));
+                if (sundayMiles < goalMiles) { sundayMiles = sundayMiles + bumpMileageUp; }
+                sunday   = getOneWeekLater(sunday);
+                if (sunday.getTime() > raceDate.getTime()) break;
+            }
+            trainingPlans.add(eventIDs);
         }
 
         private void create10kPlan() throws IOException
@@ -626,7 +639,6 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             Date startDate = new Date(raceDate.getTime() - (604800000L * weeksOfTraining));
             Date tuesday = startDate;
             SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
-            Log.i(TAG, startDate + " " + raceDate);
 
             switch (racerInfo.experienceLevel)
             {
@@ -651,7 +663,6 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             while (!sdf.format(tuesday).equals("Tuesday"))
             {
                 tuesday = new Date(tuesday.getTime() + 86400000);
-                Log.i(TAG,"START DATE: " + startDate.toString() + " " + sdf.format(startDate));
             }
 
             Date wednesday = new Date(tuesday.getTime() + dayInMillis);
@@ -710,7 +721,6 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             Date startDate = new Date(raceDate.getTime() - (604800000L * weeksOfTraining));
             Date tuesday = startDate;
             SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
-            Log.i(TAG, startDate + " " + raceDate);
 
             switch (racerInfo.experienceLevel)
             {
@@ -735,7 +745,6 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             while (!sdf.format(tuesday).equals("Tuesday"))
             {
                 tuesday = new Date(tuesday.getTime() + 86400000);
-                Log.i(TAG,"START DATE: " + startDate.toString() + " " + sdf.format(startDate));
             }
 
             Date wednesday = new Date(tuesday.getTime() + dayInMillis);
@@ -795,7 +804,6 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             Date startDate = new Date(raceDate.getTime() - (604800000L * weeksOfTraining));
             Date tuesday = startDate;
             SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
-            Log.i(TAG, startDate + " " + raceDate);
 
             switch (racerInfo.experienceLevel)
             {
@@ -820,14 +828,12 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             while (!sdf.format(tuesday).equals("Tuesday"))
             {
                 tuesday = new Date(tuesday.getTime() + 86400000);
-                Log.i(TAG,"START DATE: " + startDate.toString() + " " + sdf.format(startDate));
             }
 
             Date wednesday = new Date(tuesday.getTime() + dayInMillis);
             Date thursday = new Date(wednesday.getTime() + dayInMillis);
             Date sunday = new Date(thursday.getTime() + (dayInMillis * 3));
 
-            // adjust first week values based on experience
             tuesdayMiles = startingMiles;
             wednesdayMiles = startingMiles + 1;
             thursdayMiles = startingMiles;
@@ -872,7 +878,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         }
 
 
-        private void createEventInAPI(Date date, String mileage) throws IOException
+        private String createEventInAPI(Date date, String mileage) throws IOException
         {
             if (isRacePlannerCalendarCreated())
             {
@@ -881,16 +887,11 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                     Event event = new Event()
                             .setSummary(mileage + "M")
                             .setDescription("race-planner");
-                    Log.i(TAG, racerInfo.experienceLevel);
-                    Log.i(TAG, racerInfo.raceType);
-
 
                     Date startDate = date;
                     Date endDate = new Date(startDate.getTime() + 86400000);
 
                     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-                    Log.i(TAG, dateFormat.format(startDate));
-                    Log.i(TAG, dateFormat.format(endDate));
 
                     DateTime startDateTime = new DateTime(dateFormat.format(startDate));
                     DateTime endDateTime = new DateTime(dateFormat.format(endDate));
@@ -902,6 +903,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                     event.setEnd(endEventDateTime);
 
                     event = mService.events().insert(calID, event).execute();
+                    return event.getId();
 
                 } catch (IOException e)
                 {
@@ -909,6 +911,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                 }
 
             }
+            return null;
         }
 
 

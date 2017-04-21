@@ -31,12 +31,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     Spinner raceTypeSpinner;
     Spinner experienceLevelSpinner;
     RacerInfo racerInfo = new RacerInfo();
+    DatabaseHelper myDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        myDB = new DatabaseHelper(this);
 
         requestPermissions();
         generateRaceTypeSpinner();

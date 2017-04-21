@@ -17,7 +17,21 @@
         android:padding="16dp"
         android:scrollbars="vertical"
         />
+    <Button
+        android:id="@+id/button_create_training_plan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="create training plan"
+        android:layout_above="@+id/button_create_calendar"
+        android:layout_marginBottom="16dp"
+        />
 
+    <Button
+        android:id="@+id/button_delete_training_plan"
+        android:text="delete training plans"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button_create_training_plan"/>
     <Button
         android:id="@+id/button_create_calendar"
         android:layout_above="@+id/button_delete_calendar"
@@ -39,14 +53,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="finish"/>
-    <Button
-        android:id="@+id/button_create_training_plan"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="create training plan"
-        android:layout_above="@+id/button_create_calendar"
-        android:layout_marginBottom="16dp"
-        />
+
 
 
 
