@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         public void onDateChanged(DatePicker parent, int year, int month, int day)
         {
             racerInfo.year = year;
-            racerInfo.month = month + 1; // zero based index for month
+            racerInfo.month = month; // zero based index for month
             racerInfo.day = day;
         }
 

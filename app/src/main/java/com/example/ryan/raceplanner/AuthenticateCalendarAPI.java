@@ -17,6 +17,7 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -112,7 +113,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             }
         });
 
-        Button buttonCreateEvent = (Button) findViewById(R.id.button_create_event);
+        Button buttonCreateEvent = (Button) findViewById(R.id.button_create_training_plan);
         buttonCreateEvent.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -155,7 +156,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         if (! isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
         } else if (mCredential.getSelectedAccountName() == null) {
-            chooseAccount();
+            chooseAccount(1);
         } else if (! isDeviceOnline()) {
             mOutputText.setText("No network connection available.");
         } else {
@@ -168,6 +169,8 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
     {
         if (! isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
+        } else if (mCredential.getSelectedAccountName() == null) {
+            chooseAccount(2);
         } else if (! isDeviceOnline()) {
             mOutputText.setText("No network connection available.");
         } else {
@@ -178,7 +181,17 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
 
     private void createEventsInAPI()
     {
-        new MakeCalendarTask(mCredential).execute(R.id.button_create_event);
+        if (! isGooglePlayServicesAvailable()) {
+            acquireGooglePlayServices();
+        } else if (mCredential.getSelectedAccountName() == null) {
+            chooseAccount(3);
+        } else if (! isDeviceOnline()) {
+            mOutputText.setText("No network connection available.");
+        } else {
+            new MakeCalendarTask(mCredential).execute(R.id.button_create_training_plan);
+            mOutputText.setText("Training plan created.");
+        }
+
     }
 
     /**
@@ -192,14 +205,26 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
      * is granted.
      */
     @AfterPermissionGranted(REQUEST_PERMISSION_GET_ACCOUNTS)
-    private void chooseAccount() {
+    private void chooseAccount(int i) {
         if (EasyPermissions.hasPermissions(
                 this, Manifest.permission.GET_ACCOUNTS)) {
             String accountName = getPreferences(Context.MODE_PRIVATE)
                     .getString(PREF_ACCOUNT_NAME, null);
             if (accountName != null) {
                 mCredential.setSelectedAccountName(accountName);
-                getResultsFromApi();
+                // i = identifier for calling original method
+                switch (i)
+                {
+                    case 1:
+                        getResultsFromApi();
+                        break;
+                    case 2:
+                        deleteResultsFromAPI();
+                        break;
+                    case 3:
+                        createEventsInAPI();
+                        break;
+                }
             } else {
                 // Start a dialog from which the user can choose an account
                 startActivityForResult(
@@ -389,15 +414,22 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                     // commented out API calls to avoid getting timed out
                     case R.id.button_create_calendar:
                         createCalendarInAPI();
+                        //cancel(true);
                         Log.i(TAG, id[0].toString());
                         break;
                     case R.id.button_delete_calendar:
                         deleteCalendarFromAPI();
+                        //cancel(true);
                         Log.i(TAG, id[0].toString());
                         break;
                     case R.id.button_create_training_plan:
-                        createTrainingPlan();
+                    {
+                        //createTrainingPlan(racerInfo);
+                        createEventInAPI();
+                        //cancel(true);
                         Log.i(TAG, id[0].toString());
+                    }
+
                 }
             } catch (Exception e) {
                 mLastError = e;
@@ -414,11 +446,6 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         private void createCalendarInAPI() throws IOException {
             if (!isRacePlannerCalendarCreated())
             {
-
-                HttpTransport transport = AndroidHttp.newCompatibleTransport();
-                JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-                mService = new Calendar.Builder(transport, jsonFactory, mCredential).setApplicationName("Race Planner").build();
-
                 // BUG: when removing library definition and adding an import, calls the wrong constructor
                 // WORKAROUND: defined all manually
                 com.google.api.services.calendar.model.Calendar calendar = new com.google.api.services.calendar.model.Calendar();
@@ -431,20 +458,17 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                 Log.i(TAG, createdCalendar.getId());
             } else
             {
-                mOutputText.setText("Calendar already created.");
+                //mOutputText.setText("Calendar already created.");
             }
         }
 
         private boolean isRacePlannerCalendarCreated() throws IOException
         {
-            HttpTransport transport = AndroidHttp.newCompatibleTransport();
-            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-            mService = new Calendar.Builder(transport, jsonFactory, mCredential).setApplicationName("Race Planner").build();
-
             // iterate through entries in calendar list
             String pageToken = null;
             do
             {
+                Log.i(TAG, mCredential.toString());
                 CalendarList calendarList = mService.calendarList().list().setPageToken(pageToken).execute();
                 List<CalendarListEntry> items = calendarList.getItems();
 
@@ -483,63 +507,61 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             }
         }
 
-        private void createTrainingPlan()
-        {
-            switch (racerInfo.experienceLevel)
-            {
-                case "Beginner":
-                    createBeginnerPlan(racerInfo.raceType, racerInfo.date);
-                    break;
-                case "Intermediate":
-                    createIntermediatePlan(racerInfo.raceType, racerInfo.date);
-                    break;
-                case "Expert":
-                    createExpertPlan(racerInfo.raceType, racerInfo.date);
-                    break;
-            }
-        }
-
-        private void createBeginnerPlan(String r, Date d)
-        {
-            String raceType = r;
-            Date   date     = d;
-
-        }
-
-        private void createIntermediatePlan(String r, Date d)
-        {
-
-        }
-
-        private void createExpertPlan(String r, Date d)
-        {
-
-        }
+//        private void createTrainingPlan(RacerInfo r)
+//        {
+//            String raceType = r.raceType;
+//            Date date = r.date;
+//            int startMiles;
+//            int finishMiles;
+//
+//            switch (r.experienceLevel)
+//            {
+//
+//            }
+//        }
 
         private void createEventInAPI() throws IOException
         {
-            Event event = new Event()
-                    .setSummary("Test Event")
-                    .setDescription("Test Description");
+            if (isRacePlannerCalendarCreated())
+            {
+                try
+                {
+                    Event event = new Event()
+                            .setSummary("Test Event")
+                            .setDescription("Test Description");
+                    Log.i(TAG, racerInfo.experienceLevel);
+                    Log.i(TAG, racerInfo.raceType);
 
-            Date startDate = new Date();
-            Date endDate = new Date(startDate.getTime() + 86400000);
+                    java.util.Calendar cal = java.util.Calendar.getInstance();
+                    cal.set(java.util.Calendar.YEAR, racerInfo.year);
+                    cal.set(java.util.Calendar.MONTH, racerInfo.month);
+                    cal.set(java.util.Calendar.DAY_OF_MONTH, racerInfo.day);
+                    Date date = cal.getTime();
 
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-            Log.i(TAG, dateFormat.format(startDate));
-            Log.i(TAG, dateFormat.format(endDate));
 
-            DateTime startDateTime = new DateTime(dateFormat.format(startDate));
-            DateTime endDateTime = new DateTime(dateFormat.format(endDate));
+                    Date startDate = date;
+                    Date endDate = new Date(startDate.getTime() + 86400000);
 
-            EventDateTime startEventDateTime = new EventDateTime().setDate(startDateTime);
-            EventDateTime endEventDateTime = new EventDateTime().setDate(endDateTime);
+                    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                    Log.i(TAG, dateFormat.format(startDate));
+                    Log.i(TAG, dateFormat.format(endDate));
 
-            event.setStart(startEventDateTime);
-            event.setEnd(endEventDateTime);
+                    DateTime startDateTime = new DateTime(dateFormat.format(startDate));
+                    DateTime endDateTime = new DateTime(dateFormat.format(endDate));
 
-            event = mService.events().insert(calID, event).execute();
+                    EventDateTime startEventDateTime = new EventDateTime().setDate(startDateTime);
+                    EventDateTime endEventDateTime = new EventDateTime().setDate(endDateTime);
 
+                    event.setStart(startEventDateTime);
+                    event.setEnd(endEventDateTime);
+
+                    event = mService.events().insert(calID, event).execute();
+                } catch (IOException e)
+                {
+                    Log.e(TAG, "IOException: ", e);
+                }
+
+            }
         }
 
 

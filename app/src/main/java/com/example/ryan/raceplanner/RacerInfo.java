@@ -4,6 +4,7 @@ package com.example.ryan.raceplanner;
 import android.icu.util.Calendar;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -15,6 +16,8 @@ import java.util.Date;
 
 public class RacerInfo implements Parcelable
 {
+    private static final String TAG = AuthenticateCalendarAPI.class.getName();
+
     String raceType;
     String experienceLevel;
     Date date;
@@ -24,8 +27,9 @@ public class RacerInfo implements Parcelable
 
     RacerInfo(int y, int m, int d, String r, String e)
     {
-
-        date = new Date(y, m, d);
+        year = y;
+        month = m;
+        day = d;
         raceType = r;
         experienceLevel = e;
     }
