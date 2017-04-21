@@ -17,7 +17,6 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -31,7 +30,6 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
 import com.google.api.client.util.ExponentialBackOff;
-import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
@@ -65,6 +63,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
     Boolean buttonPressed = false;
     Boolean calCreated = false;
     RacerInfo racerInfo;
+    Date raceDate;
     private TextView mOutputText;
 
     @Override
@@ -74,6 +73,12 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         setContentView(R.layout.activity_authenticate_calendar_api);
 
         racerInfo  = getIntent().getExtras().getParcelable(GlobalVariables.RACER_INFO_ID);
+
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.set(java.util.Calendar.YEAR, racerInfo.year);
+        cal.set(java.util.Calendar.MONTH, racerInfo.month);
+        cal.set(java.util.Calendar.DAY_OF_MONTH, racerInfo.day);
+        raceDate = cal.getTime();
 
         mOutputText = (TextView) findViewById(R.id.mOutputText);
         mOutputText.setMovementMethod(new ScrollingMovementMethod());
@@ -94,7 +99,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             @Override
             public void onClick(View v)
             {
-                getResultsFromApi();
+                createCalendar();
                 buttonPressed = true;
                 Log.i(TAG, "Button create called.");
 
@@ -107,7 +112,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             @Override
             public void onClick(View v)
             {
-                deleteResultsFromAPI();
+                deleteCalendar();
                 buttonPressed = true;
                 Log.i(TAG, "Button delete called.");
             }
@@ -119,7 +124,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             @Override
             public void onClick(View v)
             {
-                createEventsInAPI();
+                createEvent();
                 Log.i(TAG, "event creator called");
             }
         });
@@ -151,7 +156,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
      * of the preconditions are not satisfied, the app will prompt the user as
      * appropriate.
      */
-    private void getResultsFromApi()
+    private void createCalendar()
     {
         if (! isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
@@ -165,7 +170,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         }
     }
 
-    private void deleteResultsFromAPI()
+    private void deleteCalendar()
     {
         if (! isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
@@ -179,7 +184,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         }
     }
 
-    private void createEventsInAPI()
+    private void createEvent()
     {
         if (! isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
@@ -216,13 +221,13 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                 switch (i)
                 {
                     case 1:
-                        getResultsFromApi();
+                        createCalendar();
                         break;
                     case 2:
-                        deleteResultsFromAPI();
+                        deleteCalendar();
                         break;
                     case 3:
-                        createEventsInAPI();
+                        createEvent();
                         break;
                 }
             } else {
@@ -261,7 +266,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                     mOutputText.setText(
                             "This app requires Google Play Services. Please install " + "Google Play Services on your device and relaunch this app.");
                 } else {
-                    getResultsFromApi();
+                    createCalendar();
                 }
                 break;
             case REQUEST_ACCOUNT_PICKER:
@@ -276,13 +281,13 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                         editor.putString(PREF_ACCOUNT_NAME, accountName);
                         editor.apply();
                         mCredential.setSelectedAccountName(accountName);
-                        getResultsFromApi();
+                        createCalendar();
                     }
                 }
                 break;
             case REQUEST_AUTHORIZATION:
                 if (resultCode == RESULT_OK) {
-                    getResultsFromApi();
+                    createCalendar();
                 }
                 break;
         }
@@ -414,19 +419,29 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                     // commented out API calls to avoid getting timed out
                     case R.id.button_create_calendar:
                         createCalendarInAPI();
-                        //cancel(true);
                         Log.i(TAG, id[0].toString());
                         break;
                     case R.id.button_delete_calendar:
                         deleteCalendarFromAPI();
-                        //cancel(true);
                         Log.i(TAG, id[0].toString());
                         break;
                     case R.id.button_create_training_plan:
                     {
-                        //createTrainingPlan(racerInfo);
-                        createEventInAPI();
-                        //cancel(true);
+                        switch(racerInfo.raceType)
+                        {
+                            case "5k":
+                                create5kPlan();
+                                break;
+                            case "10k":
+                                create10kPlan();
+                                break;
+                            case "Half-Marathon":
+                                createHalfMarathonPlan(12, 13);
+                                break;
+                            case "Marathon":
+                                createMarathonPlan(18, 27);
+                                break;
+                        }
                         Log.i(TAG, id[0].toString());
                     }
 
@@ -462,6 +477,23 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             }
         }
 
+        /**
+         * Deletes the created Calendar
+         * @throws IOException
+         */
+        private void deleteCalendarFromAPI() throws IOException
+        {
+            if (isRacePlannerCalendarCreated()){
+                mService.calendars().delete(calID).execute();
+                calCreated = false;
+                Log.i(TAG, calID);
+            }
+            else
+            {
+                mOutputText.setText("No calendar to delete.");
+            }
+        }
+
         private boolean isRacePlannerCalendarCreated() throws IOException
         {
             // iterate through entries in calendar list
@@ -490,53 +522,367 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             return false;
         }
 
-        /**
-         * Deletes the created Calendar
-         * @throws IOException
-         */
-        private void deleteCalendarFromAPI() throws IOException
+        private void create5kPlan() throws IOException
         {
-            if (calID != null){
-                mService.calendars().delete(calID).execute();
-                calCreated = false;
-                Log.i(TAG, calID);
-            }
-            else
+            double startingMiles = -1;
+            double goalMiles = 5;
+            double tuesdayMiles;
+            double wednesdayMiles;
+            double thursdayMiles;
+            double sundayMiles = -1;
+            double bumpMileageUp = -1;
+            long dayInMillis = 86400000;
+            int weeksOfTraining = 8;
+            Date startDate = new Date(raceDate.getTime() - (604800000L * weeksOfTraining)); // amount of millis in a week * 8 weeks
+            Date tuesday = startDate;
+            SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
+            Log.i(TAG, startDate + " " + raceDate);
+
+            switch (racerInfo.experienceLevel)
             {
-                mOutputText.setText("No calendar to delete.");
+                case "Beginner":
+                    startingMiles = 1;
+                    sundayMiles = 1.5;
+                    bumpMileageUp = 0.5;
+                    break;
+                case "Intermediate":
+                    startingMiles = 3;
+                    sundayMiles = 3;
+                    bumpMileageUp = 1;
+                    break;
+                case "Expert":
+                    startingMiles = 3;
+                    sundayMiles = 5;
+                    bumpMileageUp = 1;
+                    break;
+            }
+
+            // push tuesday to correct day of week
+            while (!sdf.format(tuesday).equals("Tuesday"))
+            {
+                tuesday = new Date(tuesday.getTime() + 86400000);
+                Log.i(TAG,"START DATE: " + startDate.toString() + " " + sdf.format(startDate));
+            }
+
+            Date wednesday = new Date(tuesday.getTime() + dayInMillis);
+            Date thursday = new Date(wednesday.getTime() + dayInMillis);
+            Date sunday = new Date(thursday.getTime() + (dayInMillis * 3));
+
+            // adjust first week values based on experience
+            tuesdayMiles = startingMiles;
+            wednesdayMiles = startingMiles + 1;
+            thursdayMiles = startingMiles;
+
+            // iterate and create events
+            for (int i = 0; i < weeksOfTraining; i++)
+            {
+                Log.i(TAG, tuesday.toString());
+                Log.i(TAG, wednesday.toString());
+                Log.i(TAG, thursday.toString());
+                Log.i(TAG, sunday.toString());
+
+                // i dont really like the way this looks but it works
+                if (tuesday.getTime()   < raceDate.getTime())createEventInAPI(tuesday,   Double.toString(tuesdayMiles));
+                if (wednesday.getTime() < raceDate.getTime())createEventInAPI(wednesday, Double.toString(wednesdayMiles));
+                if (thursday.getTime()  < raceDate.getTime())createEventInAPI(thursday,  Double.toString(thursdayMiles));
+
+                // changes name for halfway point practice race
+                if (i == (weeksOfTraining / 2) - 2)
+                {
+                    createEventInAPI(sunday, racerInfo.raceType + " Practice!");
+                } else
+                {
+                    if (sunday.getTime() < raceDate.getTime())createEventInAPI(sunday, Double.toString(sundayMiles));
+                }
+                tuesday   = getOneWeekLater(tuesday);
+                wednesday = getOneWeekLater(wednesday);
+                thursday  = getOneWeekLater(thursday);
+                sunday    = getOneWeekLater(sunday);
+
+                if (sundayMiles < goalMiles)
+                {
+                tuesdayMiles = tuesdayMiles + bumpMileageUp;
+                wednesdayMiles = wednesdayMiles + bumpMileageUp;
+                thursdayMiles = thursdayMiles + bumpMileageUp;
+                sundayMiles = sundayMiles + bumpMileageUp;
+                }
+            }
+
+        }
+
+        private void create10kPlan() throws IOException
+        {
+            int weeksOfTraining = 12;
+            double startingMiles = -1;
+            double goalMiles = 7;
+            double tuesdayMiles;
+            double wednesdayMiles;
+            double thursdayMiles;
+            double sundayMiles = -1;
+            double bumpMileageUp = -1;
+            long dayInMillis = 86400000;
+
+
+            Date startDate = new Date(raceDate.getTime() - (604800000L * weeksOfTraining));
+            Date tuesday = startDate;
+            SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
+            Log.i(TAG, startDate + " " + raceDate);
+
+            switch (racerInfo.experienceLevel)
+            {
+                case "Beginner":
+                    startingMiles = 1;
+                    sundayMiles = 1.5;
+                    bumpMileageUp = 0.5;
+                    break;
+                case "Intermediate":
+                    startingMiles = 3;
+                    sundayMiles = 3;
+                    bumpMileageUp = 1;
+                    break;
+                case "Expert":
+                    startingMiles = 3;
+                    sundayMiles = 5;
+                    bumpMileageUp = 1;
+                    break;
+            }
+
+            // push tuesday to correct day of week
+            while (!sdf.format(tuesday).equals("Tuesday"))
+            {
+                tuesday = new Date(tuesday.getTime() + 86400000);
+                Log.i(TAG,"START DATE: " + startDate.toString() + " " + sdf.format(startDate));
+            }
+
+            Date wednesday = new Date(tuesday.getTime() + dayInMillis);
+            Date thursday = new Date(wednesday.getTime() + dayInMillis);
+            Date sunday = new Date(thursday.getTime() + (dayInMillis * 3));
+
+            // adjust first week values based on experience
+            tuesdayMiles = startingMiles;
+            wednesdayMiles = startingMiles + 1;
+            thursdayMiles = startingMiles;
+
+            for (int i = 0; i < weeksOfTraining; i++)
+            {
+                if (tuesday.getTime()   < raceDate.getTime())createEventInAPI(tuesday, Double.toString(tuesdayMiles));
+                if (tuesdayMiles < goalMiles) { tuesdayMiles = tuesdayMiles + bumpMileageUp; }
+                tuesday   = getOneWeekLater(tuesday);
+                if (tuesday.getTime() > raceDate.getTime()) break;
+            }
+
+            for (int i = 0; i < weeksOfTraining; i++)
+            {
+                if (wednesday.getTime()   < raceDate.getTime())createEventInAPI(wednesday, Double.toString(wednesdayMiles));
+                if (wednesdayMiles < goalMiles) { wednesdayMiles = wednesdayMiles + bumpMileageUp; }
+                wednesday   = getOneWeekLater(wednesday);
+                if (wednesday.getTime() > raceDate.getTime()) break;
+            }
+
+            for (int i = 0; i < weeksOfTraining; i++)
+            {
+                if (thursday.getTime()   < raceDate.getTime())createEventInAPI(thursday, Double.toString(thursdayMiles));
+                if (thursdayMiles < goalMiles) { thursdayMiles = thursdayMiles + bumpMileageUp; }
+                thursday   = getOneWeekLater(thursday);
+                if (thursday.getTime() > raceDate.getTime()) break;
+            }
+
+            for (int i = 0; i < weeksOfTraining; i++)
+            {
+                if (sunday.getTime()   < raceDate.getTime())createEventInAPI(sunday, Double.toString(sundayMiles));
+                if (sundayMiles < goalMiles) { sundayMiles = sundayMiles + bumpMileageUp; }
+                sunday   = getOneWeekLater(sunday);
+                if (sunday.getTime() > raceDate.getTime()) break;
             }
         }
 
-//        private void createTrainingPlan(RacerInfo r)
-//        {
-//            String raceType = r.raceType;
-//            Date date = r.date;
-//            int startMiles;
-//            int finishMiles;
-//
-//            switch (r.experienceLevel)
-//            {
-//
-//            }
-//        }
+        private void createHalfMarathonPlan(int weeksOfTraining, int goalMiles) throws IOException
+        {
+            double startingMiles = -1;
+            double tuesdayMiles;
+            double wednesdayMiles;
+            double thursdayMiles;
+            double sundayMiles = -1;
+            double bumpMileageUp = -1;
+            long dayInMillis = 86400000;
 
-        private void createEventInAPI() throws IOException
+
+            Date startDate = new Date(raceDate.getTime() - (604800000L * weeksOfTraining));
+            Date tuesday = startDate;
+            SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
+            Log.i(TAG, startDate + " " + raceDate);
+
+            switch (racerInfo.experienceLevel)
+            {
+                case "Beginner":
+                    startingMiles = 1;
+                    sundayMiles = 1.5;
+                    bumpMileageUp = 0.5;
+                    break;
+                case "Intermediate":
+                    startingMiles = 3;
+                    sundayMiles = 3;
+                    bumpMileageUp = 1;
+                    break;
+                case "Expert":
+                    startingMiles = 3;
+                    sundayMiles = 5;
+                    bumpMileageUp = 1;
+                    break;
+            }
+
+            // push tuesday to correct day of week
+            while (!sdf.format(tuesday).equals("Tuesday"))
+            {
+                tuesday = new Date(tuesday.getTime() + 86400000);
+                Log.i(TAG,"START DATE: " + startDate.toString() + " " + sdf.format(startDate));
+            }
+
+            Date wednesday = new Date(tuesday.getTime() + dayInMillis);
+            Date thursday = new Date(wednesday.getTime() + dayInMillis);
+            Date sunday = new Date(thursday.getTime() + (dayInMillis * 3));
+
+            // adjust first week values based on experience
+            tuesdayMiles = startingMiles;
+            wednesdayMiles = startingMiles + 1;
+            thursdayMiles = startingMiles;
+
+            for (int i = 0; i < weeksOfTraining; i++)
+            {
+                if (tuesday.getTime()   < raceDate.getTime())createEventInAPI(tuesday, Double.toString(tuesdayMiles));
+                if (tuesdayMiles < goalMiles && tuesdayMiles < 5) { tuesdayMiles = tuesdayMiles + bumpMileageUp; }
+                tuesday   = getOneWeekLater(tuesday);
+                if (tuesday.getTime() > raceDate.getTime()) break;
+            }
+
+            for (int i = 0; i < weeksOfTraining; i++)
+            {
+                if (wednesday.getTime()   < raceDate.getTime())createEventInAPI(wednesday, Double.toString(wednesdayMiles));
+                if (wednesdayMiles < goalMiles && wednesdayMiles < 7) { wednesdayMiles = wednesdayMiles + bumpMileageUp; }
+                wednesday   = getOneWeekLater(wednesday);
+                if (wednesday.getTime() > raceDate.getTime()) break;
+            }
+
+            for (int i = 0; i < weeksOfTraining; i++)
+            {
+                if (thursday.getTime()   < raceDate.getTime())createEventInAPI(thursday, Double.toString(thursdayMiles));
+                if (thursdayMiles < goalMiles && thursdayMiles < 5) { thursdayMiles = thursdayMiles + bumpMileageUp; }
+                thursday   = getOneWeekLater(thursday);
+                if (thursday.getTime() > raceDate.getTime()) break;
+            }
+
+            for (int i = 0; i < weeksOfTraining; i++)
+            {
+                if (sunday.getTime()   < raceDate.getTime())createEventInAPI(sunday, Double.toString(sundayMiles));
+                if (sundayMiles < goalMiles) { sundayMiles = sundayMiles + 1; }
+                sunday   = getOneWeekLater(sunday);
+                if (sunday.getTime() > raceDate.getTime()) break;
+            }
+
+        }
+
+        private void createMarathonPlan(int weeksOfTraining, int goalMiles) throws IOException
+        {
+            double startingMiles = -1;
+            double tuesdayMiles;
+            double wednesdayMiles;
+            double thursdayMiles;
+            double sundayMiles = -1;
+            double bumpMileageUp = -1;
+            long dayInMillis = 86400000;
+
+
+            Date startDate = new Date(raceDate.getTime() - (604800000L * weeksOfTraining));
+            Date tuesday = startDate;
+            SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
+            Log.i(TAG, startDate + " " + raceDate);
+
+            switch (racerInfo.experienceLevel)
+            {
+                case "Beginner":
+                    startingMiles = 1;
+                    sundayMiles = 3;
+                    bumpMileageUp = 0.5;
+                    break;
+                case "Intermediate":
+                    startingMiles = 3;
+                    sundayMiles = 5;
+                    bumpMileageUp = 1;
+                    break;
+                case "Expert":
+                    startingMiles = 3;
+                    sundayMiles = 5;
+                    bumpMileageUp = 1;
+                    break;
+            }
+
+            // push tuesday to correct day of week
+            while (!sdf.format(tuesday).equals("Tuesday"))
+            {
+                tuesday = new Date(tuesday.getTime() + 86400000);
+                Log.i(TAG,"START DATE: " + startDate.toString() + " " + sdf.format(startDate));
+            }
+
+            Date wednesday = new Date(tuesday.getTime() + dayInMillis);
+            Date thursday = new Date(wednesday.getTime() + dayInMillis);
+            Date sunday = new Date(thursday.getTime() + (dayInMillis * 3));
+
+            // adjust first week values based on experience
+            tuesdayMiles = startingMiles;
+            wednesdayMiles = startingMiles + 1;
+            thursdayMiles = startingMiles;
+
+            for (int i = 0; i < weeksOfTraining; i++)
+            {
+                if (tuesday.getTime()   < raceDate.getTime())createEventInAPI(tuesday, Double.toString(tuesdayMiles));
+                if (tuesdayMiles < goalMiles && tuesdayMiles < 6) { tuesdayMiles = tuesdayMiles + bumpMileageUp; }
+                tuesday   = getOneWeekLater(tuesday);
+                if (tuesday.getTime() > raceDate.getTime()) break;
+            }
+
+            for (int i = 0; i < weeksOfTraining; i++)
+            {
+                if (wednesday.getTime()   < raceDate.getTime())createEventInAPI(wednesday, Double.toString(wednesdayMiles));
+                if (wednesdayMiles < goalMiles && wednesdayMiles < 10) { wednesdayMiles = wednesdayMiles + bumpMileageUp; }
+                wednesday   = getOneWeekLater(wednesday);
+                if (wednesday.getTime() > raceDate.getTime()) break;
+            }
+
+            for (int i = 0; i < weeksOfTraining; i++)
+            {
+                if (thursday.getTime()   < raceDate.getTime())createEventInAPI(thursday, Double.toString(thursdayMiles));
+                if (thursdayMiles < goalMiles && thursdayMiles < 6) { thursdayMiles = thursdayMiles + bumpMileageUp; }
+                thursday   = getOneWeekLater(thursday);
+                if (thursday.getTime() > raceDate.getTime()) break;
+            }
+
+            for (int i = 0; i < weeksOfTraining; i++)
+            {
+                if (sunday.getTime()   < raceDate.getTime())createEventInAPI(sunday, Double.toString(sundayMiles));
+                if (sundayMiles < goalMiles) { sundayMiles = sundayMiles + 1.5; }
+                sunday   = getOneWeekLater(sunday);
+                if (sunday.getTime() > raceDate.getTime()) break;
+            }
+
+        }
+
+        private Date getOneWeekLater(Date date)
+        {
+            return new Date(date.getTime() + 604800000L);
+        }
+
+
+        private void createEventInAPI(Date date, String mileage) throws IOException
         {
             if (isRacePlannerCalendarCreated())
             {
                 try
                 {
                     Event event = new Event()
-                            .setSummary("Test Event")
-                            .setDescription("Test Description");
+                            .setSummary(mileage + "M")
+                            .setDescription("race-planner");
                     Log.i(TAG, racerInfo.experienceLevel);
                     Log.i(TAG, racerInfo.raceType);
-
-                    java.util.Calendar cal = java.util.Calendar.getInstance();
-                    cal.set(java.util.Calendar.YEAR, racerInfo.year);
-                    cal.set(java.util.Calendar.MONTH, racerInfo.month);
-                    cal.set(java.util.Calendar.DAY_OF_MONTH, racerInfo.day);
-                    Date date = cal.getTime();
 
 
                     Date startDate = date;
@@ -556,6 +902,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                     event.setEnd(endEventDateTime);
 
                     event = mService.events().insert(calID, event).execute();
+
                 } catch (IOException e)
                 {
                     Log.e(TAG, "IOException: ", e);
