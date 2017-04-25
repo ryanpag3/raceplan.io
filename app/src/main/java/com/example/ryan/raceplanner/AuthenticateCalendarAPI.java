@@ -470,26 +470,9 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                         Log.i(TAG, id[0].toString());
                         break;
                     case R.id.button_create_training_plan:
-                    {
                         createPlan();
-//                        switch(racerInfo.raceType)
-//                        {
-//                            case "5k":
-//                                create5kPlan();
-//                                break;
-//                            case "10k":
-//                                create10kPlan();
-//                                break;
-//                            case "Half-Marathon":
-//                                createHalfMarathonPlan(12, 13);
-//                                break;
-//                            case "Marathon":
-//                                createMarathonPlan(18, 27);
-//                                break;
-//                        }
                         Log.i(TAG, id[0].toString());
                         break;
-                    }
                     case R.id.button_delete_training_plan:
                         deleteTrainingPlanTask();
                         break;
