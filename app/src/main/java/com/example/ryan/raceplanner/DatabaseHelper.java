@@ -102,4 +102,11 @@ public class DatabaseHelper extends SQLiteOpenHelper
         long result = db.insert(EVENT_ID_TABLE_NAME, null, values);
         return result != -1;
     }
+
+    public void deleteDatabases()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TRAINING_PLAN_TABLE_NAME, null, null);
+        db.delete(EVENT_ID_TABLE_NAME, null, null);
+    }
 }

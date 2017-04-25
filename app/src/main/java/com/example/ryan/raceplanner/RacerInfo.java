@@ -20,6 +20,7 @@ public class RacerInfo implements Parcelable
 
     String raceType;
     String experienceLevel;
+    String nameOfPlan;
     Date date;
     int year;
     int month;
@@ -76,6 +77,7 @@ public class RacerInfo implements Parcelable
 
         raceType = in.readString();
         experienceLevel = in.readString();
+        nameOfPlan = in.readString();
     }
 
 
@@ -89,6 +91,7 @@ public class RacerInfo implements Parcelable
         out.writeIntArray(new int[]{this.year, this.month, this.day});
         out.writeString(raceType);
         out.writeString(experienceLevel);
+        out.writeString(nameOfPlan);
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator()

@@ -1,80 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context="com.example.ryan.raceplanner.MainActivity">
 
-    <TextView
-        android:id="@+id/title_placeholder"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2"
-        android:gravity="center"
-        android:text="@string/main_todo_title"
-        android:textSize="24sp" />
-
-    <TextView
-        android:id="@+id/select_type"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Select Race Type"
-        android:textSize="16sp" />
-
-    <Spinner
-        android:id="@+id/spinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:spinnerMode="dropdown" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Select Date of Race"
-        android:textSize="16sp" />
-
-    <DatePicker
-        android:id="@+id/datepicker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:calendarViewShown="false"
-        android:datePickerMode="spinner"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Select Experience Level"
-        android:textSize="16sp" />
-
-    <Spinner
-        android:id="@+id/expSpinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:spinnerMode="dropdown" />
-
-    <Switch
-        android:id="@+id/main_switch_new_calendar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/main_switch_sidetext"
-        android:switchPadding="90dp"/>
-
     <Button
-        android:id="@+id/generateButton"
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:background="@android:color/holo_blue_dark"
-        android:text="Build Training Plan"
-        android:textAlignment="center"
-        android:textColor="@android:color/white"
-        android:textSize="24sp" />
+        android:id="@+id/button_open_select_training_plan_activity"
+        android:text="create training plan"
+        android:layout_width="wrap_content"
+        android:layout_height="54dp"
+        android:layout_alignParentBottom="true"
+        />
+    <Button
+        android:id="@+id/button_open_list_training_plans_activity"
+        android:text="view created training plans"
+        android:layout_width="wrap_content"
+        android:layout_height="54dp"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/button_open_select_training_plan_activity"
+        />
 
 
-</LinearLayout>
+</RelativeLayout>

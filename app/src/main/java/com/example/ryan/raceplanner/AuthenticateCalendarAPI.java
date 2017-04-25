@@ -18,6 +18,7 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -77,8 +78,8 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         setContentView(R.layout.activity_authenticate_calendar_api);
 
         racerInfo  = getIntent().getExtras().getParcelable(GlobalVariables.RACER_INFO_ID);
+        Log.i(TAG, racerInfo.nameOfPlan);
         db = new DatabaseHelper(this);
-
 
         java.util.Calendar cal = java.util.Calendar.getInstance();
         cal.set(java.util.Calendar.YEAR, racerInfo.year);
@@ -150,6 +151,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             {
                 if (buttonPressed)
                 {
+
                     Intent intent = new Intent(AuthenticateCalendarAPI.this, GenerateTrainingPlan.class);
                     intent.putExtra(GlobalVariables.RACER_INFO_ID, getIntent().getExtras().getParcelable(GlobalVariables.RACER_INFO_ID));
                     intent.putExtra(GlobalVariables.CALENDAR_CREATED_ID, calCreated);
@@ -180,6 +182,13 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                     Log.i(TAG, c.getString(0) + " " + c.getString(1));
                 }
                 c.close();
+
+                c = db.query("SELECT * FROM " + DatabaseHelper.TRAINING_PLAN_TABLE_NAME, null);
+                while (c.moveToNext())
+                {
+                    Log.i(TAG, c.getString(0) + " " + c.getString(1));
+                }
+                c.close();
             }
         });
 
@@ -189,7 +198,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             @Override
             public void onClick(View v)
             {
-                db.deletePlanFromDatabase("'test_training_plan'");
+                db.deleteDatabases();
             }
         });
         // DEBUGGING END
@@ -588,8 +597,8 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             Date startDate; // amount of millis in a week * 8 weeks
             Date tuesday;
             SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
-
-            db.insertNewPlanToDatabase("test_training_plan");
+            Log.e(TAG, "YOOOOOOO THIS IS THE NAME: " + racerInfo.nameOfPlan);
+            db.insertNewPlanToDatabase(racerInfo.nameOfPlan);
 
             Cursor c = db.query("SELECT * FROM " + DatabaseHelper.TRAINING_PLAN_TABLE_NAME, null);
             c.moveToLast();
