@@ -8,6 +8,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -28,6 +29,7 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecovera
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.Data;
 import com.google.api.client.util.DateTime;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.calendar.CalendarScopes;
@@ -48,6 +50,8 @@ import java.util.Locale;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
+import com.example.ryan.raceplanner.DatabaseHelper;
+
 public class AuthenticateCalendarAPI extends Activity implements EasyPermissions.PermissionCallbacks
 {
     static final int REQUEST_ACCOUNT_PICKER = 1000;
@@ -58,6 +62,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
     private static final String BUTTON_TEXT = "Call Google Calendar API";
     private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String[] SCOPES = { CalendarScopes.CALENDAR };
+    private int TRAINING_PLAN_ID = -1;
     GoogleAccountCredential mCredential;
     ProgressDialog mProgress;
     String calID;
@@ -67,6 +72,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
     Date raceDate;
     private TextView mOutputText;
     List<List<String>> trainingPlans;
+    DatabaseHelper db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -75,6 +81,8 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         setContentView(R.layout.activity_authenticate_calendar_api);
 
         racerInfo  = getIntent().getExtras().getParcelable(GlobalVariables.RACER_INFO_ID);
+        db = new DatabaseHelper(this);
+
 
         java.util.Calendar cal = java.util.Calendar.getInstance();
         cal.set(java.util.Calendar.YEAR, racerInfo.year);
@@ -156,6 +164,39 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                 }
             }
         });
+
+        // FOR DEBUGGING
+        Button buttonQueryDatabase = (Button) findViewById(R.id.button_query_database);
+        buttonQueryDatabase.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Cursor c = db.query("SELECT * FROM " + DatabaseHelper.TRAINING_PLAN_TABLE_NAME, null);
+                while (c.moveToNext())
+                {
+                    Log.i(TAG, c.getString(0) + " " + c.getString(1));
+                }
+
+                c = db.query("SELECT * FROM " + DatabaseHelper.EVENT_ID_TABLE_NAME, null);
+                while (c.moveToNext())
+                {
+                    Log.i(TAG, c.getString(0) + " " + c.getString(1));
+                }
+                c.close();
+            }
+        });
+
+        Button buttonDeleteAllTestPlans = (Button) findViewById(R.id.button_delete_all_test_plans);
+        buttonDeleteAllTestPlans.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                db.deletePlanFromDatabase("'test_training_plan'");
+            }
+        });
+        // DEBUGGING END
     }
 
     private boolean meetsPreReqs()
@@ -430,22 +471,24 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                         break;
                     case R.id.button_create_training_plan:
                     {
-                        switch(racerInfo.raceType)
-                        {
-                            case "5k":
-                                create5kPlan();
-                                break;
-                            case "10k":
-                                create10kPlan();
-                                break;
-                            case "Half-Marathon":
-                                createHalfMarathonPlan(12, 13);
-                                break;
-                            case "Marathon":
-                                createMarathonPlan(18, 27);
-                                break;
-                        }
+                        createPlan();
+//                        switch(racerInfo.raceType)
+//                        {
+//                            case "5k":
+//                                create5kPlan();
+//                                break;
+//                            case "10k":
+//                                create10kPlan();
+//                                break;
+//                            case "Half-Marathon":
+//                                createHalfMarathonPlan(12, 13);
+//                                break;
+//                            case "Marathon":
+//                                createMarathonPlan(18, 27);
+//                                break;
+//                        }
                         Log.i(TAG, id[0].toString());
+                        break;
                     }
                     case R.id.button_delete_training_plan:
                         deleteTrainingPlanTask();
@@ -499,12 +542,13 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
 
         private void deleteTrainingPlanTask() throws IOException
         {
-            for (List<String> l : trainingPlans)
+
+            db.deletePlanFromDatabase(TRAINING_PLAN_ID);
+            Cursor c = db.query("SELECT * FROM " + DatabaseHelper.EVENT_ID_TABLE_NAME + " WHERE " + DatabaseHelper.EVENT_ID_COL_1 + "=?", new String[] {String.valueOf(TRAINING_PLAN_ID)});
+
+            while (c.moveToNext())
             {
-                for (int i = 1; i < l.size(); i++)
-                {
-                    deleteEventByID(l.get(i));
-                }
+                deleteEventByID(c.getString(1));
             }
         }
 
@@ -538,7 +582,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             return false;
         }
 
-        private void create5kPlan() throws IOException
+        private void createPlan() throws IOException
         {
             double startingMiles = -1;
             double goalMiles = 5;
@@ -547,20 +591,28 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             double thursdayMiles;
             double sundayMiles = -1;
             double bumpMileageUp = -1;
+            int tuesThursMileCap = -1;
+            int wedMileCap = -1;
             long dayInMillis = 86400000;
-            int weeksOfTraining = 8;
-            Date startDate = new Date(raceDate.getTime() - (604800000L * weeksOfTraining)); // amount of millis in a week * 8 weeks
-            Date tuesday = startDate;
+            int weeksOfTraining = -1;
+            Date startDate; // amount of millis in a week * 8 weeks
+            Date tuesday;
             SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
-            List<String> eventIDs = new ArrayList<>();
-            eventIDs.add("5k");
+
+            db.insertNewPlanToDatabase("test_training_plan");
+
+            Cursor c = db.query("SELECT * FROM " + DatabaseHelper.TRAINING_PLAN_TABLE_NAME, null);
+            c.moveToLast();
+            TRAINING_PLAN_ID = c.getInt(0);
+            Log.e(TAG, "YOOOOOOO THIS IS THE ID: " + TRAINING_PLAN_ID);
+            c.close();
 
             switch (racerInfo.experienceLevel)
             {
                 case "Beginner":
                     startingMiles = 1;
-                    sundayMiles = 1.5;
-                    bumpMileageUp = 0.5;
+                    sundayMiles = 2;
+                    bumpMileageUp = 1;
                     break;
                 case "Intermediate":
                     startingMiles = 3;
@@ -574,90 +626,36 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                     break;
             }
 
-            // push tuesday to correct day of week
-            while (!sdf.format(tuesday).equals("Tuesday"))
+            switch(racerInfo.raceType)
             {
-                tuesday = new Date(tuesday.getTime() + 86400000);
-            }
-
-            Date wednesday = new Date(tuesday.getTime() + dayInMillis);
-            Date thursday = new Date(wednesday.getTime() + dayInMillis);
-            Date sunday = new Date(thursday.getTime() + (dayInMillis * 3));
-
-            // adjust first week values based on experience
-            tuesdayMiles = startingMiles;
-            wednesdayMiles = startingMiles + 1;
-            thursdayMiles = startingMiles;
-
-            for (int i = 0; i < weeksOfTraining; i++)
-            {
-                if (tuesday.getTime()   < raceDate.getTime())eventIDs.add(createEventInAPI(tuesday, Double.toString(tuesdayMiles)));
-                if (tuesdayMiles < goalMiles) { tuesdayMiles = tuesdayMiles + bumpMileageUp; }
-                tuesday   = getOneWeekLater(tuesday);
-                if (tuesday.getTime() > raceDate.getTime()) break;
-            }
-
-            for (int i = 0; i < weeksOfTraining; i++)
-            {
-                if (wednesday.getTime()   < raceDate.getTime())eventIDs.add(createEventInAPI(wednesday, Double.toString(wednesdayMiles)));
-                if (wednesdayMiles < goalMiles) { wednesdayMiles = wednesdayMiles + bumpMileageUp; }
-                wednesday   = getOneWeekLater(wednesday);
-                if (wednesday.getTime() > raceDate.getTime()) break;
-            }
-
-            for (int i = 0; i < weeksOfTraining; i++)
-            {
-                if (thursday.getTime()   < raceDate.getTime())eventIDs.add(createEventInAPI(thursday, Double.toString(thursdayMiles)));
-                if (thursdayMiles < goalMiles) { thursdayMiles = thursdayMiles + bumpMileageUp; }
-                thursday   = getOneWeekLater(thursday);
-                if (thursday.getTime() > raceDate.getTime()) break;
-            }
-
-            for (int i = 0; i < weeksOfTraining; i++)
-            {
-                if (sunday.getTime()   < raceDate.getTime())eventIDs.add(createEventInAPI(sunday, Double.toString(sundayMiles)));
-                if (sundayMiles < goalMiles) { sundayMiles = sundayMiles + bumpMileageUp; }
-                sunday   = getOneWeekLater(sunday);
-                if (sunday.getTime() > raceDate.getTime()) break;
-            }
-            trainingPlans.add(eventIDs);
-        }
-
-        private void create10kPlan() throws IOException
-        {
-            int weeksOfTraining = 12;
-            double startingMiles = -1;
-            double goalMiles = 7;
-            double tuesdayMiles;
-            double wednesdayMiles;
-            double thursdayMiles;
-            double sundayMiles = -1;
-            double bumpMileageUp = -1;
-            long dayInMillis = 86400000;
-
-
-            Date startDate = new Date(raceDate.getTime() - (604800000L * weeksOfTraining));
-            Date tuesday = startDate;
-            SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
-
-            switch (racerInfo.experienceLevel)
-            {
-                case "Beginner":
-                    startingMiles = 1;
-                    sundayMiles = 1.5;
-                    bumpMileageUp = 0.5;
+                case "5k":
+                    weeksOfTraining = 8;
+                    goalMiles = 5;
+                    tuesThursMileCap = 2;
+                    wedMileCap = 3;
                     break;
-                case "Intermediate":
-                    startingMiles = 3;
-                    sundayMiles = 3;
-                    bumpMileageUp = 1;
+                case "10k":
+                    weeksOfTraining = 12;
+                    goalMiles = 7;
+                    tuesThursMileCap = 3;
+                    wedMileCap = 5;
                     break;
-                case "Expert":
-                    startingMiles = 3;
-                    sundayMiles = 5;
-                    bumpMileageUp = 1;
+                case "Half-Marathon":
+                    weeksOfTraining = 12;
+                    goalMiles = 13;
+                    tuesThursMileCap = 5;
+                    wedMileCap = 7;
+                    break;
+                case "Marathon":
+                    weeksOfTraining = 18;
+                    goalMiles = 26;
+                    tuesThursMileCap = 5;
+                    wedMileCap = 10;
                     break;
             }
+
+            startDate = new Date(raceDate.getTime() - (604800000L * weeksOfTraining));
+            tuesday = startDate;
 
             // push tuesday to correct day of week
             while (!sdf.format(tuesday).equals("Tuesday"))
@@ -677,7 +675,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             for (int i = 0; i < weeksOfTraining; i++)
             {
                 if (tuesday.getTime()   < raceDate.getTime())createEventInAPI(tuesday, Double.toString(tuesdayMiles));
-                if (tuesdayMiles < goalMiles) { tuesdayMiles = tuesdayMiles + bumpMileageUp; }
+                if (tuesdayMiles < goalMiles && tuesdayMiles < tuesThursMileCap) { tuesdayMiles = tuesdayMiles + (bumpMileageUp / 2); }
                 tuesday   = getOneWeekLater(tuesday);
                 if (tuesday.getTime() > raceDate.getTime()) break;
             }
@@ -685,7 +683,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             for (int i = 0; i < weeksOfTraining; i++)
             {
                 if (wednesday.getTime()   < raceDate.getTime())createEventInAPI(wednesday, Double.toString(wednesdayMiles));
-                if (wednesdayMiles < goalMiles) { wednesdayMiles = wednesdayMiles + bumpMileageUp; }
+                if (wednesdayMiles < goalMiles && wednesdayMiles < wedMileCap) { wednesdayMiles = wednesdayMiles + (bumpMileageUp / 2); }
                 wednesday   = getOneWeekLater(wednesday);
                 if (wednesday.getTime() > raceDate.getTime()) break;
             }
@@ -693,89 +691,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             for (int i = 0; i < weeksOfTraining; i++)
             {
                 if (thursday.getTime()   < raceDate.getTime())createEventInAPI(thursday, Double.toString(thursdayMiles));
-                if (thursdayMiles < goalMiles) { thursdayMiles = thursdayMiles + bumpMileageUp; }
-                thursday   = getOneWeekLater(thursday);
-                if (thursday.getTime() > raceDate.getTime()) break;
-            }
-
-            for (int i = 0; i < weeksOfTraining; i++)
-            {
-                if (sunday.getTime()   < raceDate.getTime())createEventInAPI(sunday, Double.toString(sundayMiles));
-                if (sundayMiles < goalMiles) { sundayMiles = sundayMiles + bumpMileageUp; }
-                sunday   = getOneWeekLater(sunday);
-                if (sunday.getTime() > raceDate.getTime()) break;
-            }
-        }
-
-        private void createHalfMarathonPlan(int weeksOfTraining, int goalMiles) throws IOException
-        {
-            double startingMiles = -1;
-            double tuesdayMiles;
-            double wednesdayMiles;
-            double thursdayMiles;
-            double sundayMiles = -1;
-            double bumpMileageUp = -1;
-            long dayInMillis = 86400000;
-
-
-            Date startDate = new Date(raceDate.getTime() - (604800000L * weeksOfTraining));
-            Date tuesday = startDate;
-            SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
-
-            switch (racerInfo.experienceLevel)
-            {
-                case "Beginner":
-                    startingMiles = 1;
-                    sundayMiles = 1.5;
-                    bumpMileageUp = 0.5;
-                    break;
-                case "Intermediate":
-                    startingMiles = 3;
-                    sundayMiles = 3;
-                    bumpMileageUp = 1;
-                    break;
-                case "Expert":
-                    startingMiles = 3;
-                    sundayMiles = 5;
-                    bumpMileageUp = 1;
-                    break;
-            }
-
-            // push tuesday to correct day of week
-            while (!sdf.format(tuesday).equals("Tuesday"))
-            {
-                tuesday = new Date(tuesday.getTime() + 86400000);
-            }
-
-            Date wednesday = new Date(tuesday.getTime() + dayInMillis);
-            Date thursday = new Date(wednesday.getTime() + dayInMillis);
-            Date sunday = new Date(thursday.getTime() + (dayInMillis * 3));
-
-            // adjust first week values based on experience
-            tuesdayMiles = startingMiles;
-            wednesdayMiles = startingMiles + 1;
-            thursdayMiles = startingMiles;
-
-            for (int i = 0; i < weeksOfTraining; i++)
-            {
-                if (tuesday.getTime()   < raceDate.getTime())createEventInAPI(tuesday, Double.toString(tuesdayMiles));
-                if (tuesdayMiles < goalMiles && tuesdayMiles < 5) { tuesdayMiles = tuesdayMiles + bumpMileageUp; }
-                tuesday   = getOneWeekLater(tuesday);
-                if (tuesday.getTime() > raceDate.getTime()) break;
-            }
-
-            for (int i = 0; i < weeksOfTraining; i++)
-            {
-                if (wednesday.getTime()   < raceDate.getTime())createEventInAPI(wednesday, Double.toString(wednesdayMiles));
-                if (wednesdayMiles < goalMiles && wednesdayMiles < 7) { wednesdayMiles = wednesdayMiles + bumpMileageUp; }
-                wednesday   = getOneWeekLater(wednesday);
-                if (wednesday.getTime() > raceDate.getTime()) break;
-            }
-
-            for (int i = 0; i < weeksOfTraining; i++)
-            {
-                if (thursday.getTime()   < raceDate.getTime())createEventInAPI(thursday, Double.toString(thursdayMiles));
-                if (thursdayMiles < goalMiles && thursdayMiles < 5) { thursdayMiles = thursdayMiles + bumpMileageUp; }
+                if (thursdayMiles < goalMiles && thursdayMiles < tuesThursMileCap) { thursdayMiles = thursdayMiles + (bumpMileageUp / 2); }
                 thursday   = getOneWeekLater(thursday);
                 if (thursday.getTime() > raceDate.getTime()) break;
             }
@@ -787,89 +703,6 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                 sunday   = getOneWeekLater(sunday);
                 if (sunday.getTime() > raceDate.getTime()) break;
             }
-
-        }
-
-        private void createMarathonPlan(int weeksOfTraining, int goalMiles) throws IOException
-        {
-            double startingMiles = -1;
-            double tuesdayMiles;
-            double wednesdayMiles;
-            double thursdayMiles;
-            double sundayMiles = -1;
-            double bumpMileageUp = -1;
-            long dayInMillis = 86400000;
-
-
-            Date startDate = new Date(raceDate.getTime() - (604800000L * weeksOfTraining));
-            Date tuesday = startDate;
-            SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
-
-            switch (racerInfo.experienceLevel)
-            {
-                case "Beginner":
-                    startingMiles = 1;
-                    sundayMiles = 3;
-                    bumpMileageUp = 0.5;
-                    break;
-                case "Intermediate":
-                    startingMiles = 3;
-                    sundayMiles = 5;
-                    bumpMileageUp = 1;
-                    break;
-                case "Expert":
-                    startingMiles = 3;
-                    sundayMiles = 5;
-                    bumpMileageUp = 1;
-                    break;
-            }
-
-            // push tuesday to correct day of week
-            while (!sdf.format(tuesday).equals("Tuesday"))
-            {
-                tuesday = new Date(tuesday.getTime() + 86400000);
-            }
-
-            Date wednesday = new Date(tuesday.getTime() + dayInMillis);
-            Date thursday = new Date(wednesday.getTime() + dayInMillis);
-            Date sunday = new Date(thursday.getTime() + (dayInMillis * 3));
-
-            tuesdayMiles = startingMiles;
-            wednesdayMiles = startingMiles + 1;
-            thursdayMiles = startingMiles;
-
-            for (int i = 0; i < weeksOfTraining; i++)
-            {
-                if (tuesday.getTime()   < raceDate.getTime())createEventInAPI(tuesday, Double.toString(tuesdayMiles));
-                if (tuesdayMiles < goalMiles && tuesdayMiles < 6) { tuesdayMiles = tuesdayMiles + bumpMileageUp; }
-                tuesday   = getOneWeekLater(tuesday);
-                if (tuesday.getTime() > raceDate.getTime()) break;
-            }
-
-            for (int i = 0; i < weeksOfTraining; i++)
-            {
-                if (wednesday.getTime()   < raceDate.getTime())createEventInAPI(wednesday, Double.toString(wednesdayMiles));
-                if (wednesdayMiles < goalMiles && wednesdayMiles < 10) { wednesdayMiles = wednesdayMiles + bumpMileageUp; }
-                wednesday   = getOneWeekLater(wednesday);
-                if (wednesday.getTime() > raceDate.getTime()) break;
-            }
-
-            for (int i = 0; i < weeksOfTraining; i++)
-            {
-                if (thursday.getTime()   < raceDate.getTime())createEventInAPI(thursday, Double.toString(thursdayMiles));
-                if (thursdayMiles < goalMiles && thursdayMiles < 6) { thursdayMiles = thursdayMiles + bumpMileageUp; }
-                thursday   = getOneWeekLater(thursday);
-                if (thursday.getTime() > raceDate.getTime()) break;
-            }
-
-            for (int i = 0; i < weeksOfTraining; i++)
-            {
-                if (sunday.getTime()   < raceDate.getTime())createEventInAPI(sunday, Double.toString(sundayMiles));
-                if (sundayMiles < goalMiles) { sundayMiles = sundayMiles + 1.5; }
-                sunday   = getOneWeekLater(sunday);
-                if (sunday.getTime() > raceDate.getTime()) break;
-            }
-
         }
 
         private Date getOneWeekLater(Date date)
@@ -878,7 +711,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         }
 
 
-        private String createEventInAPI(Date date, String mileage) throws IOException
+        private void createEventInAPI(Date date, String mileage) throws IOException
         {
             if (isRacePlannerCalendarCreated())
             {
@@ -901,17 +734,15 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
 
                     event.setStart(startEventDateTime);
                     event.setEnd(endEventDateTime);
-
                     event = mService.events().insert(calID, event).execute();
-                    return event.getId();
+
+                    db.insertEventToDatabase(TRAINING_PLAN_ID, event.getId());
 
                 } catch (IOException e)
                 {
                     Log.e(TAG, "IOException: ", e);
                 }
-
             }
-            return null;
         }
 
 

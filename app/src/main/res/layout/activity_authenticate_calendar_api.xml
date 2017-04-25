@@ -17,6 +17,31 @@
         android:padding="16dp"
         android:scrollbars="vertical"
         />
+
+    <Button
+        android:id="@+id/button_delete_training_plan"
+        android:text="delete training plan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button_create_training_plan"/>
+
+    <Button
+    android:id="@+id/button_query_database"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="query database"
+    android:textColor="@android:color/holo_red_light"
+    android:layout_above="@id/button_delete_training_plan"
+    />
+
+    <Button
+        android:id="@+id/button_delete_all_test_plans"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="delete all test plans"
+        android:layout_alignBottom="@+id/button_query_database"
+        android:layout_alignParentRight="true"/>
+
     <Button
         android:id="@+id/button_create_training_plan"
         android:layout_width="match_parent"
@@ -25,13 +50,6 @@
         android:layout_above="@+id/button_create_calendar"
         android:layout_marginBottom="16dp"
         />
-
-    <Button
-        android:id="@+id/button_delete_training_plan"
-        android:text="delete training plans"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/button_create_training_plan"/>
     <Button
         android:id="@+id/button_create_calendar"
         android:layout_above="@+id/button_delete_calendar"
