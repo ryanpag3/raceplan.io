@@ -29,7 +29,6 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecovera
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.Data;
 import com.google.api.client.util.DateTime;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.calendar.CalendarScopes;
@@ -41,7 +40,6 @@ import com.google.api.services.calendar.model.EventDateTime;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -50,7 +48,6 @@ import java.util.Locale;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
-import com.example.ryan.raceplanner.DatabaseHelper;
 
 public class AuthenticateCalendarAPI extends Activity implements EasyPermissions.PermissionCallbacks
 {
@@ -71,7 +68,6 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
     RacerInfo racerInfo;
     Date raceDate;
     private TextView mOutputText;
-    List<List<String>> trainingPlans;
     DatabaseHelper db;
 
     @Override
@@ -199,6 +195,9 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         // DEBUGGING END
     }
 
+    /**
+     * Returns true if prerequisites for API are met.
+     */
     private boolean meetsPreReqs()
     {
         if (!isGooglePlayServicesAvailable()) {
@@ -213,11 +212,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
     }
 
     /**
-     * Attempt to call the API, after verifying that all the preconditions are
-     * satisfied. The preconditions are: Google Play Services installed, an
-     * account was selected and the device currently has online access. If any
-     * of the preconditions are not satisfied, the app will prompt the user as
-     * appropriate.
+     * If prereqs are met, calls a new AsyncTask with proper ID
      */
     private void createCalendar()
     {
@@ -228,6 +223,9 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         }
     }
 
+    /**
+     * If prereqs are met, calls a new AsyncTask with proper ID
+     */
     private void deleteCalendar()
     {
         if (meetsPreReqs())
@@ -237,6 +235,9 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         }
     }
 
+    /**
+     * If prereqs are met, calls a new AsyncTask with proper ID
+     */
     private void createTrainingPlan()
     {
         if (meetsPreReqs())
@@ -246,6 +247,9 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         }
     }
 
+    /**
+     * If prereqs are met, calls a new AsyncTask with proper ID
+     */
     private void deleteTrainingPlan()
     {
         if (meetsPreReqs())
@@ -437,7 +441,6 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
      * An asynchronous task that handles the Google Calendar API call.
      * Placing the API calls in their own task ensures the UI stays responsive.
      */
-
     private class MakeCalendarTask extends AsyncTask<Integer, Integer, Void>
     {
         private com.google.api.services.calendar.Calendar mService = null;
@@ -458,7 +461,6 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         @Override
         protected Void doInBackground(Integer... id) {
             try {
-                trainingPlans = new ArrayList<>();
                 switch (id[0])
                 {
                     case R.id.button_create_calendar:
@@ -487,7 +489,6 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         /**
          * Creates new Calendar for events to be placed in.
          * @throws IOException throws exception if input is missing
-         * TODO: calID can only check for
          */
         private void createCalendarInAPI() throws IOException {
             if (!isRacePlannerCalendarCreated())
@@ -503,7 +504,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                 calID = createdCalendar.getId();
             } else
             {
-                //mOutputText.setText("Calendar already created.");
+                mOutputText.setText("Calendar already created.");
             }
         }
 
@@ -523,6 +524,11 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             }
         }
 
+        /**
+         * Deletes the training plan from the database, then removes calendar events
+         * by stored eventIDs.
+         * @throws IOException
+         */
         private void deleteTrainingPlanTask() throws IOException
         {
 
@@ -534,6 +540,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                 deleteEventByID(c.getString(1));
             }
         }
+
 
         private void deleteEventByID(String ID) throws IOException
         {
