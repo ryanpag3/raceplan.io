@@ -71,6 +71,8 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
     private TextView mOutputText;
     DatabaseHelper db;
 
+    CalendarTask c;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -80,6 +82,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
         racerInfo  = getIntent().getExtras().getParcelable(GlobalVariables.RACER_INFO_ID);
         Log.i(TAG, racerInfo.nameOfPlan);
         db = new DatabaseHelper(this);
+        c = new CalendarTask(mCredential, racerInfo, this);
 
         java.util.Calendar cal = java.util.Calendar.getInstance();
         cal.set(java.util.Calendar.YEAR, racerInfo.year);
@@ -106,9 +109,16 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             @Override
             public void onClick(View v)
             {
-                createCalendar();
-                buttonPressed = true;
-
+                if (meetsPreReqs())
+                {
+                    try
+                    {
+                        createCalendar();
+                        buttonPressed = true;
+                    } catch (IOException e)
+                    {
+                    }
+                }
             }
         });
 
@@ -118,8 +128,17 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             @Override
             public void onClick(View v)
             {
-                deleteCalendar();
-                buttonPressed = true;
+                if (meetsPreReqs())
+                {
+                    try
+                    {
+                        deleteCalendar();
+                        buttonPressed = true;
+                    } catch (IOException e)
+                    {
+                        Log.e(TAG, "IOException" + e.toString());
+                    }
+                }
             }
         });
 
@@ -129,7 +148,17 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             @Override
             public void onClick(View v)
             {
-                createTrainingPlan();
+                if (meetsPreReqs())
+                {
+                    try
+                    {
+                        createTrainingPlan();
+                        buttonPressed = true;
+                    } catch (IOException e)
+                    {
+                        Log.e(TAG, "IOException" + e.toString());
+                    }
+                }
             }
         });
 
@@ -139,7 +168,17 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             @Override
             public void onClick(View v)
             {
-                deleteTrainingPlan();
+                if (meetsPreReqs())
+                {
+                    try
+                    {
+                        deleteTrainingPlan();
+                        buttonPressed = true;
+                    } catch (IOException e)
+                    {
+                        Log.e(TAG, "IOException" + e.toString());
+                    }
+                }
             }
         });
 
@@ -151,7 +190,6 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
             {
                 if (buttonPressed)
                 {
-
                     Intent intent = new Intent(AuthenticateCalendarAPI.this, GenerateTrainingPlan.class);
                     intent.putExtra(GlobalVariables.RACER_INFO_ID, getIntent().getExtras().getParcelable(GlobalVariables.RACER_INFO_ID));
                     intent.putExtra(GlobalVariables.CALENDAR_CREATED_ID, calCreated);
@@ -223,49 +261,44 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
     /**
      * If prereqs are met, calls a new AsyncTask with proper ID
      */
-    private void createCalendar()
+    private void createCalendar() throws IOException
     {
-        if (meetsPreReqs())
-        {
-            new MakeCalendarTask(mCredential).execute(R.id.button_create_calendar);
-            mOutputText.setText("Calendar created");
-        }
+        new CalendarTask(mCredential, racerInfo, this).execute("createCalendar");
+        mOutputText.setText("Calendar created");
+
     }
 
     /**
      * If prereqs are met, calls a new AsyncTask with proper ID
      */
-    private void deleteCalendar()
+    private void deleteCalendar() throws IOException
     {
-        if (meetsPreReqs())
-        {
-            new MakeCalendarTask(mCredential).execute(R.id.button_delete_calendar);
-            mOutputText.setText("Calendar deleted");
-        }
+        new CalendarTask(mCredential, racerInfo, this).execute("deleteCalendar");
+        mOutputText.setText("Calendar deleted");
+
     }
 
     /**
      * If prereqs are met, calls a new AsyncTask with proper ID
      */
-    private void createTrainingPlan()
+    private void createTrainingPlan() throws IOException
     {
-        if (meetsPreReqs())
-        {
-            new MakeCalendarTask(mCredential).execute(R.id.button_create_training_plan);
-            mOutputText.setText("Training plan created.");
-        }
+
+        new CalendarTask(mCredential, racerInfo, this).execute("createTrainingPlan");
+        //new CalendarTask(mCredential, racerInfo).execute(R.id.button_create_training_plan);
+        mOutputText.setText("Training plan created.");
+
     }
 
     /**
      * If prereqs are met, calls a new AsyncTask with proper ID
      */
-    private void deleteTrainingPlan()
+    private void deleteTrainingPlan() throws IOException
     {
-        if (meetsPreReqs())
-        {
-            new MakeCalendarTask(mCredential).execute(R.id.button_delete_training_plan);
-            mOutputText.setText("Training plan events deleted.");
-        }
+        new CalendarTask(mCredential, racerInfo, this).execute("deleteTrainingPlan");
+        //new CalendarTask(mCredential, racerInfo).execute(R.id.button_delete_training_plan);
+        mOutputText.setText("Training plan events deleted.");
+
     }
 
     /**
@@ -323,7 +356,7 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                     mOutputText.setText(
                             "This app requires Google Play Services. Please install " + "Google Play Services on your device and relaunch this app.");
                 } else {
-                    createCalendar();
+                    meetsPreReqs();
                 }
                 break;
             case REQUEST_ACCOUNT_PICKER:
@@ -338,13 +371,13 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
                         editor.putString(PREF_ACCOUNT_NAME, accountName);
                         editor.apply();
                         mCredential.setSelectedAccountName(accountName);
-                        createCalendar();
+                        meetsPreReqs();
                     }
                 }
                 break;
             case REQUEST_AUTHORIZATION:
                 if (resultCode == RESULT_OK) {
-                    createCalendar();
+                    meetsPreReqs();
                 }
                 break;
         }
@@ -450,334 +483,335 @@ public class AuthenticateCalendarAPI extends Activity implements EasyPermissions
      * An asynchronous task that handles the Google Calendar API call.
      * Placing the API calls in their own task ensures the UI stays responsive.
      */
-    private class MakeCalendarTask extends AsyncTask<Integer, Integer, Void>
-    {
-        private com.google.api.services.calendar.Calendar mService = null;
-        private Exception mLastError = null;
-
-        MakeCalendarTask(GoogleAccountCredential credential) {
-            HttpTransport transport = AndroidHttp.newCompatibleTransport();
-            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-            mService = new com.google.api.services.calendar.Calendar.Builder(
-                    transport, jsonFactory, credential)
-                    .setApplicationName("race-planner")
-                    .build();
-        }
-
-        /**
-         * Background task to call Google Calendar API.
-         */
-        @Override
-        protected Void doInBackground(Integer... id) {
-            try {
-                switch (id[0])
-                {
-                    case R.id.button_create_calendar:
-                        createCalendarInAPI();
-                        Log.i(TAG, id[0].toString());
-                        break;
-                    case R.id.button_delete_calendar:
-                        deleteCalendarFromAPI();
-                        Log.i(TAG, id[0].toString());
-                        break;
-                    case R.id.button_create_training_plan:
-                        createPlan();
-                        Log.i(TAG, id[0].toString());
-                        break;
-                    case R.id.button_delete_training_plan:
-                        deleteTrainingPlanTask();
-                        break;
-                }
-            } catch (Exception e) {
-                mLastError = e;
-                cancel(true);
-            }
-            return null;
-        }
-
-        /**
-         * Creates new Calendar for events to be placed in.
-         * @throws IOException throws exception if input is missing
-         */
-        private void createCalendarInAPI() throws IOException {
-            if (!isRacePlannerCalendarCreated())
-            {
-                // BUG: when removing library definition and adding an import, calls the wrong constructor
-                // WORKAROUND: defined all manually
-                com.google.api.services.calendar.model.Calendar calendar = new com.google.api.services.calendar.model.Calendar();
-                calendar.setSummary("race-planner");
-                calendar.setTimeZone("America/Los_Angeles");
-                com.google.api.services.calendar.model.Calendar createdCalendar = mService.calendars().insert(calendar).execute();
-                calCreated = true;
-
-                calID = createdCalendar.getId();
-            } else
-            {
-                mOutputText.setText("Calendar already created.");
-            }
-        }
-
-        /**
-         * Deletes the created Calendar
-         * @throws IOException
-         */
-        private void deleteCalendarFromAPI() throws IOException
-        {
-            if (isRacePlannerCalendarCreated()){
-                mService.calendars().delete(calID).execute();
-                calCreated = false;
-            }
-            else
-            {
-                mOutputText.setText("No calendar to delete.");
-            }
-        }
-
-        /**
-         * Deletes the training plan from the database, then removes calendar events
-         * by stored eventIDs.
-         * @throws IOException
-         */
-        private void deleteTrainingPlanTask() throws IOException
-        {
-
-            db.deletePlanFromDatabase(TRAINING_PLAN_ID);
-            Cursor c = db.query("SELECT * FROM " + DatabaseHelper.EVENT_ID_TABLE_NAME + " WHERE " + DatabaseHelper.EVENT_ID_COL_1 + "=?", new String[] {String.valueOf(TRAINING_PLAN_ID)});
-
-            while (c.moveToNext())
-            {
-                deleteEventByID(c.getString(1));
-            }
-        }
-
-
-        private void deleteEventByID(String ID) throws IOException
-        {
-            mService.events().delete(calID, ID).execute();
-        }
-
-        private boolean isRacePlannerCalendarCreated() throws IOException
-        {
-            // iterate through entries in calendar list
-            String pageToken = null;
-            do
-            {
-                CalendarList calendarList = mService.calendarList().list().setPageToken(pageToken).execute();
-                List<CalendarListEntry> items = calendarList.getItems();
-
-                for (CalendarListEntry calendarListEntry : items)
-                {
-                    String temp = calendarListEntry.getSummary();
-                    if (calendarListEntry.getSummary().equals("race-planner"))
-                    {
-                        calID = calendarListEntry.getId();
-                        Log.i(TAG, "isRacePlannerCalendarCreated returned true");
-                        return true;
-                    }
-                }
-                pageToken = calendarList.getNextPageToken();
-            } while (pageToken != null);
-            Log.i(TAG, "isRacePlannerCrated returned false");
-            return false;
-        }
-
-        private void createPlan() throws IOException
-        {
-            double startingMiles = -1;
-            double goalMiles = 5;
-            double tuesdayMiles;
-            double wednesdayMiles;
-            double thursdayMiles;
-            double sundayMiles = -1;
-            double bumpMileageUp = -1;
-            int tuesThursMileCap = -1;
-            int wedMileCap = -1;
-            long dayInMillis = 86400000;
-            int weeksOfTraining = -1;
-            Date startDate; // amount of millis in a week * 8 weeks
-            Date tuesday;
-            SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
-            Log.e(TAG, "YOOOOOOO THIS IS THE NAME: " + racerInfo.nameOfPlan);
-            db.insertNewPlanToDatabase(racerInfo.nameOfPlan);
-
-            Cursor c = db.query("SELECT * FROM " + DatabaseHelper.TRAINING_PLAN_TABLE_NAME, null);
-            c.moveToLast();
-            TRAINING_PLAN_ID = c.getInt(0);
-            Log.e(TAG, "YOOOOOOO THIS IS THE ID: " + TRAINING_PLAN_ID);
-            c.close();
-
-            switch (racerInfo.experienceLevel)
-            {
-                case "Beginner":
-                    startingMiles = 1;
-                    sundayMiles = 2;
-                    bumpMileageUp = 1;
-                    break;
-                case "Intermediate":
-                    startingMiles = 3;
-                    sundayMiles = 3;
-                    bumpMileageUp = 1;
-                    break;
-                case "Expert":
-                    startingMiles = 3;
-                    sundayMiles = 5;
-                    bumpMileageUp = 1;
-                    break;
-            }
-
-            switch(racerInfo.raceType)
-            {
-                case "5k":
-                    weeksOfTraining = 8;
-                    goalMiles = 5;
-                    tuesThursMileCap = 2;
-                    wedMileCap = 3;
-                    break;
-                case "10k":
-                    weeksOfTraining = 12;
-                    goalMiles = 7;
-                    tuesThursMileCap = 3;
-                    wedMileCap = 5;
-                    break;
-                case "Half-Marathon":
-                    weeksOfTraining = 12;
-                    goalMiles = 13;
-                    tuesThursMileCap = 5;
-                    wedMileCap = 7;
-                    break;
-                case "Marathon":
-                    weeksOfTraining = 18;
-                    goalMiles = 26;
-                    tuesThursMileCap = 5;
-                    wedMileCap = 10;
-                    break;
-            }
-
-            startDate = new Date(raceDate.getTime() - (604800000L * weeksOfTraining));
-            tuesday = startDate;
-
-            // push tuesday to correct day of week
-            while (!sdf.format(tuesday).equals("Tuesday"))
-            {
-                tuesday = new Date(tuesday.getTime() + 86400000);
-            }
-
-            Date wednesday = new Date(tuesday.getTime() + dayInMillis);
-            Date thursday = new Date(wednesday.getTime() + dayInMillis);
-            Date sunday = new Date(thursday.getTime() + (dayInMillis * 3));
-
-            // adjust first week values based on experience
-            tuesdayMiles = startingMiles;
-            wednesdayMiles = startingMiles + 1;
-            thursdayMiles = startingMiles;
-
-            for (int i = 0; i < weeksOfTraining; i++)
-            {
-                if (tuesday.getTime()   < raceDate.getTime())createEventInAPI(tuesday, Double.toString(tuesdayMiles));
-                if (tuesdayMiles < goalMiles && tuesdayMiles < tuesThursMileCap) { tuesdayMiles = tuesdayMiles + (bumpMileageUp / 2); }
-                tuesday   = getOneWeekLater(tuesday);
-                if (tuesday.getTime() > raceDate.getTime()) break;
-            }
-
-            for (int i = 0; i < weeksOfTraining; i++)
-            {
-                if (wednesday.getTime()   < raceDate.getTime())createEventInAPI(wednesday, Double.toString(wednesdayMiles));
-                if (wednesdayMiles < goalMiles && wednesdayMiles < wedMileCap) { wednesdayMiles = wednesdayMiles + (bumpMileageUp / 2); }
-                wednesday   = getOneWeekLater(wednesday);
-                if (wednesday.getTime() > raceDate.getTime()) break;
-            }
-
-            for (int i = 0; i < weeksOfTraining; i++)
-            {
-                if (thursday.getTime()   < raceDate.getTime())createEventInAPI(thursday, Double.toString(thursdayMiles));
-                if (thursdayMiles < goalMiles && thursdayMiles < tuesThursMileCap) { thursdayMiles = thursdayMiles + (bumpMileageUp / 2); }
-                thursday   = getOneWeekLater(thursday);
-                if (thursday.getTime() > raceDate.getTime()) break;
-            }
-
-            for (int i = 0; i < weeksOfTraining; i++)
-            {
-                if (sunday.getTime()   < raceDate.getTime())createEventInAPI(sunday, Double.toString(sundayMiles));
-                if (sundayMiles < goalMiles) { sundayMiles = sundayMiles + 1; }
-                sunday   = getOneWeekLater(sunday);
-                if (sunday.getTime() > raceDate.getTime()) break;
-            }
-        }
-
-        private Date getOneWeekLater(Date date)
-        {
-            return new Date(date.getTime() + 604800000L);
-        }
-
-
-        private void createEventInAPI(Date date, String mileage) throws IOException
-        {
-            if (isRacePlannerCalendarCreated())
-            {
-                try
-                {
-                    Event event = new Event()
-                            .setSummary(mileage + "M")
-                            .setDescription("race-planner");
-
-                    Date startDate = date;
-                    Date endDate = new Date(startDate.getTime() + 86400000);
-
-                    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-
-                    DateTime startDateTime = new DateTime(dateFormat.format(startDate));
-                    DateTime endDateTime = new DateTime(dateFormat.format(endDate));
-
-                    EventDateTime startEventDateTime = new EventDateTime().setDate(startDateTime);
-                    EventDateTime endEventDateTime = new EventDateTime().setDate(endDateTime);
-
-                    event.setStart(startEventDateTime);
-                    event.setEnd(endEventDateTime);
-                    event = mService.events().insert(calID, event).execute();
-
-                    db.insertEventToDatabase(TRAINING_PLAN_ID, event.getId());
-
-                } catch (IOException e)
-                {
-                    Log.e(TAG, "IOException: ", e);
-                }
-            }
-        }
-
-
-        @Override
-        protected void onPreExecute()
-        {
-            mOutputText.setText("");
-            mProgress.show();
-        }
-
-        @Override
-        protected void onPostExecute(Void output)
-        {
-            mProgress.hide();
-        }
-
-        @Override
-        protected void onCancelled()
-        {
-            mProgress.hide();
-            if (mLastError != null) {
-                if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
-                    showGooglePlayServicesAvailabilityErrorDialog(
-                            ((GooglePlayServicesAvailabilityIOException) mLastError)
-                                    .getConnectionStatusCode());
-                } else if (mLastError instanceof UserRecoverableAuthIOException) {
-                    startActivityForResult(
-                            ((UserRecoverableAuthIOException) mLastError).getIntent(),
-                            AuthenticateCalendarAPI.REQUEST_AUTHORIZATION);
-                } else {
-                    mOutputText.setText("The following error occurred:\n" + mLastError.getMessage());
-                }
-            } else {
-                mOutputText.setText("Request cancelled.");
-            }
-        }
-    }
+//    private class MakeCalendarTask extends AsyncTask<Integer, Integer, Void>
+//    {
+//        private com.google.api.services.calendar.Calendar mService = null;
+//        private Exception mLastError = null;
+//
+//        MakeCalendarTask(GoogleAccountCredential credential) {
+//            HttpTransport transport = AndroidHttp.newCompatibleTransport();
+//            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+//            mService = new com.google.api.services.calendar.Calendar.Builder(
+//                    transport, jsonFactory, credential)
+//                    .setApplicationName("race-planner")
+//                    .build();
+//        }
+//
+//        /**
+//         * Background task to call Google Calendar API.
+//         */
+//        @Override
+//        protected Void doInBackground(Integer... id) {
+//            try {
+//                switch (id[0])
+//                {
+//                    case R.id.button_create_calendar:
+//                        createCalendarInAPI();
+//                        Log.i(TAG, id[0].toString());
+//                        break;
+//                    case R.id.button_delete_calendar:
+//                        deleteCalendarFromAPI();
+//                        Log.i(TAG, id[0].toString());
+//                        break;
+//                    case R.id.button_create_training_plan:
+//                        createPlan();
+//                        Log.i(TAG, id[0].toString());
+//                        break;
+//                    case R.id.button_delete_training_plan:
+//                        deleteTrainingPlanTask();
+//                        break;
+//                }
+//            } catch (Exception e) {
+//                mLastError = e;
+//                cancel(true);
+//            }
+//            return null;
+//        }
+//
+//        /**
+//         * Creates new Calendar for events to be placed in.
+//         * @throws IOException throws exception if input is missing
+//         */
+//        private void createCalendarInAPI() throws IOException {
+//            if (!isRacePlannerCalendarCreated())
+//            {
+//                // BUG: when removing library definition and adding an import, calls the wrong constructor
+//                // WORKAROUND: defined all manually
+//                com.google.api.services.calendar.model.Calendar calendar = new com.google.api.services.calendar.model.Calendar();
+//                calendar.setSummary("race-planner");
+//                calendar.setTimeZone("America/Los_Angeles");
+//                com.google.api.services.calendar.model.Calendar createdCalendar = mService.calendars().insert(calendar).execute();
+//                calCreated = true;
+//
+//                calID = createdCalendar.getId();
+//            } else
+//            {
+//                mOutputText.setText("Calendar already created.");
+//            }
+//        }
+//
+//        /**
+//         * Deletes the created Calendar
+//         * @throws IOException
+//         */
+//        private void deleteCalendarFromAPI() throws IOException
+//        {
+//            if (isRacePlannerCalendarCreated()){
+//                mService.calendars().delete(calID).execute();
+//                calCreated = false;
+//            }
+//            else
+//            {
+//                mOutputText.setText("No calendar to delete.");
+//            }
+//        }
+//
+//        /**
+//         * Deletes the training plan from the database, then removes calendar events
+//         * by stored eventIDs.
+//         * @throws IOException
+//         */
+//        private void deleteTrainingPlanTask(int id) throws IOException
+//        {
+//
+//            db.deletePlanFromDatabase(id);
+//            Cursor c = db.query("SELECT * FROM " + DatabaseHelper.EVENT_ID_TABLE_NAME + " WHERE " + DatabaseHelper.EVENT_ID_COL_1 + "=?", new String[] {String.valueOf(id)});
+//
+//            while (c.moveToNext())
+//            {
+//                deleteEventByID(c.getString(1));
+//            }
+//        }
+//
+//
+//        private void deleteEventByID(String ID) throws IOException
+//        {
+//            mService.events().delete(calID, ID).execute();
+//        }
+//
+//        private boolean isRacePlannerCalendarCreated() throws IOException
+//        {
+//            // iterate through entries in calendar list
+//            String pageToken = null;
+//            do
+//            {
+//                CalendarList calendarList = mService.calendarList().list().setPageToken(pageToken).execute();
+//                List<CalendarListEntry> items = calendarList.getItems();
+//
+//                for (CalendarListEntry calendarListEntry : items)
+//                {
+//                    String temp = calendarListEntry.getSummary();
+//                    if (calendarListEntry.getSummary().equals("race-planner"))
+//                    {
+//                        calID = calendarListEntry.getId();
+//                        Log.i(TAG, "isRacePlannerCalendarCreated returned true");
+//                        return true;
+//                    }
+//                }
+//                pageToken = calendarList.getNextPageToken();
+//            } while (pageToken != null);
+//            Log.i(TAG, "isRacePlannerCrated returned false");
+//            return false;
+//        }
+//
+//        private void createPlan() throws IOException
+//        {
+//            double startingMiles = -1;
+//            double goalMiles = 5;
+//            double tuesdayMiles;
+//            double wednesdayMiles;
+//            double thursdayMiles;
+//            double sundayMiles = -1;
+//            double bumpMileageUp = -1;
+//            int tuesThursMileCap = -1;
+//            int wedMileCap = -1;
+//            long dayInMillis = 86400000;
+//            int weeksOfTraining = -1;
+//            Date startDate; // amount of millis in a week * 8 weeks
+//            Date tuesday;
+//            SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
+//            Log.e(TAG, "YOOOOOOO THIS IS THE NAME: " + racerInfo.nameOfPlan);
+//
+//            db.insertNewPlanToDatabase(racerInfo.nameOfPlan, racerInfo.getDate(), racerInfo.raceType, racerInfo.experienceLevel, "TBD");
+//
+//            Cursor c = db.query("SELECT * FROM " + DatabaseHelper.TRAINING_PLAN_TABLE_NAME, null);
+//            c.moveToLast();
+//            TRAINING_PLAN_ID = c.getInt(0);
+//            Log.e(TAG, "YOOOOOOO THIS IS THE ID: " + TRAINING_PLAN_ID);
+//            c.close();
+//
+//            switch (racerInfo.experienceLevel)
+//            {
+//                case "Beginner":
+//                    startingMiles = 1;
+//                    sundayMiles = 2;
+//                    bumpMileageUp = 1;
+//                    break;
+//                case "Intermediate":
+//                    startingMiles = 3;
+//                    sundayMiles = 3;
+//                    bumpMileageUp = 1;
+//                    break;
+//                case "Expert":
+//                    startingMiles = 3;
+//                    sundayMiles = 5;
+//                    bumpMileageUp = 1;
+//                    break;
+//            }
+//
+//            switch(racerInfo.raceType)
+//            {
+//                case "5k":
+//                    weeksOfTraining = 8;
+//                    goalMiles = 5;
+//                    tuesThursMileCap = 2;
+//                    wedMileCap = 3;
+//                    break;
+//                case "10k":
+//                    weeksOfTraining = 12;
+//                    goalMiles = 7;
+//                    tuesThursMileCap = 3;
+//                    wedMileCap = 5;
+//                    break;
+//                case "Half-Marathon":
+//                    weeksOfTraining = 12;
+//                    goalMiles = 13;
+//                    tuesThursMileCap = 5;
+//                    wedMileCap = 7;
+//                    break;
+//                case "Marathon":
+//                    weeksOfTraining = 18;
+//                    goalMiles = 26;
+//                    tuesThursMileCap = 5;
+//                    wedMileCap = 10;
+//                    break;
+//            }
+//
+//            startDate = new Date(raceDate.getTime() - (604800000L * weeksOfTraining));
+//            tuesday = startDate;
+//
+//            // push tuesday to correct day of week
+//            while (!sdf.format(tuesday).equals("Tuesday"))
+//            {
+//                tuesday = new Date(tuesday.getTime() + 86400000);
+//            }
+//
+//            Date wednesday = new Date(tuesday.getTime() + dayInMillis);
+//            Date thursday = new Date(wednesday.getTime() + dayInMillis);
+//            Date sunday = new Date(thursday.getTime() + (dayInMillis * 3));
+//
+//            // adjust first week values based on experience
+//            tuesdayMiles = startingMiles;
+//            wednesdayMiles = startingMiles + 1;
+//            thursdayMiles = startingMiles;
+//
+//            for (int i = 0; i < weeksOfTraining; i++)
+//            {
+//                if (tuesday.getTime()   < raceDate.getTime())createEventInAPI(tuesday, Double.toString(tuesdayMiles));
+//                if (tuesdayMiles < goalMiles && tuesdayMiles < tuesThursMileCap) { tuesdayMiles = tuesdayMiles + (bumpMileageUp / 2); }
+//                tuesday   = getOneWeekLater(tuesday);
+//                if (tuesday.getTime() > raceDate.getTime()) break;
+//            }
+//
+//            for (int i = 0; i < weeksOfTraining; i++)
+//            {
+//                if (wednesday.getTime()   < raceDate.getTime())createEventInAPI(wednesday, Double.toString(wednesdayMiles));
+//                if (wednesdayMiles < goalMiles && wednesdayMiles < wedMileCap) { wednesdayMiles = wednesdayMiles + (bumpMileageUp / 2); }
+//                wednesday   = getOneWeekLater(wednesday);
+//                if (wednesday.getTime() > raceDate.getTime()) break;
+//            }
+//
+//            for (int i = 0; i < weeksOfTraining; i++)
+//            {
+//                if (thursday.getTime()   < raceDate.getTime())createEventInAPI(thursday, Double.toString(thursdayMiles));
+//                if (thursdayMiles < goalMiles && thursdayMiles < tuesThursMileCap) { thursdayMiles = thursdayMiles + (bumpMileageUp / 2); }
+//                thursday   = getOneWeekLater(thursday);
+//                if (thursday.getTime() > raceDate.getTime()) break;
+//            }
+//
+//            for (int i = 0; i < weeksOfTraining; i++)
+//            {
+//                if (sunday.getTime()   < raceDate.getTime())createEventInAPI(sunday, Double.toString(sundayMiles));
+//                if (sundayMiles < goalMiles) { sundayMiles = sundayMiles + 1; }
+//                sunday   = getOneWeekLater(sunday);
+//                if (sunday.getTime() > raceDate.getTime()) break;
+//            }
+//        }
+//
+//        private Date getOneWeekLater(Date date)
+//        {
+//            return new Date(date.getTime() + 604800000L);
+//        }
+//
+//
+//        private void createEventInAPI(Date date, String mileage) throws IOException
+//        {
+//            if (isRacePlannerCalendarCreated())
+//            {
+//                try
+//                {
+//                    Event event = new Event()
+//                            .setSummary(mileage + "M")
+//                            .setDescription("race-planner");
+//
+//                    Date startDate = date;
+//                    Date endDate = new Date(startDate.getTime() + 86400000);
+//
+//                    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+//
+//                    DateTime startDateTime = new DateTime(dateFormat.format(startDate));
+//                    DateTime endDateTime = new DateTime(dateFormat.format(endDate));
+//
+//                    EventDateTime startEventDateTime = new EventDateTime().setDate(startDateTime);
+//                    EventDateTime endEventDateTime = new EventDateTime().setDate(endDateTime);
+//
+//                    event.setStart(startEventDateTime);
+//                    event.setEnd(endEventDateTime);
+//                    event = mService.events().insert(calID, event).execute();
+//
+//                    db.insertEventToDatabase(TRAINING_PLAN_ID, event.getId());
+//
+//                } catch (IOException e)
+//                {
+//                    Log.e(TAG, "IOException: ", e);
+//                }
+//            }
+//        }
+//
+//
+//        @Override
+//        protected void onPreExecute()
+//        {
+//            mOutputText.setText("");
+//            mProgress.show();
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Void output)
+//        {
+//            mProgress.hide();
+//        }
+//
+//        @Override
+//        protected void onCancelled()
+//        {
+//            mProgress.hide();
+//            if (mLastError != null) {
+//                if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
+//                    showGooglePlayServicesAvailabilityErrorDialog(
+//                            ((GooglePlayServicesAvailabilityIOException) mLastError)
+//                                    .getConnectionStatusCode());
+//                } else if (mLastError instanceof UserRecoverableAuthIOException) {
+//                    startActivityForResult(
+//                            ((UserRecoverableAuthIOException) mLastError).getIntent(),
+//                            AuthenticateCalendarAPI.REQUEST_AUTHORIZATION);
+//                } else {
+//                    mOutputText.setText("The following error occurred:\n" + mLastError.getMessage());
+//                }
+//            } else {
+//                mOutputText.setText("Request cancelled.");
+//            }
+//        }
+//    }
 
 }

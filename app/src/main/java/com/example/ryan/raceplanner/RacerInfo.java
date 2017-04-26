@@ -45,19 +45,9 @@ public class RacerInfo implements Parcelable
     }
 
     // Getters && Setters
-    int getYear()
+    String getDate()
     {
-        return year;
-    }
-
-    int getMonth()
-    {
-        return month;
-    }
-
-    int getDay()
-    {
-        return day;
+        return year + "-" + month + "-" + day;
     }
 
     boolean isComplete()

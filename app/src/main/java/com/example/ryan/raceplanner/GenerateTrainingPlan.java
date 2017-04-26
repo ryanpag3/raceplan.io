@@ -279,9 +279,9 @@ public class GenerateTrainingPlan extends AppCompatActivity
     public void createEvent(Long calID, RacerInfo racerInfo)
     {
         Calendar beginTime = Calendar.getInstance();
-        beginTime.set(racerInfo.getYear(), racerInfo.getMonth() - 1, racerInfo.getDay(), 0, 0);
+        beginTime.set(racerInfo.year, racerInfo.month - 1, racerInfo.day, 0, 0);
         Calendar endTime = Calendar.getInstance();
-        endTime.set(racerInfo.getYear(), racerInfo.getMonth() - 1, racerInfo.getDay(), 0, 0);
+        endTime.set(racerInfo.year, racerInfo.month - 1, racerInfo.day, 0, 0);
 
         long startMillis = beginTime.getTimeInMillis();
         long endMillis = endTime.getTimeInMillis();

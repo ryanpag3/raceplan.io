@@ -16,6 +16,10 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public static final String TRAINING_PLAN_TABLE_NAME = "training_plans_table";
     public static final String TRAINING_PLAN_COL_1 = "id";
     public static final String TRAINING_PLAN_COL_2 = "name";
+    public static final String TRAINING_PLAN_COL_3 = "race_date";
+    public static final String TRAINING_PLAN_COL_4 = "race_type";
+    public static final String TRAINING_PLAN_COL_5 = "experience_level";
+    public static final String TRAINING_PLAN_COL_6 = "calendar";
 
 
     public static final String EVENT_ID_TABLE_NAME = "event_id_table";
@@ -24,7 +28,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     public DatabaseHelper(Context context)
     {
-        super(context, DATABASE_NAME, null, 1);
+        super(context, DATABASE_NAME, null, 2);
         SQLiteDatabase db = this.getWritableDatabase();
 
     }
@@ -33,8 +37,13 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public void onCreate(SQLiteDatabase db)
     {
         db.execSQL("create table " + TRAINING_PLAN_TABLE_NAME
-                + " ( " + TRAINING_PLAN_COL_1 + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                        + TRAINING_PLAN_COL_2 + " TEXT)");
+                + " (" + TRAINING_PLAN_COL_1 + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                        + TRAINING_PLAN_COL_2 + " TEXT NOT NULL, "
+                        + TRAINING_PLAN_COL_3 + " TEXT NOT NULL, "
+                        + TRAINING_PLAN_COL_4 + " TEXT NOT NULL, "
+                        + TRAINING_PLAN_COL_5 + " TEXT NOT NULL, "
+                        + TRAINING_PLAN_COL_6 + " TEXT NOT NULL)");
+
         db.execSQL("create table " + EVENT_ID_TABLE_NAME
                 + " ( " + EVENT_ID_COL_1 + " INT NOT NULL, "
                         + EVENT_ID_COL_2 + " TEXT, PRIMARY KEY(training_plan_id, event_id))");
@@ -70,11 +79,16 @@ public class DatabaseHelper extends SQLiteOpenHelper
      * @param name
      * @return
      */
-    public boolean insertNewPlanToDatabase(String name)
+    public boolean insertNewPlanToDatabase(String name, String raceDate, String raceType,
+                                           String experienceLevel, String calendarName)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(TRAINING_PLAN_COL_2, name);
+        values.put(TRAINING_PLAN_COL_3, raceDate);
+        values.put(TRAINING_PLAN_COL_4, raceType);
+        values.put(TRAINING_PLAN_COL_5, experienceLevel);
+        values.put(TRAINING_PLAN_COL_6, calendarName);
         long result = db.insert(TRAINING_PLAN_TABLE_NAME, null, values);
         return result != -1;
     }
@@ -83,7 +97,8 @@ public class DatabaseHelper extends SQLiteOpenHelper
     {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TRAINING_PLAN_TABLE_NAME, TRAINING_PLAN_COL_1 + "=" + id, null);
-        //db.delete(EVENT_ID_TABLE_NAME, EVENT_ID_COL_1 + "=" + id, null);
+        db.delete(EVENT_ID_TABLE_NAME, EVENT_ID_COL_1 + "=" + id, null);
+
     }
 
     public void deletePlanFromDatabase(String name)
