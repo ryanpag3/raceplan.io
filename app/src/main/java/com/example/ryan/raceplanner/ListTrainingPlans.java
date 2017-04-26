@@ -1,9 +1,17 @@
 package com.example.ryan.raceplanner;
 
+import android.Manifest;
+import android.accounts.AccountManager;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,23 +28,68 @@ import android.widget.TextView;
 import org.w3c.dom.Text;
 
 import java.lang.reflect.Array;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 import com.example.ryan.raceplanner.CalendarTask;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.util.ExponentialBackOff;
+import com.google.api.services.calendar.CalendarScopes;
+
+import android.text.format.DateFormat;
+
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
 
 public class ListTrainingPlans extends AppCompatActivity
 {
+    static final int REQUEST_ACCOUNT_PICKER = 1000;
+    static final int REQUEST_AUTHORIZATION = 1001;
+    static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
+    static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
+    private static final String BUTTON_TEXT = "Call Google Calendar API";
+    private static final String PREF_ACCOUNT_NAME = "accountName";
+    private static final String[] SCOPES = { CalendarScopes.CALENDAR };
+
     ArrayList<String> results = new ArrayList<>();
     ViewHolder mViewHolder = new ViewHolder();
     private final String TAG = this.getClass().getSimpleName();
-
+    GoogleAccountCredential mCredential;
+    MyArrayAdapter myArrayAdapter;
+    ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_training_plans);
+
+        myArrayAdapter = new MyArrayAdapter(this);
+
+        mCredential = GoogleAccountCredential.usingOAuth2(
+                getApplicationContext(), Arrays.asList(SCOPES))
+                .setBackOff(new ExponentialBackOff());
+        mCredential.setSelectedAccountName(getIntent().getExtras().getString(GlobalVariables.CREDENTIAL_ACCOUNT_NAME));
+
+        Button refreshButton = (Button) findViewById(R.id.button_refresh);
+        refreshButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                myArrayAdapter = new MyArrayAdapter(ListTrainingPlans.this);
+                listView.setAdapter(myArrayAdapter);
+                Log.i(TAG, "set adapter");
+            }
+        });
+
         openAndQueryDatabase();
         displayTrainingPlanList();
     }
@@ -74,10 +127,10 @@ public class ListTrainingPlans extends AppCompatActivity
     {
         String[] fromColumns = new String[results.size()];
         int[] toViews = {android.R.id.text1};
-        ListView listView = (ListView) findViewById(R.id.list_view_created_plans);
-        MyArrayAdapter myArrayAdapter = new MyArrayAdapter(this);
+        listView = (ListView) findViewById(R.id.list_view_created_plans);
         listView.setAdapter(myArrayAdapter);
     }
+
 
     /**
      * Custom ArrayAdapter for populating the ListView
@@ -85,7 +138,6 @@ public class ListTrainingPlans extends AppCompatActivity
     private class MyArrayAdapter extends BaseAdapter
     {
         private LayoutInflater inflater;
-
 
         public MyArrayAdapter(Context context)
         {
@@ -128,12 +180,34 @@ public class ListTrainingPlans extends AppCompatActivity
                 @Override
                 public void onClick(View v)
                 {
+                        // parse date string
+                        String dateString = mViewHolder.raceDateList.get(position);
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                        Date date = new Date();
+                        try
+                        {
+                            date = dateFormat.parse(dateString);
+                        } catch (ParseException e)
+                        {
+                            e.printStackTrace();
+                        }
 
-                    db.deletePlanFromDatabase(mViewHolder.idList.get(position));
-                    mViewHolder.idList.remove(position);
-                    notifyDataSetChanged();
+                        // create new RacerInfo object to pass to AsyncTask
+                        int year = Integer.parseInt((String) DateFormat.format("yyyy", date));
+                        int month = Integer.parseInt((String) DateFormat.format("MM", date));
+                        int day = Integer.parseInt((String) DateFormat.format("dd", date));
 
-                }
+                        int id = mViewHolder.idList.get(position);
+                        String name = mViewHolder.nameList.get(position);
+                        String raceType = mViewHolder.raceTypeList.get(position);
+                        String experienceLevel = mViewHolder.experienceLevelList.get(position);
+                        String calendarName = mViewHolder.calendarList.get(position);
+
+                        RacerInfo racerInfo = new RacerInfo(year, month, day, raceType, experienceLevel, name, id);
+
+                        new CalendarTask(mCredential, racerInfo, ListTrainingPlans.this).execute("deleteTrainingPlan");
+                        mViewHolder.idList.remove(position);
+                    }
             });
 
             mViewHolder.name.setText(mViewHolder.nameList.get(position));

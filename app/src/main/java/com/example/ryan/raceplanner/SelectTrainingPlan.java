@@ -101,6 +101,8 @@ public class SelectTrainingPlan extends AppCompatActivity implements AdapterView
                     {
                         Intent intent = new Intent(SelectTrainingPlan.this, AuthenticateCalendarAPI.class);
                         intent.putExtra(GlobalVariables.RACER_INFO_ID, racerInfo);
+                        intent.putExtra(GlobalVariables.CREDENTIAL_ACCOUNT_NAME, getIntent()
+                                .getExtras().getString(GlobalVariables.CREDENTIAL_ACCOUNT_NAME));
                         startActivity(intent);
                     } else
                     {

@@ -25,14 +25,17 @@ public class RacerInfo implements Parcelable
     int year;
     int month;
     int day;
+    int databaseID;
 
-    RacerInfo(int y, int m, int d, String r, String e)
+    RacerInfo(int y, int m, int d, String r, String e, String n, int id)
     {
         year = y;
         month = m;
         day = d;
         raceType = r;
         experienceLevel = e;
+        nameOfPlan = n;
+        databaseID = id;
     }
 
     RacerInfo()

@@ -7,6 +7,15 @@
     android:layout_height="match_parent"
     tools:context="com.example.ryan.raceplanner.MainActivity">
 
+    <TextView
+        android:id="@+id/mOutputText"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:scrollbars="vertical"
+        />
+
     <Button
         android:id="@+id/button_open_select_training_plan_activity"
         android:text="create training plan"

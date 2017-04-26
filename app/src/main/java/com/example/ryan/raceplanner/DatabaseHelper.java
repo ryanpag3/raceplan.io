@@ -25,10 +25,12 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public static final String EVENT_ID_TABLE_NAME = "event_id_table";
     public static final String EVENT_ID_COL_1 = "training_plan_id";
     public static final String EVENT_ID_COL_2 = "event_id";
+    public static final String EVENT_ID_COL_3 = "calendar_id";
+
 
     public DatabaseHelper(Context context)
     {
-        super(context, DATABASE_NAME, null, 2);
+        super(context, DATABASE_NAME, null, 4);
         SQLiteDatabase db = this.getWritableDatabase();
 
     }
@@ -46,7 +48,8 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
         db.execSQL("create table " + EVENT_ID_TABLE_NAME
                 + " ( " + EVENT_ID_COL_1 + " INT NOT NULL, "
-                        + EVENT_ID_COL_2 + " TEXT, PRIMARY KEY(training_plan_id, event_id))");
+                        + EVENT_ID_COL_2 + " TEXT, "
+                        + EVENT_ID_COL_3 + " TEXT )");
     }
 
     @Override
@@ -108,12 +111,13 @@ public class DatabaseHelper extends SQLiteOpenHelper
         db.delete(EVENT_ID_TABLE_NAME, null, null);
     }
 
-    public boolean insertEventToDatabase(int plan_id, String event_id)
+    public boolean insertEventToDatabase(int plan_id, String event_id, String calID)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(EVENT_ID_COL_1, plan_id);
         values.put(EVENT_ID_COL_2, event_id);
+        values.put(EVENT_ID_COL_3, calID);
         long result = db.insert(EVENT_ID_TABLE_NAME, null, values);
         return result != -1;
     }

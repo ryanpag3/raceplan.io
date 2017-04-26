@@ -63,6 +63,7 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
 
         HttpTransport transport = AndroidHttp.newCompatibleTransport();
         JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+        mCredential = credential;
         mService = new com.google.api.services.calendar.Calendar.Builder(
                 transport, jsonFactory, credential)
                 .setApplicationName("race-planner")
@@ -89,15 +90,12 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
                 {
                     case "createCalendar":
                         createCalendarInAPI();
-                        Log.i(TAG, methodCall[0].toString());
                         break;
                     case "deleteCalendar":
                         deleteCalendarFromAPI();
-                        Log.i(TAG, methodCall[0].toString());
                         break;
                     case "createTrainingPlan":
                         createPlan();
-                        Log.i(TAG, methodCall[0].toString());
                         break;
                     case "deleteTrainingPlan":
                         deleteTrainingPlanTask();
@@ -157,22 +155,27 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
      */
     public void deleteTrainingPlanTask() throws IOException
     {
-        Cursor c = db.query("SELECT * FROM " + DatabaseHelper.TRAINING_PLAN_TABLE_NAME, null);
-        c.moveToLast();
-        TRAINING_PLAN_ID = c.getInt(0);
+//        Cursor c = db.query("SELECT * FROM " + DatabaseHelper.TRAINING_PLAN_TABLE_NAME, null);
+//        c.moveToLast();
+//        TRAINING_PLAN_ID = c.getInt(0);
 
-        c = db.query("SELECT * FROM " + DatabaseHelper.EVENT_ID_TABLE_NAME + " WHERE " + DatabaseHelper.EVENT_ID_COL_1 + "=?", new String[] {String.valueOf(TRAINING_PLAN_ID)});
+        Cursor c = db.query("SELECT * FROM " + DatabaseHelper.EVENT_ID_TABLE_NAME + " WHERE "
+                + DatabaseHelper.EVENT_ID_COL_1 + "= ?", new String[] {String.valueOf(racerInfo.databaseID)});
+        c.moveToFirst();
+
+        String temp = c.getString(1);
+
         while (c.moveToNext())
         {
-            deleteEventByID(c.getString(1));
+            deleteEventByID(c.getString(1), c.getString(2));
         }
-        db.deletePlanFromDatabase(TRAINING_PLAN_ID);
+        db.deletePlanFromDatabase(racerInfo.databaseID);
     }
 
 
-    public void deleteEventByID(String ID) throws IOException
+    public void deleteEventByID(String ID, String calID) throws IOException
     {
-        isRacePlannerCalendarCreated();
+        //isRacePlannerCalendarCreated();
         mService.events().delete(calID, ID).execute();
     }
 
@@ -230,8 +233,8 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
 
         Cursor c = db.query("SELECT * FROM " + DatabaseHelper.TRAINING_PLAN_TABLE_NAME, null);
         c.moveToLast();
-        TRAINING_PLAN_ID = c.getInt(0);
-        Log.e(TAG, "YOOOOOOO THIS IS THE ID: " + TRAINING_PLAN_ID);
+        racerInfo.databaseID = c.getInt(0);
+        Log.e(TAG, "YOOOOOOO THIS IS THE ID: " + racerInfo.databaseID);
         c.close();
 
         switch (racerInfo.experienceLevel)
@@ -361,9 +364,11 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
 
                 event.setStart(startEventDateTime);
                 event.setEnd(endEventDateTime);
+                // insert event into Calendar via API
                 event = mService.events().insert(calID, event).execute();
 
-                db.insertEventToDatabase(TRAINING_PLAN_ID, event.getId());
+                // insert event info into database
+                db.insertEventToDatabase(racerInfo.databaseID, event.getId(), calID);
 
             } catch (IOException e)
             {
