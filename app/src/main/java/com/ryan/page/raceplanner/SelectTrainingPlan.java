@@ -1,4 +1,4 @@
-package com.example.ryan.raceplanner;
+package com.ryan.page.raceplanner;
 
 import android.Manifest;
 import android.content.Intent;
@@ -22,13 +22,13 @@ import android.widget.Toast;
 
 import java.util.Calendar;
 
-import static com.example.ryan.raceplanner.GlobalVariables.*;
+import static com.ryan.page.raceplanner.GlobalVariables.*;
 
 
 public class SelectTrainingPlan extends AppCompatActivity implements AdapterView.OnItemSelectedListener
 {
     private static final String TAG = GenerateTrainingPlan.class.getName();
-    private boolean createNewCalendar = false;
+    private boolean createNewCalendar = true;
     Spinner raceTypeSpinner;
     Spinner experienceLevelSpinner;
     RacerInfo racerInfo = new RacerInfo();
@@ -64,17 +64,12 @@ public class SelectTrainingPlan extends AppCompatActivity implements AdapterView
 
         // generate switch for creating new calendar
         Switch switchNewCalendar = (Switch) findViewById(R.id.main_switch_new_calendar);
+        switchNewCalendar.setChecked(true);
         switchNewCalendar.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
         {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
             {
-                if(isChecked)
-                {
-                    createNewCalendar = true;
-                } else
-                {
-                    createNewCalendar = false;
-                }
+                createNewCalendar = isChecked;
             }
         });
 
@@ -97,19 +92,12 @@ public class SelectTrainingPlan extends AppCompatActivity implements AdapterView
                         racerInfo.nameOfPlan = editText.getText().toString();
                     }
 
-                    if(createNewCalendar)
-                    {
-                        Intent intent = new Intent(SelectTrainingPlan.this, AuthenticateCalendarAPI.class);
-                        intent.putExtra(GlobalVariables.RACER_INFO_ID, racerInfo);
-                        intent.putExtra(GlobalVariables.CREDENTIAL_ACCOUNT_NAME, getIntent()
-                                .getExtras().getString(GlobalVariables.CREDENTIAL_ACCOUNT_NAME));
-                        startActivity(intent);
-                    } else
-                    {
-                        Intent intent = new Intent(SelectTrainingPlan.this, GenerateTrainingPlan.class);
-                        intent.putExtra(GlobalVariables.RACER_INFO_ID, racerInfo);
-                        startActivity(intent);
-                    }
+                    Intent intent = new Intent(SelectTrainingPlan.this, AuthenticateCalendarAPI.class);
+                    intent.putExtra(GlobalVariables.RACER_INFO_ID, racerInfo);
+                    intent.putExtra(GlobalVariables.CREDENTIAL_ACCOUNT_NAME, getIntent()
+                            .getExtras().getString(GlobalVariables.CREDENTIAL_ACCOUNT_NAME));
+                    intent.putExtra(GlobalVariables.CREATE_CALENDAR_BOOL, createNewCalendar);
+                    startActivity(intent);
 
                 } else
                 {

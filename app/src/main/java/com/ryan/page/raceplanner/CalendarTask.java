@@ -1,11 +1,13 @@
-package com.example.ryan.raceplanner;
+package com.ryan.page.raceplanner;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
@@ -44,7 +46,8 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
     Boolean buttonPressed = false;
     Boolean calCreated = false;
     Date raceDate;
-    DatabaseHelper db;
+    Context context;
+
 
     private com.google.api.services.calendar.Calendar mService = null;
     private Exception mLastError = null;
@@ -54,9 +57,9 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
 
     String calID;
     RacerInfo racerInfo;
+    DatabaseHelper db;
 
     CalendarTask(GoogleAccountCredential credential, RacerInfo racerInfo, Activity context) {
-        db = new DatabaseHelper(context);
         mOutput = (TextView) context.findViewById(R.id.mOutputText);
         mProgress = new ProgressDialog(context);
         mProgress.setMessage("Working...");
@@ -69,6 +72,8 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
                 .setApplicationName("race-planner")
                 .build();
         this.racerInfo = racerInfo;
+        this.context = context;
+        db = new DatabaseHelper(context);
 
         java.util.Calendar cal = java.util.Calendar.getInstance();
         cal.set(java.util.Calendar.YEAR, racerInfo.year);
@@ -96,6 +101,10 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
                         break;
                     case "createTrainingPlan":
                         createPlan();
+                        break;
+                    case "createCustomTrainingPlan":
+                        Log.i(TAG, racerInfo.calendarID);
+                        createPlan(racerInfo.calendarID);
                         break;
                     case "deleteTrainingPlan":
                         deleteTrainingPlanTask();
@@ -128,7 +137,8 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
             calID = createdCalendar.getId();
         } else
         {
-            mOutput.setText("Calendar already created.");
+            Toast toast = Toast.makeText(context, "race-planner calendar already exists! Creating new plan there.", Toast.LENGTH_LONG);
+            toast.show();
         }
     }
 
@@ -158,12 +168,9 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
 //        Cursor c = db.query("SELECT * FROM " + DatabaseHelper.TRAINING_PLAN_TABLE_NAME, null);
 //        c.moveToLast();
 //        TRAINING_PLAN_ID = c.getInt(0);
-
+        //DatabaseHelper db = new DatabaseHelper(context);
         Cursor c = db.query("SELECT * FROM " + DatabaseHelper.EVENT_ID_TABLE_NAME + " WHERE "
                 + DatabaseHelper.EVENT_ID_COL_1 + "= ?", new String[] {String.valueOf(racerInfo.databaseID)});
-        c.moveToFirst();
-
-        String temp = c.getString(1);
 
         while (c.moveToNext())
         {
@@ -176,7 +183,9 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
     public void deleteEventByID(String ID, String calID) throws IOException
     {
         //isRacePlannerCalendarCreated();
+        //DatabaseHelper db = new DatabaseHelper(context);
         mService.events().delete(calID, ID).execute();
+        db.deleteEventFromDatabase(ID);
     }
 
     public boolean isRacePlannerCalendarCreated()
@@ -197,7 +206,6 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
                         if (calendarListEntry.getSummary().equals("race-planner"))
                         {
                             calID = calendarListEntry.getId();
-                            Log.i(TAG, "isRacePlannerCalendarCreated returned true");
                             return true;
                         }
                     }
@@ -212,6 +220,18 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
     }
 
     public void createPlan() throws IOException
+    {
+        racerInfo.calendarName = "race-planner";
+        if (isRacePlannerCalendarCreated()){
+            createPlan(calID);}
+        else
+        {
+            createCalendarInAPI();
+            createPlan(calID);
+        }
+    }
+
+    public void createPlan(String calID) throws IOException
     {
         double startingMiles = -1;
         double goalMiles = 5;
@@ -228,14 +248,22 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
         Date tuesday;
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
         Log.e(TAG, "YOOOOOOO THIS IS THE NAME: " + racerInfo.nameOfPlan);
-
-        db.insertNewPlanToDatabase(racerInfo.nameOfPlan, racerInfo.getDate(), racerInfo.raceType, racerInfo.experienceLevel, "TBD");
+        //DatabaseHelper db = new DatabaseHelper(context);
+        Log.i(TAG, racerInfo.nameOfPlan + " " + racerInfo.getDate() + " " + racerInfo.raceType + " " + racerInfo.experienceLevel);
+        db.insertNewPlanToDatabase(racerInfo.nameOfPlan, racerInfo.getDate(), racerInfo.raceType, racerInfo.experienceLevel, racerInfo.calendarName);
 
         Cursor c = db.query("SELECT * FROM " + DatabaseHelper.TRAINING_PLAN_TABLE_NAME, null);
+
+        while(c.moveToNext())
+        {
+            Log.i(TAG, "plan name: " + c.getString(1));
+        }
+
         c.moveToLast();
         racerInfo.databaseID = c.getInt(0);
         Log.e(TAG, "YOOOOOOO THIS IS THE ID: " + racerInfo.databaseID);
         c.close();
+        db.close();
 
         switch (racerInfo.experienceLevel)
         {
@@ -304,7 +332,7 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
 
         for (int i = 0; i < weeksOfTraining; i++)
         {
-            if (tuesday.getTime()   < raceDate.getTime())createEventInAPI(tuesday, Double.toString(tuesdayMiles));
+            if (tuesday.getTime()   < raceDate.getTime())createEventInAPI(calID, tuesday, Double.toString(tuesdayMiles));
             if (tuesdayMiles < goalMiles && tuesdayMiles < tuesThursMileCap) { tuesdayMiles = tuesdayMiles + (bumpMileageUp / 2); }
             tuesday   = getOneWeekLater(tuesday);
             if (tuesday.getTime() > raceDate.getTime()) break;
@@ -312,7 +340,7 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
 
         for (int i = 0; i < weeksOfTraining; i++)
         {
-            if (wednesday.getTime()   < raceDate.getTime())createEventInAPI(wednesday, Double.toString(wednesdayMiles));
+            if (wednesday.getTime()   < raceDate.getTime())createEventInAPI(calID, wednesday, Double.toString(wednesdayMiles));
             if (wednesdayMiles < goalMiles && wednesdayMiles < wedMileCap) { wednesdayMiles = wednesdayMiles + (bumpMileageUp / 2); }
             wednesday   = getOneWeekLater(wednesday);
             if (wednesday.getTime() > raceDate.getTime()) break;
@@ -320,7 +348,7 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
 
         for (int i = 0; i < weeksOfTraining; i++)
         {
-            if (thursday.getTime()   < raceDate.getTime())createEventInAPI(thursday, Double.toString(thursdayMiles));
+            if (thursday.getTime()   < raceDate.getTime())createEventInAPI(calID, thursday, Double.toString(thursdayMiles));
             if (thursdayMiles < goalMiles && thursdayMiles < tuesThursMileCap) { thursdayMiles = thursdayMiles + (bumpMileageUp / 2); }
             thursday   = getOneWeekLater(thursday);
             if (thursday.getTime() > raceDate.getTime()) break;
@@ -328,7 +356,7 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
 
         for (int i = 0; i < weeksOfTraining; i++)
         {
-            if (sunday.getTime()   < raceDate.getTime())createEventInAPI(sunday, Double.toString(sundayMiles));
+            if (sunday.getTime()   < raceDate.getTime())createEventInAPI(calID, sunday, Double.toString(sundayMiles));
             if (sundayMiles < goalMiles) { sundayMiles = sundayMiles + 1; }
             sunday   = getOneWeekLater(sunday);
             if (sunday.getTime() > raceDate.getTime()) break;
@@ -341,7 +369,7 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
     }
 
 
-    private void createEventInAPI(Date date, String mileage) throws IOException
+    private void createEventInAPI(String calID, Date date, String mileage) throws IOException
     {
         if (isRacePlannerCalendarCreated())
         {
@@ -387,6 +415,7 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
     @Override
     protected void onPostExecute(Void output)
     {
+        Toast.makeText(context, "All finished! Check your google calendar to see what changed!", Toast.LENGTH_SHORT).show();
         mProgress.hide();
     }
 

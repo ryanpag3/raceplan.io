@@ -19,6 +19,6 @@
 
     <string name="generate_event_button">FINISH</string>
 
-    <string name="main_switch_sidetext">Would you like to create a new calendar?</string>
+    <string name="main_switch_sidetext">Use default race-planner calendar?</string>
 
 </resources>

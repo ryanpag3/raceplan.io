@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.example.ryan.raceplanner.ListTrainingPlans">
+    tools:context="com.ryan.page.raceplanner.ListTrainingPlans">
 
     <ListView
         android:id="@+id/list_view_created_plans"

@@ -1,14 +1,8 @@
-package com.example.ryan.raceplanner;
+package com.ryan.page.raceplanner;
 
 
-import android.icu.util.Calendar;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Created by ryan on 4/7/17.
@@ -21,7 +15,9 @@ public class RacerInfo implements Parcelable
     String raceType;
     String experienceLevel;
     String nameOfPlan;
-    Date date;
+    String calendarID;
+    String calendarName;
+
     int year;
     int month;
     int day;
@@ -71,6 +67,8 @@ public class RacerInfo implements Parcelable
         raceType = in.readString();
         experienceLevel = in.readString();
         nameOfPlan = in.readString();
+        calendarID = in.readString();
+        calendarName = in.readString();
     }
 
 
@@ -85,6 +83,8 @@ public class RacerInfo implements Parcelable
         out.writeString(raceType);
         out.writeString(experienceLevel);
         out.writeString(nameOfPlan);
+        out.writeString(calendarID);
+        out.writeString(calendarName);
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator()

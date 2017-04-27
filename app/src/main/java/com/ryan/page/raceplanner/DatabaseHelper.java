@@ -1,4 +1,4 @@
-package com.example.ryan.raceplanner;
+package com.ryan.page.raceplanner;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -14,7 +14,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "training_plans.db";
     public static final String TRAINING_PLAN_TABLE_NAME = "training_plans_table";
-    public static final String TRAINING_PLAN_COL_1 = "id";
+    public static final String TRAINING_PLAN_COL_1 = "_id";
     public static final String TRAINING_PLAN_COL_2 = "name";
     public static final String TRAINING_PLAN_COL_3 = "race_date";
     public static final String TRAINING_PLAN_COL_4 = "race_type";
@@ -30,7 +30,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     public DatabaseHelper(Context context)
     {
-        super(context, DATABASE_NAME, null, 4);
+        super(context, DATABASE_NAME, null, 5);
         SQLiteDatabase db = this.getWritableDatabase();
 
     }
@@ -100,7 +100,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
     {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TRAINING_PLAN_TABLE_NAME, TRAINING_PLAN_COL_1 + "=" + id, null);
-        db.delete(EVENT_ID_TABLE_NAME, EVENT_ID_COL_1 + "=" + id, null);
+        //db.delete(EVENT_ID_TABLE_NAME, EVENT_ID_COL_1 + "=" + id, null);
 
     }
 
@@ -120,6 +120,12 @@ public class DatabaseHelper extends SQLiteOpenHelper
         values.put(EVENT_ID_COL_3, calID);
         long result = db.insert(EVENT_ID_TABLE_NAME, null, values);
         return result != -1;
+    }
+
+    public boolean deleteEventFromDatabase(String event_id)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(EVENT_ID_TABLE_NAME, EVENT_ID_COL_2 + " =?", new String[] {event_id}) > 0;
     }
 
     public void deleteDatabases()

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.example.ryan.raceplanner">
+          package="com.ryan.page.raceplanner">
 
     <!-- Permissions necessary for Calendar Content Provider -->
     <uses-permission android:name="android.permission.READ_CALENDAR"/>
@@ -20,30 +20,30 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".SelectTrainingPlan"
+            android:name="com.ryan.page.raceplanner.SelectTrainingPlan"
             android:screenOrientation="portrait">
 
         </activity>
 
         <activity
-            android:name=".GenerateTrainingPlan"
+            android:name="com.ryan.page.raceplanner.GenerateTrainingPlan"
             android:screenOrientation="portrait">
         </activity>
 
         <activity
-            android:name=".AuthenticateCalendarAPI"
+            android:name="com.ryan.page.raceplanner.AuthenticateCalendarAPI"
             android:screenOrientation="portrait">
         </activity>
 
 
-        <activity android:name=".MainActivity">
+        <activity android:name="com.ryan.page.raceplanner.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
-        <activity android:name=".ListTrainingPlans">
+        <activity android:name="com.ryan.page.raceplanner.ListTrainingPlans">
         </activity>
 
     </application>

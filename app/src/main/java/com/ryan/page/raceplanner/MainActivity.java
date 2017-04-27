@@ -1,4 +1,4 @@
-package com.example.ryan.raceplanner;
+package com.ryan.page.raceplanner;
 
 import android.Manifest;
 import android.accounts.AccountManager;
@@ -11,7 +11,6 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
@@ -57,7 +56,7 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
         mOutputText = (TextView) findViewById(R.id.mOutputText);
         mOutputText.setMovementMethod(new ScrollingMovementMethod());
         mOutputText.setText(
-                "Click the \'" + BUTTON_TEXT +"\' button to test the API.");
+                "Welcome to Race Planner training plan generator. Please choose one of the options below.");
 
         mProgress = new ProgressDialog(this);
         mProgress.setMessage("Calling Google Calendar API ...");
@@ -106,13 +105,9 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
             chooseAccount();
         } else if (!isDeviceOnline()) {
             mOutputText.setText("No network connection available.");
-            return false;
-        } else
-        {
-            return true;
         }
 
-        return false;
+        return true;
     }
 
     /**

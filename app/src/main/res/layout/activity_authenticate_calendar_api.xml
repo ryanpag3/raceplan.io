@@ -7,72 +7,36 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context="com.example.ryan.raceplanner.AuthenticateCalendarAPI">
+    tools:context="com.ryan.page.raceplanner.AuthenticateCalendarAPI">
+
+    <Spinner
+        android:id="@+id/spinner_calendar_select_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:spinnerMode="dropdown"
+        android:layout_marginBottom="24dp"/>
 
     <TextView
         android:id="@+id/mOutputText"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/spinner_calendar_select_2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:scrollbars="vertical"
-        />
+        android:scrollbars="vertical"/>
 
     <Button
-        android:id="@+id/button_delete_training_plan"
-        android:text="delete training plan"
+        android:id="@+id/button_create_calendar_on_selected"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/button_create_training_plan"/>
+        android:text="create plan on selected calendar"
+        android:layout_above="@+id/button_finish_authenticate_api"/>
 
-    <Button
-    android:id="@+id/button_query_database"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="query database"
-    android:textColor="@android:color/holo_red_light"
-    android:layout_above="@id/button_delete_training_plan"
-    />
-
-    <Button
-        android:id="@+id/button_delete_all_test_plans"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="delete all test plans"
-        android:layout_alignBottom="@+id/button_query_database"
-        android:layout_alignParentRight="true"/>
-
-    <Button
-        android:id="@+id/button_create_training_plan"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="create training plan"
-        android:layout_above="@+id/button_create_calendar"
-        android:layout_marginBottom="16dp"
-        />
-    <Button
-        android:id="@+id/button_create_calendar"
-        android:layout_above="@+id/button_delete_calendar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="press to create calendar"
-        android:layout_centerHorizontal="true"/>
-    <Button
-        android:id="@+id/button_delete_calendar"
-        android:layout_above="@+id/button_finish_authenticate_api"
-        android:layout_marginBottom="16dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="press to delete calendar"
-        android:layout_centerHorizontal="true"/>
     <Button
         android:id="@+id/button_finish_authenticate_api"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="finish"/>
-
-
-
-
+        android:text="main menu"
+        />
 </RelativeLayout>
