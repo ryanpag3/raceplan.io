@@ -1,4 +1,4 @@
-package com.ryan.page.raceplanner;
+package com.race.planner;
 
 
 import android.accounts.Account;
@@ -20,6 +20,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import com.ryan.race.planner.R;
 
 import java.util.ArrayList;
 import java.util.Calendar;

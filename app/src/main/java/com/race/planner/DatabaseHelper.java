@@ -1,4 +1,4 @@
-package com.ryan.page.raceplanner;
+package com.race.planner;
 
 import android.content.ContentValues;
 import android.content.Context;

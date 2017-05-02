@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context="com.ryan.page.raceplanner.AuthenticateCalendarAPI">
+    tools:context="com.ryan.race.planner.com.race.planner.AuthenticateCalendarAPI">
 
     <Spinner
         android:id="@+id/spinner_calendar_select_2"

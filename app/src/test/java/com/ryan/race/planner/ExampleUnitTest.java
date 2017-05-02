@@ -1,4 +1,4 @@
-package com.ryan.page.raceplanner;
+package com.ryan.race.planner;
 
 import org.junit.Test;
 

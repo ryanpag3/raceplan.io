@@ -1,4 +1,4 @@
-package com.ryan.page.raceplanner;
+package com.race.planner;
 
 import android.Manifest;
 import android.accounts.AccountManager;
@@ -14,7 +14,6 @@ import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Button;
@@ -25,6 +24,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.calendar.CalendarScopes;
+import com.ryan.race.planner.R;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,9 +32,7 @@ import java.util.List;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
-import static com.ryan.page.raceplanner.GlobalVariables.MY_PERMISSIONS_REQUEST_READ_CALENDAR;
-import static com.ryan.page.raceplanner.GlobalVariables.MY_PERMISSIONS_REQUEST_READ_SYNC_SETTINGS;
-import static com.ryan.page.raceplanner.GlobalVariables.MY_PERMISSIONS_REQUEST_WRITE_CALENDAR;
+import static com.race.planner.GlobalVariables.MY_PERMISSIONS_REQUEST_READ_CALENDAR;
 
 /**
  * The MainActivity class currently allows users to choose between creating a new training plan and

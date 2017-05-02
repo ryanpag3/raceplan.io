@@ -15,7 +15,7 @@
         <item>Half-Marathon</item>
         <item>Marathon</item>
     </string-array>
-    <string name="main_todo_title">PRE-ALPHA BUILD</string>
+    <string name="main_todo_title">ALPHA RELEASE 0.1a</string>
 
     <string name="generate_event_button">FINISH</string>
 
