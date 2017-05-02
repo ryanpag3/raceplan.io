@@ -1,4 +1,4 @@
-package com.race.planner;
+package com.race.raceplanner;
 
 import android.Manifest;
 import android.content.Intent;
@@ -22,7 +22,7 @@ import android.widget.Toast;
 
 import java.util.Calendar;
 
-import static com.race.planner.GlobalVariables.*;
+import static com.race.raceplanner.GlobalVariables.*;
 
 
 public class SelectTrainingPlan extends AppCompatActivity implements AdapterView.OnItemSelectedListener

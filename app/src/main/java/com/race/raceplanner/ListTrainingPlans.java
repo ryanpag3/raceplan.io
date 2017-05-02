@@ -1,4 +1,4 @@
-package com.race.planner;
+package com.race.raceplanner;
 
 import android.content.Context;
 import android.database.Cursor;
