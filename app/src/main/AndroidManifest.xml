@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.ryan.race.planner">
+          package="com.race.planner">
 
     <!-- Permissions necessary for Calendar Content Provider -->
     <uses-permission android:name="android.permission.READ_CALENDAR"/>
