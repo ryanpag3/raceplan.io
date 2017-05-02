@@ -27,15 +27,7 @@ import android.text.format.DateFormat;
 
 public class ListTrainingPlans extends AppCompatActivity
 {
-    static final int REQUEST_ACCOUNT_PICKER = 1000;
-    static final int REQUEST_AUTHORIZATION = 1001;
-    static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
-    static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
-    private static final String BUTTON_TEXT = "Call Google Calendar API";
-    private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String[] SCOPES = { CalendarScopes.CALENDAR };
-
-    ArrayList<String> results = new ArrayList<>();
     private final String TAG = this.getClass().getSimpleName();
     GoogleAccountCredential mCredential;
     ListView listView;
@@ -46,24 +38,27 @@ public class ListTrainingPlans extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_training_plans);
 
+        // instantiate credential object used for API authentication
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
 
+        // instantiate DatabaseHelper object for accessing sqlite databases
         DatabaseHelper db = new DatabaseHelper(this);
+
+        // cursor object to be able to iterate through db
         Cursor c = db.query("SELECT * FROM " + DatabaseHelper.TRAINING_PLAN_TABLE_NAME, null);
 
-        while (c.moveToNext())
-        {
-            Log.e(TAG, c.getString(1));
-        }
+        // listView for displaying created training plans
         listView = (ListView) findViewById(R.id.list_view_created_plans);
-
+        // MyCursorAdapter holds the custom layout for each training plan
         final MyCursorAdapter cursorAdapter = new MyCursorAdapter(this, c);
-        listView.setAdapter(cursorAdapter);
+        listView.setAdapter(cursorAdapter); // ties the custom adapter to the listview
 
+        // store account name as intent for next activity
         mCredential.setSelectedAccountName(getIntent().getExtras().getString(GlobalVariables.CREDENTIAL_ACCOUNT_NAME));
 
+        // instantiate button for refreshing listview
         Button refreshButton = (Button) findViewById(R.id.button_refresh);
         refreshButton.setOnClickListener(new View.OnClickListener()
         {
@@ -79,20 +74,25 @@ public class ListTrainingPlans extends AppCompatActivity
     }
 
 
+    /**
+     * adapter for custom listview layout
+     */
     private class MyCursorAdapter extends CursorAdapter
     {
-
+        // override super constructor
         public MyCursorAdapter(Context context, Cursor c)
         {
             super(context, c, 0);
         }
 
+        // inflates the custom layout to the current parent listview and context
         @Override
         public View newView(Context context, Cursor cursor, ViewGroup parent)
         {
             return LayoutInflater.from(context).inflate(R.layout.layout_training_plan_row, parent, false);
         }
 
+        // binds data to the custom layout
         @Override
         public void bindView(View view, Context context, Cursor cursor)
         {
@@ -102,7 +102,7 @@ public class ListTrainingPlans extends AppCompatActivity
             TextView tvExperienceLevel = (TextView) view.findViewById(R.id.row_text_experience_level);
             TextView tvCalendar = (TextView) view.findViewById(R.id.row_text_calendar);
             Button bDeleteTrainingPlan = (Button) view.findViewById(R.id.row_button_delete_training_plan);
-
+            // assigns values based on cursor object position
             final int id = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.TRAINING_PLAN_COL_1));
             final String name = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TRAINING_PLAN_COL_2));
             final String raceDate = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TRAINING_PLAN_COL_3));
@@ -110,6 +110,7 @@ public class ListTrainingPlans extends AppCompatActivity
             final String experienceLevel = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TRAINING_PLAN_COL_5));
             String calendar = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TRAINING_PLAN_COL_6));
 
+            // assign values to ui elements
             tvName.setText(name);
             tvRaceDate.setText(raceDate);
             tvRaceType.setText(raceType);
@@ -138,28 +139,12 @@ public class ListTrainingPlans extends AppCompatActivity
                     int day = Integer.parseInt((String) DateFormat.format("dd", date));
 
                     RacerInfo racerInfo = new RacerInfo(year, month, day, raceType, experienceLevel, name, id);
-
+                    // creates new asynctask for deleting a training plan
                     new CalendarTask(mCredential, racerInfo, ListTrainingPlans.this).execute("deleteTrainingPlan");
+                    // deletes plan from the database
                     db.deletePlanFromDatabase(id);
                 }
             });
-    }
-
-    private class ViewHolder
-    {
-        public ArrayList<Integer> idList = new ArrayList<>();
-        public ArrayList<String> nameList = new ArrayList<>();
-        public ArrayList<String> calendarList = new ArrayList<>();
-        public ArrayList<String> raceDateList = new ArrayList<>();
-        public ArrayList<String> raceTypeList = new ArrayList<>();
-        public ArrayList<String> experienceLevelList = new ArrayList<>();
-
-        private TextView name;
-        private TextView calendar;
-        private TextView raceDate;
-        private TextView raceType;
-        private TextView experienceLevel;
-        private Button deleteTrainingPlanButton;
-    }
+        }
     }
 }

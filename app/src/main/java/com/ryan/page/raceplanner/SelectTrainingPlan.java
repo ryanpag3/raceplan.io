@@ -38,8 +38,6 @@ public class SelectTrainingPlan extends AppCompatActivity implements AdapterView
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_training_plan);
-        requestPermissions();
-
         final EditText editText = (EditText) findViewById(R.id.edit_enter_name);
 
 
@@ -80,7 +78,7 @@ public class SelectTrainingPlan extends AppCompatActivity implements AdapterView
             public void onClick(View v)
             {
                 // check for correct selections
-                if (/*racerInfo.isComplete()*/ true)
+                if (racerInfo.isComplete())
                 {
                     if (editText.getText().toString().matches(""))
                     {

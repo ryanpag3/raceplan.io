@@ -15,13 +15,13 @@ public class RacerInfo implements Parcelable
     String raceType;
     String experienceLevel;
     String nameOfPlan;
-    String calendarID;
+    String calendarID; // google api calendar id
     String calendarName;
 
     int year;
     int month;
     int day;
-    int databaseID;
+    int databaseID; // sql id
 
     RacerInfo(int y, int m, int d, String r, String e, String n, int id)
     {

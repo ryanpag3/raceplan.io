@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.Gravity;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,6 +61,8 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
     DatabaseHelper db;
 
     CalendarTask(GoogleAccountCredential credential, RacerInfo racerInfo, Activity context) {
+        if(android.os.Debug.isDebuggerConnected())
+            android.os.Debug.waitForDebugger();
         mOutput = (TextView) context.findViewById(R.id.mOutputText);
         mProgress = new ProgressDialog(context);
         mProgress.setMessage("Working...");
@@ -89,6 +92,7 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
     protected Void doInBackground(String... methodCall) {
         if(android.os.Debug.isDebuggerConnected())
             android.os.Debug.waitForDebugger();
+
             try
             {
                 switch (methodCall[0])
@@ -113,6 +117,7 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
             } catch (Exception e)
             {
                 mLastError = e;
+                Log.e(TAG, "Exception: ", e);
                 cancel(true);
             }
         return null;
@@ -124,6 +129,7 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
      * @throws IOException throws exception if input is missing
      */
     public void createCalendarInAPI() throws IOException {
+        Log.e(TAG, "createCalendarInAPI called.");
         if (!isRacePlannerCalendarCreated())
         {
             // BUG: when removing library definition and adding an import, calls the wrong constructor
@@ -250,7 +256,7 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
         Log.e(TAG, "YOOOOOOO THIS IS THE NAME: " + racerInfo.nameOfPlan);
         //DatabaseHelper db = new DatabaseHelper(context);
         Log.i(TAG, racerInfo.nameOfPlan + " " + racerInfo.getDate() + " " + racerInfo.raceType + " " + racerInfo.experienceLevel);
-        db.insertNewPlanToDatabase(racerInfo.nameOfPlan, racerInfo.getDate(), racerInfo.raceType, racerInfo.experienceLevel, racerInfo.calendarName);
+        db.insertNewPlanToDatabase(racerInfo);
 
         Cursor c = db.query("SELECT * FROM " + DatabaseHelper.TRAINING_PLAN_TABLE_NAME, null);
 
@@ -415,8 +421,10 @@ public class CalendarTask extends AsyncTask<String, Void, Void>
     @Override
     protected void onPostExecute(Void output)
     {
-        Toast.makeText(context, "All finished! Check your google calendar to see what changed!", Toast.LENGTH_SHORT).show();
         mProgress.hide();
+        Toast toast = Toast.makeText(context, "All finished! Check your google calendar to see what changed!", Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER|Gravity.TOP,0,0);
+        toast.show();
     }
 
     @Override

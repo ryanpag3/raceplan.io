@@ -180,8 +180,6 @@ public class AuthenticateCalendarAPI extends Activity
             protected void onPostExecute(Void result)
             {
                 Log.i(TAG, String.valueOf(names.size()));
-                String[] temp = new String[names.size()];
-                temp = names.toArray(temp);
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(AuthenticateCalendarAPI.this, android.R.layout.simple_spinner_item, names);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 calendarSelect = (Spinner) findViewById(R.id.spinner_calendar_select_2);

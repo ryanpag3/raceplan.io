@@ -25,6 +25,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+/**
+ * This whole class is deprecated.
+ * Could not implement app in its current form with the internal android calendar API.
+ */
 public class GenerateTrainingPlan extends AppCompatActivity
 {
     private static final String TAG = GenerateTrainingPlan.class.getName();
@@ -40,11 +44,6 @@ public class GenerateTrainingPlan extends AppCompatActivity
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_generate_training_plan);
-
-//        // check position in code, moved up for debugging purposes
-//        // IF a boolean is set to true on GenerateTrainingPlan, call this activity
-//        Intent intent = new Intent(GenerateTrainingPlan.this, AuthenticateCalendarAPI.class);
-//        startActivity(intent);
 
         // grab data from previous activity
         racerInfo  = getIntent().getExtras().getParcelable(GlobalVariables.RACER_INFO_ID);

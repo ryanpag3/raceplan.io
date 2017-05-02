@@ -8,10 +8,13 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Button;
@@ -29,6 +32,14 @@ import java.util.List;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
+import static com.ryan.page.raceplanner.GlobalVariables.MY_PERMISSIONS_REQUEST_READ_CALENDAR;
+import static com.ryan.page.raceplanner.GlobalVariables.MY_PERMISSIONS_REQUEST_READ_SYNC_SETTINGS;
+import static com.ryan.page.raceplanner.GlobalVariables.MY_PERMISSIONS_REQUEST_WRITE_CALENDAR;
+
+/**
+ * The MainActivity class currently allows users to choose between creating a new training plan and
+ * listing all current training plans that are created.
+ */
 public class MainActivity extends Activity implements EasyPermissions.PermissionCallbacks
 {
 
@@ -52,7 +63,10 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        requestPermissions();
 
+
+        // instantiate TextView object for user directions
         mOutputText = (TextView) findViewById(R.id.mOutputText);
         mOutputText.setMovementMethod(new ScrollingMovementMethod());
         mOutputText.setText(
@@ -61,11 +75,12 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
         mProgress = new ProgressDialog(this);
         mProgress.setMessage("Calling Google Calendar API ...");
 
-        // Initialize credentials and service object.
+        // instantiate credentials and service object.
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
 
+        // instantiate button for creating a new training plan
         Button openSelectTrainingPlanActivity = (Button) findViewById(R.id.button_open_select_training_plan_activity);
         openSelectTrainingPlanActivity.setOnClickListener(new View.OnClickListener()
         {
@@ -81,6 +96,7 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
             }
         });
 
+        // instantiate button for listing all created training plans
         Button openListTrainingPlansActivity = (Button) findViewById(R.id.button_open_list_training_plans_activity);
         openListTrainingPlansActivity.setOnClickListener(new View.OnClickListener()
         {
@@ -97,6 +113,10 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
         });
     }
 
+    /**
+     * checks to make sure all necessary prerequisites for the google API are met
+     * @return
+     */
     private boolean meetsPreReqs()
     {
         if (!isGooglePlayServicesAvailable()) {
@@ -108,6 +128,23 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
         }
 
         return true;
+    }
+
+    private void requestPermissions()
+    {
+        if (       ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_SYNC_SETTINGS) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED)
+        {
+
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{Manifest.permission.READ_CALENDAR,
+                            Manifest.permission.WRITE_CALENDAR,
+                            Manifest.permission.READ_SYNC_SETTINGS,
+                            Manifest.permission.GET_ACCOUNTS},
+                    MY_PERMISSIONS_REQUEST_READ_CALENDAR);
+        }
     }
 
     /**
@@ -207,6 +244,8 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         EasyPermissions.onRequestPermissionsResult(
                 requestCode, permissions, grantResults, this);
+
+        chooseAccount();
     }
 
     /**
