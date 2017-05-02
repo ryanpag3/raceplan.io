@@ -44,7 +44,7 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
     static final int REQUEST_AUTHORIZATION = 1001;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
-    private static final String TAG = AuthenticateCalendarAPI.class.getName();
+    private static final String TAG = AuthenticateAndCallAPI.class.getName();
     private static final String BUTTON_TEXT = "Call Google Calendar API";
     private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String[] SCOPES = { CalendarScopes.CALENDAR };
@@ -60,7 +60,7 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        requestPermissions();
+
 
 
         // instantiate TextView object for user directions
@@ -76,6 +76,14 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
+        // if called from other activity, grabs updated account name for listing
+        if (getIntent().hasExtra(GlobalVariables.CREDENTIAL_ACCOUNT_NAME))
+        {
+            mCredential.setSelectedAccountName(getIntent().getExtras().getString(GlobalVariables.CREDENTIAL_ACCOUNT_NAME));
+        }
+
+        requestPermissions();
+
 
         // instantiate button for creating a new training plan
         Button openSelectTrainingPlanActivity = (Button) findViewById(R.id.button_open_select_training_plan_activity);
@@ -84,12 +92,10 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
             @Override
             public void onClick(View v)
             {
-                if (meetsPreReqs())
-                {
+
                     Intent intent = new Intent(MainActivity.this, SelectTrainingPlan.class);
                     intent.putExtra(GlobalVariables.CREDENTIAL_ACCOUNT_NAME, mCredential.getSelectedAccountName());
                     startActivity(intent);
-                }
             }
         });
 
@@ -100,12 +106,9 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
             @Override
             public void onClick(View v)
             {
-                if (meetsPreReqs())
-                {
                     Intent intent = new Intent(MainActivity.this, ListTrainingPlans.class);
                     intent.putExtra(GlobalVariables.CREDENTIAL_ACCOUNT_NAME, mCredential.getSelectedAccountName());
                     startActivity(intent);
-                }
             }
         });
     }
@@ -119,11 +122,10 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
         if (!isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
         } else if (mCredential.getSelectedAccountName() == null) {
-            chooseAccount();
+            //chooseAccount();
         } else if (!isDeviceOnline()) {
             mOutputText.setText("No network connection available.");
         }
-
         return true;
     }
 
@@ -241,8 +243,6 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         EasyPermissions.onRequestPermissionsResult(
                 requestCode, permissions, grantResults, this);
-
-        chooseAccount();
     }
 
     /**
@@ -254,7 +254,7 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
      */
     @Override
     public void onPermissionsGranted(int requestCode, List<String> list) {
-        // Do nothing.
+        // do nothing
     }
 
     /**

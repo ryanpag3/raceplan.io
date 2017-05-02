@@ -31,7 +31,7 @@
         </activity>
 
         <activity
-            android:name="com.race.raceplanner.AuthenticateCalendarAPI"
+            android:name="com.race.raceplanner.AuthenticateAndCallAPI"
             android:screenOrientation="portrait">
         </activity>
 
