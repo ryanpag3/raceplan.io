@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,9 +23,11 @@ import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.calendar.CalendarScopes;
 
 import android.text.format.DateFormat;
+import android.widget.Toast;
 
 public class ListTrainingPlans extends AppCompatActivity
 {
+    static final int REQUEST_ACCOUNT_PICKER = 1000;
     private static final String[] SCOPES = { CalendarScopes.CALENDAR };
     private final String TAG = this.getClass().getSimpleName();
     GoogleAccountCredential mCredential;
@@ -55,6 +58,12 @@ public class ListTrainingPlans extends AppCompatActivity
 
         // store account name as intent for next activity
         mCredential.setSelectedAccountName(getIntent().getExtras().getString(GlobalVariables.CREDENTIAL_ACCOUNT_NAME));
+//        if(mCredential.getSelectedAccountName() == null)
+//        {
+//            Toast toast = Toast.makeText(this, "Uh oh, no training plans created! Come back later!", Toast.LENGTH_LONG);
+//            toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 0);
+//            toast.show();
+//        }
 
         // instantiate button for refreshing listview
         Button refreshButton = (Button) findViewById(R.id.button_refresh);
@@ -138,7 +147,9 @@ public class ListTrainingPlans extends AppCompatActivity
 
                     RacerInfo racerInfo = new RacerInfo(year, month, day, raceType, experienceLevel, name, id);
                     // creates new asynctask for deleting a training plan
-                    new CalendarTask(mCredential, racerInfo, ListTrainingPlans.this).execute("deleteTrainingPlan");
+                    //new CalendarTask(mCredential, racerInfo, ListTrainingPlans.this).execute();
+
+                    new DeleteTrainingPlanTask(mCredential, racerInfo, ListTrainingPlans.this).execute();
                     // deletes plan from the database
                     db.deletePlanFromDatabase(id);
                 }

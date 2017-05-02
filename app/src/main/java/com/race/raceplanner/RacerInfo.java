@@ -10,7 +10,7 @@ import android.os.Parcelable;
 
 public class RacerInfo implements Parcelable
 {
-    private static final String TAG = AuthenticateCalendarAPI.class.getName();
+    private static final String TAG = AuthenticateAndCallAPI.class.getName();
 
     String raceType;
     String experienceLevel;
