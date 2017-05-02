@@ -21,7 +21,6 @@ import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
-import com.ryan.race.planner.R;
 
 import java.io.IOException;
 import java.text.DateFormat;

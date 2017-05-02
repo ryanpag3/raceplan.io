@@ -20,7 +20,6 @@ import java.util.Date;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.calendar.CalendarScopes;
-import com.ryan.race.planner.R;
 
 import android.text.format.DateFormat;
 

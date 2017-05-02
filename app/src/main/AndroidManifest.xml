@@ -20,30 +20,30 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name="com.ryan.race.planner.com.race.planner.SelectTrainingPlan"
+            android:name="com.race.planner.SelectTrainingPlan"
             android:screenOrientation="portrait">
 
         </activity>
 
         <activity
-            android:name="com.ryan.race.planner.com.race.planner.GenerateTrainingPlan"
+            android:name="com.race.planner.GenerateTrainingPlan"
             android:screenOrientation="portrait">
         </activity>
 
         <activity
-            android:name="com.ryan.race.planner.com.race.planner.AuthenticateCalendarAPI"
+            android:name="com.race.planner.AuthenticateCalendarAPI"
             android:screenOrientation="portrait">
         </activity>
 
 
-        <activity android:name="com.ryan.race.planner.com.race.planner.MainActivity">
+        <activity android:name="com.race.planner.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
-        <activity android:name="com.ryan.race.planner.com.race.planner.ListTrainingPlans">
+        <activity android:name="com.race.planner.ListTrainingPlans">
         </activity>
 
     </application>

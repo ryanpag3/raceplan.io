@@ -23,7 +23,6 @@ import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
-import com.ryan.race.planner.R;
 
 import java.io.IOException;
 import java.util.ArrayList;

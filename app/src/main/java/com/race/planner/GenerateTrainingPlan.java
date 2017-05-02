@@ -21,7 +21,6 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.ryan.race.planner.R;
 
 import java.util.ArrayList;
 import java.util.Calendar;

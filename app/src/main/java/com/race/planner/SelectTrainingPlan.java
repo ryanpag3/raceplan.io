@@ -20,8 +20,6 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 
-import com.ryan.race.planner.R;
-
 import java.util.Calendar;
 
 import static com.race.planner.GlobalVariables.*;
