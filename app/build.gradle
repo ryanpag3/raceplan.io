@@ -11,10 +11,10 @@ android {
 //    }
     signingConfigs {
         release {
-            keyAlias 'RacePlannerKey'
-            keyPassword 'Awe1som1e!'
-            storeFile file('C:/Users/dev/Google Drive/keystores/android.jks')
-            storePassword 'Awe1som1e!'
+            keyAlias 'RacePlannerKeyAlias'
+            keyPassword '5Fr3OngJfumP'
+            storeFile file('C:/Users/dev/Google Drive/keystores/raceplannerkey.jks')
+            storePassword '5Fr3OngJfumP'
         }
     }
     compileSdkVersion 25
