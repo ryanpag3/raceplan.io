@@ -499,8 +499,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
         protected void onPreExecute()
         {
             // set ui as non-intractable
-            getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            mProgress.setCancelable(false);
             mProgress.show();
 
 
@@ -762,8 +761,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
         protected void onPreExecute()
         {
             // set UI not interactable
-            getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            mProgress.setCancelable(false);
             mProgress.show();
         }
 
@@ -776,7 +774,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
 
 
             Toast toast = Toast.makeText(AuthenticateAndCallAPI.this, "Training plan created succesfully!" +
-                    " Check your google calendar to see what changed!", Toast.LENGTH_LONG);
+                    " Refresh your google calendar by using the top right button on the app to see changes!", Toast.LENGTH_LONG);
             toast.setGravity(Gravity.CENTER | Gravity.TOP, 0, 0);
             toast.show();
         }

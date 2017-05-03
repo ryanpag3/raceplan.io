@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.database.Cursor;
 import android.os.AsyncTask;
+import android.view.Gravity;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
@@ -26,6 +28,7 @@ public class DeleteTrainingPlanTask extends AsyncTask<Void, Void, Void>
     private DatabaseHelper db;
     private TextView mOutput;
     private ProgressDialog mProgress;
+    private Activity mContext;
 
     DeleteTrainingPlanTask(GoogleAccountCredential credential, RacerInfo r, Activity context)
     {
@@ -50,6 +53,8 @@ public class DeleteTrainingPlanTask extends AsyncTask<Void, Void, Void>
         racerInfo = r;
         // instantiate new database
         db = new DatabaseHelper(context);
+
+        mContext = context;
     }
 
     @Override
@@ -85,6 +90,7 @@ public class DeleteTrainingPlanTask extends AsyncTask<Void, Void, Void>
     @Override
     protected void onPreExecute()
     {
+        mProgress.setCancelable(false);
         mProgress.show();
     }
 
@@ -92,6 +98,9 @@ public class DeleteTrainingPlanTask extends AsyncTask<Void, Void, Void>
     protected void onPostExecute(Void output)
     {
         mProgress.hide();
+        Toast toast = Toast.makeText(mContext, "Deleted successfully! Refresh your google calendar by using the top right button on the app to see changes!", Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 0);
+        toast.show();
     }
 
     @Override
