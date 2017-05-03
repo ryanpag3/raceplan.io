@@ -15,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.calendar.CalendarScopes;
 
@@ -47,12 +49,11 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
     private static final String TAG = AuthenticateAndCallAPI.class.getName();
     private static final String BUTTON_TEXT = "Call Google Calendar API";
     private static final String PREF_ACCOUNT_NAME = "accountName";
-    private static final String[] SCOPES = { CalendarScopes.CALENDAR };
+    private static final String[] SCOPES = {CalendarScopes.CALENDAR};
     private TextView mOutputText;
     private ProgressDialog mProgress;
     private GoogleAccountCredential mCredential;
-
-
+    private Exception mLastError;
 
 
     @Override
@@ -62,15 +63,14 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
         setContentView(R.layout.activity_main);
 
 
-
         // instantiate TextView object for user directions
         mOutputText = (TextView) findViewById(R.id.mOutputText);
         mOutputText.setMovementMethod(new ScrollingMovementMethod());
         mOutputText.setText(
                 "Welcome to Race Planner training plan generator. Please choose one of the options below. \n \n \n"
-        + "This application is in ALPHA and with it comes frequent updates, crashes, and potential errors. \n \n \n"
-        + "If you need to uninstall the app, it is highly recommended to delete all training plans first. If you do not do this, you will need to do it through google calendar, which could potentially take a long time. \n \n \n"
-        + "Thanks again for trying out my app and please send all feedback to raceplannerapp@gmail.com");
+                        + "This application is in ALPHA and with it comes frequent updates, crashes, and potential errors. \n \n \n"
+                        + "If you need to uninstall the app, it is highly recommended to delete all training plans first. If you do not do this, you will need to do it through google calendar, which could potentially take a long time. \n \n \n"
+                        + "Thanks again for trying out my app and please send all feedback to raceplannerapp@gmail.com");
 
         mProgress = new ProgressDialog(this);
         mProgress.setMessage("Calling Google Calendar API ...");
@@ -85,6 +85,7 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
             mCredential.setSelectedAccountName(getIntent().getExtras().getString(GlobalVariables.CREDENTIAL_ACCOUNT_NAME));
         }
 
+
         requestPermissions();
 
 
@@ -96,9 +97,9 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
             public void onClick(View v)
             {
 
-                    Intent intent = new Intent(MainActivity.this, SelectTrainingPlan.class);
-                    intent.putExtra(GlobalVariables.CREDENTIAL_ACCOUNT_NAME, mCredential.getSelectedAccountName());
-                    startActivity(intent);
+                Intent intent = new Intent(MainActivity.this, SelectTrainingPlan.class);
+                intent.putExtra(GlobalVariables.CREDENTIAL_ACCOUNT_NAME, mCredential.getSelectedAccountName());
+                startActivity(intent);
             }
         });
 
@@ -109,32 +110,16 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
             @Override
             public void onClick(View v)
             {
-                    Intent intent = new Intent(MainActivity.this, ListTrainingPlans.class);
-                    intent.putExtra(GlobalVariables.CREDENTIAL_ACCOUNT_NAME, mCredential.getSelectedAccountName());
-                    startActivity(intent);
+                Intent intent = new Intent(MainActivity.this, ListTrainingPlans.class);
+                intent.putExtra(GlobalVariables.CREDENTIAL_ACCOUNT_NAME, mCredential.getSelectedAccountName());
+                startActivity(intent);
             }
         });
     }
 
-    /**
-     * checks to make sure all necessary prerequisites for the google API are met
-     * @return
-     */
-    private boolean meetsPreReqs()
-    {
-        if (!isGooglePlayServicesAvailable()) {
-            acquireGooglePlayServices();
-        } else if (mCredential.getSelectedAccountName() == null) {
-            //chooseAccount();
-        } else if (!isDeviceOnline()) {
-            mOutputText.setText("No network connection available.");
-        }
-        return true;
-    }
-
     private void requestPermissions()
     {
-        if (       ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_SYNC_SETTINGS) != PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED)
@@ -149,6 +134,13 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
         }
     }
 
+//    private void authenticateCalendarPermissions()
+//    {
+//        startActivityForResult(
+//                ((UserRecoverableAuthIOException) mLastError).getIntent(),
+//                MainActivity.REQUEST_AUTHORIZATION);
+//    }
+
     /**
      * Attempts to set the account used with the API credentials. If an account
      * name was previously saved it will use that one; otherwise an account
@@ -160,21 +152,27 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
      * is granted.
      */
     @AfterPermissionGranted(REQUEST_PERMISSION_GET_ACCOUNTS)
-    private void chooseAccount() {
+    private void chooseAccount()
+    {
         if (EasyPermissions.hasPermissions(
-                this, Manifest.permission.GET_ACCOUNTS)) {
+                this, Manifest.permission.GET_ACCOUNTS))
+        {
             String accountName = getPreferences(Context.MODE_PRIVATE)
                     .getString(PREF_ACCOUNT_NAME, null);
-            if (accountName != null) {
+            if (accountName != null)
+            {
                 mCredential.setSelectedAccountName(accountName);
-                meetsPreReqs();
-            } else {
+                Log.e(TAG, "Create Calendar inside chooseAccount called");
+
+            } else
+            {
                 // Start a dialog from which the user can choose an account
                 startActivityForResult(
                         mCredential.newChooseAccountIntent(),
                         REQUEST_ACCOUNT_PICKER);
             }
-        } else {
+        } else
+        {
             // Request the GET_ACCOUNTS permission via a user dialog
             EasyPermissions.requestPermissions(
                     this,
@@ -188,44 +186,53 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
      * Called when an activity launched here (specifically, AccountPicker
      * and authorization) exits, giving you the requestCode you started it with,
      * the resultCode it returned, and any additional data from it.
+     *
      * @param requestCode code indicating which activity result is incoming.
-     * @param resultCode code indicating the result of the incoming
-     *     activity result.
-     * @param data Intent (containing result data) returned by incoming
-     *     activity result.
+     * @param resultCode  code indicating the result of the incoming
+     *                    activity result.
+     * @param data        Intent (containing result data) returned by incoming
+     *                    activity result.
      */
     @Override
     protected void onActivityResult(
-            int requestCode, int resultCode, Intent data) {
+            int requestCode, int resultCode, Intent data)
+    {
         super.onActivityResult(requestCode, resultCode, data);
-        switch(requestCode) {
+        switch (requestCode)
+        {
             case REQUEST_GOOGLE_PLAY_SERVICES:
-                if (resultCode != RESULT_OK) {
+                if (resultCode != RESULT_OK)
+                {
                     mOutputText.setText(
                             "This app requires Google Play Services. Please install " + "Google Play Services on your device and relaunch this app.");
-                } else {
-                    meetsPreReqs();
+                } else
+                {
+
                 }
                 break;
             case REQUEST_ACCOUNT_PICKER:
                 if (resultCode == RESULT_OK && data != null &&
-                        data.getExtras() != null) {
+                        data.getExtras() != null)
+                {
                     String accountName =
                             data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-                    if (accountName != null) {
+                    if (accountName != null)
+                    {
                         SharedPreferences settings =
                                 getPreferences(Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = settings.edit();
                         editor.putString(PREF_ACCOUNT_NAME, accountName);
                         editor.apply();
                         mCredential.setSelectedAccountName(accountName);
-                        meetsPreReqs();
                     }
+
+                    //authenticateCalendarPermissions();
                 }
                 break;
             case REQUEST_AUTHORIZATION:
-                if (resultCode == RESULT_OK) {
-                    meetsPreReqs();
+                if (resultCode == RESULT_OK)
+                {
+                    Log.i(TAG, "Calendar successfully authenticated.");
                 }
                 break;
         }
@@ -233,50 +240,60 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
 
     /**
      * Respond to requests for permissions at runtime for API 23 and above.
-     * @param requestCode The request code passed in
-     *     requestPermissions(android.app.Activity, String, int, String[])
-     * @param permissions The requested permissions. Never null.
+     *
+     * @param requestCode  The request code passed in
+     *                     requestPermissions(android.app.Activity, String, int, String[])
+     * @param permissions  The requested permissions. Never null.
      * @param grantResults The grant results for the corresponding permissions
-     *     which is either PERMISSION_GRANTED or PERMISSION_DENIED. Never null.
+     *                     which is either PERMISSION_GRANTED or PERMISSION_DENIED. Never null.
      */
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
+                                           @NonNull int[] grantResults)
+    {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         EasyPermissions.onRequestPermissionsResult(
                 requestCode, permissions, grantResults, this);
+
+        chooseAccount();
     }
 
     /**
      * Callback for when a permission is granted using the EasyPermissions
      * library.
+     *
      * @param requestCode The request code associated with the requested
-     *         permission
-     * @param list The requested permission list. Never null.
+     *                    permission
+     * @param list        The requested permission list. Never null.
      */
     @Override
-    public void onPermissionsGranted(int requestCode, List<String> list) {
+    public void onPermissionsGranted(int requestCode, List<String> list)
+    {
         // do nothing
     }
 
     /**
      * Callback for when a permission is denied using the EasyPermissions
      * library.
+     *
      * @param requestCode The request code associated with the requested
-     *         permission
-     * @param list The requested permission list. Never null.
+     *                    permission
+     * @param list        The requested permission list. Never null.
      */
     @Override
-    public void onPermissionsDenied(int requestCode, List<String> list) {
+    public void onPermissionsDenied(int requestCode, List<String> list)
+    {
         // Do nothing.
     }
 
     /**
      * Checks whether the device currently has a network connection.
+     *
      * @return true if the device has a network connection, false otherwise.
      */
-    private boolean isDeviceOnline() {
+    private boolean isDeviceOnline()
+    {
         ConnectivityManager connMgr =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -285,10 +302,12 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
 
     /**
      * Check that Google Play services APK is installed and up to date.
+     *
      * @return true if Google Play Services is available and up to
-     *     date on this device; false otherwise.
+     * date on this device; false otherwise.
      */
-    private boolean isGooglePlayServicesAvailable() {
+    private boolean isGooglePlayServicesAvailable()
+    {
         GoogleApiAvailability apiAvailability =
                 GoogleApiAvailability.getInstance();
         final int connectionStatusCode =
@@ -300,12 +319,14 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
      * Attempt to resolve a missing, out-of-date, invalid or disabled Google
      * Play Services installation via a user dialog, if possible.
      */
-    private void acquireGooglePlayServices() {
+    private void acquireGooglePlayServices()
+    {
         GoogleApiAvailability apiAvailability =
                 GoogleApiAvailability.getInstance();
         final int connectionStatusCode =
                 apiAvailability.isGooglePlayServicesAvailable(this);
-        if (apiAvailability.isUserResolvableError(connectionStatusCode)) {
+        if (apiAvailability.isUserResolvableError(connectionStatusCode))
+        {
             showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode);
         }
     }
@@ -314,11 +335,13 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
     /**
      * Display an error dialog showing that Google Play Services is missing
      * or out of date.
+     *
      * @param connectionStatusCode code describing the presence (or lack of)
-     *     Google Play Services on this device.
+     *                             Google Play Services on this device.
      */
     void showGooglePlayServicesAvailabilityErrorDialog(
-            final int connectionStatusCode) {
+            final int connectionStatusCode)
+    {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
         Dialog dialog = apiAvailability.getErrorDialog(
                 MainActivity.this,
