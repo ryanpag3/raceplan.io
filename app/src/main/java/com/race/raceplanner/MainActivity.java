@@ -67,7 +67,10 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
         mOutputText = (TextView) findViewById(R.id.mOutputText);
         mOutputText.setMovementMethod(new ScrollingMovementMethod());
         mOutputText.setText(
-                "Welcome to Race Planner training plan generator. Please choose one of the options below.");
+                "Welcome to Race Planner training plan generator. Please choose one of the options below. \n \n \n"
+        + "This application is in ALPHA and with it comes frequent updates, crashes, and potential errors. \n \n \n"
+        + "If you need to uninstall the app, it is highly recommended to delete all training plans first. If you do not do this, you will need to do it through google calendar, which could potentially take a long time. \n \n \n"
+        + "Thanks again for trying out my app and please send all feedback to raceplannerapp@gmail.com");
 
         mProgress = new ProgressDialog(this);
         mProgress.setMessage("Calling Google Calendar API ...");
