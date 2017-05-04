@@ -1,4 +1,4 @@
-package com.race.planner;
+package com.race.planner.data_models;
 
 import android.app.Application;
 

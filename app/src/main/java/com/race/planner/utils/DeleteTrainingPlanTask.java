@@ -1,4 +1,4 @@
-package com.race.planner;
+package com.race.planner.utils;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -16,6 +16,9 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 
 import java.io.IOException;
 
+import com.race.planner.R;
+import com.race.planner.data_models.*;
+
 /**
  * DeleteTrainingPlanTask is an AsyncTask much like the inner classes of AuthenticateAndCallAPI.
  */
@@ -30,7 +33,7 @@ public class DeleteTrainingPlanTask extends AsyncTask<Void, Void, Void>
     private ProgressDialog mProgress;
     private Activity mContext;
 
-    DeleteTrainingPlanTask(GoogleAccountCredential credential, RacerInfo r, Activity context)
+    public DeleteTrainingPlanTask(GoogleAccountCredential credential, RacerInfo r, Activity context)
     {
         if(android.os.Debug.isDebuggerConnected())
             android.os.Debug.waitForDebugger();

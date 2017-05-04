@@ -1,4 +1,4 @@
-package com.race.planner;
+package com.race.planner.activities;
 
 import android.Manifest;
 import android.accounts.AccountManager;
@@ -54,6 +54,10 @@ import java.util.Locale;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
+
+import com.race.planner.utils.*;
+import com.race.planner.data_models.*;
+import com.race.planner.R;
 
 
 public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.PermissionCallbacks

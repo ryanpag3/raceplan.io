@@ -1,4 +1,4 @@
-package com.race.planner;
+package com.race.planner.activities;
 
 import android.Manifest;
 import android.accounts.AccountManager;
@@ -24,6 +24,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.calendar.CalendarScopes;
+import com.race.planner.R;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +32,7 @@ import java.util.List;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
-import static com.race.planner.GlobalVariables.MY_PERMISSIONS_REQUEST_READ_CALENDAR;
+import com.race.planner.data_models.*;
 
 /**
  * The MainActivity class currently allows users to choose between creating a new training plan and
@@ -145,7 +146,7 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
                             Manifest.permission.WRITE_CALENDAR,
                             Manifest.permission.READ_SYNC_SETTINGS,
                             Manifest.permission.GET_ACCOUNTS},
-                    MY_PERMISSIONS_REQUEST_READ_CALENDAR);
+                    GlobalVariables.MY_PERMISSIONS_REQUEST_READ_CALENDAR);
         }
     }
 
