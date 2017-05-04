@@ -1,4 +1,4 @@
-package com.race.planner;
+package com.race.planner.data_models;
 
 
 import android.os.Parcel;
@@ -10,20 +10,20 @@ import android.os.Parcelable;
 
 public class RacerInfo implements Parcelable
 {
-    private static final String TAG = AuthenticateAndCallAPI.class.getName();
+    private static final String TAG = RacerInfo.class.getName();
 
-    String raceType;
-    String experienceLevel;
-    String nameOfPlan;
-    String calendarID; // google api calendar id
-    String calendarName;
+    public String raceType;
+    public String experienceLevel;
+    public String nameOfPlan;
+    public String calendarID; // google api calendar id
+    public String calendarName;
 
-    int year;
-    int month;
-    int day;
-    int databaseID; // sql id
+    public int year;
+    public int month;
+    public int day;
+    public int databaseID; // sql id
 
-    RacerInfo(int y, int m, int d, String r, String e, String n, int id)
+    public RacerInfo(int y, int m, int d, String r, String e, String n, int id)
     {
         year = y;
         month = m;
@@ -34,7 +34,7 @@ public class RacerInfo implements Parcelable
         databaseID = id;
     }
 
-    RacerInfo()
+    public RacerInfo()
     {
         year = -1;
         month = -1;
@@ -44,12 +44,12 @@ public class RacerInfo implements Parcelable
     }
 
     // Getters && Setters
-    String getDate()
+    public String getDate()
     {
         return year + "-" + month + "-" + day;
     }
 
-    boolean isComplete()
+    public boolean isComplete()
     {
         return year != -1 && month != -1 && day != -1 && raceType != null && experienceLevel != null;
     }

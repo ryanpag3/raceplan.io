@@ -1,10 +1,11 @@
-package com.race.planner;
+package com.race.planner.utils;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import com.race.planner.data_models.*;
 
 /**
  * Created by ryan on 4/21/17.

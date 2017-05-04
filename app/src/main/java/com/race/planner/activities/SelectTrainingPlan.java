@@ -1,4 +1,4 @@
-package com.race.planner;
+package com.race.planner.activities;
 
 import android.Manifest;
 import android.content.Intent;
@@ -22,12 +22,13 @@ import android.widget.Toast;
 
 import java.util.Calendar;
 
-import static com.race.planner.GlobalVariables.*;
-
+import com.race.planner.R;
+import com.race.planner.data_models.GlobalVariables;
+import com.race.planner.data_models.RacerInfo;
 
 public class SelectTrainingPlan extends AppCompatActivity implements AdapterView.OnItemSelectedListener
 {
-    private static final String TAG = GenerateTrainingPlan.class.getName();
+    private static final String TAG = SelectTrainingPlan.class.getName();
     private boolean createNewCalendar = true;
     Spinner raceTypeSpinner;
     Spinner experienceLevelSpinner;
@@ -113,29 +114,29 @@ public class SelectTrainingPlan extends AppCompatActivity implements AdapterView
      * is all that is necessary to run the app if the user does not wish to create a new Calendar
      * to host their training plan on.
      */
-    private void requestPermissions()
-    {
-        if (ContextCompat.checkSelfPermission(SelectTrainingPlan.this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED)
-        {
-            ActivityCompat.requestPermissions(SelectTrainingPlan.this,
-                    new String[]{Manifest.permission.READ_CALENDAR},
-                    MY_PERMISSIONS_REQUEST_READ_CALENDAR);
-        }
-
-        if (ContextCompat.checkSelfPermission(SelectTrainingPlan.this, Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED)
-        {
-            ActivityCompat.requestPermissions(SelectTrainingPlan.this,
-                    new String[]{Manifest.permission.WRITE_CALENDAR},
-                    MY_PERMISSIONS_REQUEST_WRITE_CALENDAR);
-        }
-
-        if (ContextCompat.checkSelfPermission(SelectTrainingPlan.this, Manifest.permission.READ_SYNC_SETTINGS) != PackageManager.PERMISSION_GRANTED)
-        {
-            ActivityCompat.requestPermissions(SelectTrainingPlan.this,
-                    new String[]{Manifest.permission.READ_SYNC_SETTINGS},
-                    MY_PERMISSIONS_REQUEST_READ_SYNC_SETTINGS);
-        }
-    }
+//    private void requestPermissions()
+//    {
+//        if (ContextCompat.checkSelfPermission(SelectTrainingPlan.this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED)
+//        {
+//            ActivityCompat.requestPermissions(SelectTrainingPlan.this,
+//                    new String[]{Manifest.permission.READ_CALENDAR},
+//                    MY_PERMISSIONS_REQUEST_READ_CALENDAR);
+//        }
+//
+//        if (ContextCompat.checkSelfPermission(SelectTrainingPlan.this, Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED)
+//        {
+//            ActivityCompat.requestPermissions(SelectTrainingPlan.this,
+//                    new String[]{Manifest.permission.WRITE_CALENDAR},
+//                    MY_PERMISSIONS_REQUEST_WRITE_CALENDAR);
+//        }
+//
+//        if (ContextCompat.checkSelfPermission(SelectTrainingPlan.this, Manifest.permission.READ_SYNC_SETTINGS) != PackageManager.PERMISSION_GRANTED)
+//        {
+//            ActivityCompat.requestPermissions(SelectTrainingPlan.this,
+//                    new String[]{Manifest.permission.READ_SYNC_SETTINGS},
+//                    MY_PERMISSIONS_REQUEST_READ_SYNC_SETTINGS);
+//        }
+//    }
 
 
     /**

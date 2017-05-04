@@ -1,4 +1,4 @@
-package com.race.planner;
+package com.race.planner.activities;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -22,6 +22,10 @@ import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.calendar.CalendarScopes;
 
 import android.text.format.DateFormat;
+
+import com.race.planner.R;
+import com.race.planner.data_models.*;
+import com.race.planner.utils.*;
 
 public class ListTrainingPlans extends AppCompatActivity
 {
