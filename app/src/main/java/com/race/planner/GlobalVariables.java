@@ -1,4 +1,4 @@
-package com.race.raceplanner;
+package com.race.planner;
 
 import android.app.Application;
 

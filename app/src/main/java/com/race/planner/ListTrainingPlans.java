@@ -1,10 +1,9 @@
-package com.race.raceplanner;
+package com.race.planner;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +22,6 @@ import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.calendar.CalendarScopes;
 
 import android.text.format.DateFormat;
-import android.widget.Toast;
 
 public class ListTrainingPlans extends AppCompatActivity
 {

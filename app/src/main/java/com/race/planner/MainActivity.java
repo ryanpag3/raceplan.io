@@ -1,4 +1,4 @@
-package com.race.raceplanner;
+package com.race.planner;
 
 import android.Manifest;
 import android.accounts.AccountManager;
@@ -31,7 +31,7 @@ import java.util.List;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
-import static com.race.raceplanner.GlobalVariables.MY_PERMISSIONS_REQUEST_READ_CALENDAR;
+import static com.race.planner.GlobalVariables.MY_PERMISSIONS_REQUEST_READ_CALENDAR;
 
 /**
  * The MainActivity class currently allows users to choose between creating a new training plan and
