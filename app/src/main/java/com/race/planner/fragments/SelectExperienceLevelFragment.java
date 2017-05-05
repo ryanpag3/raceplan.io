@@ -2,7 +2,6 @@ package com.race.planner.fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
@@ -35,7 +34,7 @@ public class SelectExperienceLevelFragment extends Fragment
     private String mParam1;
     private String mParam2;
 
-    private FragmentCommunicator mListener;
+    private FragmentListener mListener;
 
     public SelectExperienceLevelFragment()
     {
@@ -121,9 +120,7 @@ public class SelectExperienceLevelFragment extends Fragment
             @Override
             public void onClick(View v)
             {
-                Intent intent = new Intent(getActivity(), MainActivity.class);
-                startActivity(intent);
-
+                mListener.onBackButtonClicked();
             }
         });
 
@@ -147,9 +144,9 @@ public class SelectExperienceLevelFragment extends Fragment
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if (context instanceof FragmentCommunicator)
+        if (context instanceof FragmentListener)
         {
-            mListener = (FragmentCommunicator) context;
+            mListener = (FragmentListener) context;
         } else
         {
             throw new RuntimeException(context.toString()

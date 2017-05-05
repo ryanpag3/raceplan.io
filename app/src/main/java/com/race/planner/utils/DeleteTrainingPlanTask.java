@@ -33,11 +33,7 @@ public class DeleteTrainingPlanTask extends AsyncTask<Void, Void, Void>
     private ProgressDialog mProgress;
     private Activity mContext;
 
-<<<<<<< HEAD:app/src/main/java/com/race/planner/utils/DeleteTrainingPlanTask.java
     public DeleteTrainingPlanTask(GoogleAccountCredential credential, Racer r, Activity context)
-=======
-    public DeleteTrainingPlanTask(GoogleAccountCredential credential, RacerInfo r, Activity context)
->>>>>>> eb735ff748415c65dcafae5e9fd59a82e6f98a6e:app/src/main/java/com/race/planner/utils/DeleteTrainingPlanTask.java
     {
         if(android.os.Debug.isDebuggerConnected())
             android.os.Debug.waitForDebugger();

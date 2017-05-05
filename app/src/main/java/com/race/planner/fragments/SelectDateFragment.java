@@ -1,7 +1,6 @@
 package com.race.planner.fragments;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -9,14 +8,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.race.planner.R;
-import com.race.planner.utils.FragmentCommunicator;
-
-import java.util.Date;
+import com.race.planner.utils.FragmentListener;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link FragmentCommunicator} interface
+ * {@link FragmentListener} interface
  * to handle interaction events.
  * Use the {@link SelectDateFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -32,7 +29,7 @@ public class SelectDateFragment extends Fragment
     private String mParam1;
     private String mParam2;
 
-    FragmentCommunicator comm;
+    FragmentListener comm;
 
     public SelectDateFragment()
     {
@@ -78,9 +75,9 @@ public class SelectDateFragment extends Fragment
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if (context instanceof FragmentCommunicator)
+        if (context instanceof FragmentListener)
         {
-            comm = (FragmentCommunicator) context;
+            comm = (FragmentListener) context;
         } else
         {
             throw new RuntimeException(context.toString()

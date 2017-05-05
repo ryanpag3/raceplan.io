@@ -13,29 +13,21 @@ import android.widget.Button;
 
 import com.race.planner.R;
 import com.race.planner.activities.MainActivity;
-import com.race.planner.utils.FragmentCommunicator;
+import com.race.planner.utils.FragmentListener;
 import static com.race.planner.data_models.GlobalVariables.*;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link FragmentCommunicator} interface
+ * {@link FragmentListener} interface
  * to handle interaction events.
  * Use the {@link SelectRaceTypeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
 public class SelectRaceTypeFragment extends Fragment
 {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    private FragmentCommunicator mListener;
+    private FragmentListener mListener;
 
     public SelectRaceTypeFragment()
     {
@@ -55,9 +47,6 @@ public class SelectRaceTypeFragment extends Fragment
     {
         SelectRaceTypeFragment fragment = new SelectRaceTypeFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
         return fragment;
     }
 
@@ -65,11 +54,6 @@ public class SelectRaceTypeFragment extends Fragment
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null)
-        {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -88,7 +72,7 @@ public class SelectRaceTypeFragment extends Fragment
             public void onClick(View v)
             {
                 mListener.passRaceType(RACE_5K);
-                startNextSelection();
+                mListener.onNextFragmentClicked();
             }
         });
 
@@ -100,7 +84,7 @@ public class SelectRaceTypeFragment extends Fragment
             public void onClick(View v)
             {
                 mListener.passRaceType(RACE_10K);
-                startNextSelection();
+                mListener.onNextFragmentClicked();
             }
         });
 
@@ -112,7 +96,7 @@ public class SelectRaceTypeFragment extends Fragment
             public void onClick(View v)
             {
                 mListener.passRaceType(RACE_HALF);
-                startNextSelection();
+                mListener.onNextFragmentClicked();
             }
         });
 
@@ -124,7 +108,7 @@ public class SelectRaceTypeFragment extends Fragment
             public void onClick(View v)
             {
                 mListener.passRaceType(RACE_MARATHON);
-                startNextSelection();
+                mListener.onNextFragmentClicked();
             }
         });
 
@@ -161,9 +145,9 @@ public class SelectRaceTypeFragment extends Fragment
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if (context instanceof FragmentCommunicator)
+        if (context instanceof FragmentListener)
         {
-            mListener = (FragmentCommunicator) context;
+            mListener = (FragmentListener) context;
         } else
         {
             throw new RuntimeException(context.toString()
@@ -176,15 +160,5 @@ public class SelectRaceTypeFragment extends Fragment
     {
         super.onDetach();
         mListener = null;
-    }
-
-    public void startNextSelection()
-    {
-        FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left);
-        SelectExperienceLevelFragment selectExperienceLevelFragment = new SelectExperienceLevelFragment();
-        fragmentTransaction.replace(R.id.race_type_container, selectExperienceLevelFragment);
-        fragmentTransaction.commit();
     }
 }

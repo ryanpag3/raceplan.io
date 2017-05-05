@@ -55,15 +55,11 @@ import java.util.Locale;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
+import com.race.planner.R;
 import com.race.planner.utils.*;
 import com.race.planner.data_models.*;
-import com.race.planner.R;
 
-<<<<<<< HEAD:app/src/main/java/com/race/planner/activities/AuthenticateAndCallAPI.java
 import static com.race.planner.data_models.GlobalVariables.*;
-
-=======
->>>>>>> eb735ff748415c65dcafae5e9fd59a82e6f98a6e:app/src/main/java/com/race/planner/activities/AuthenticateAndCallAPI.java
 
 public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.PermissionCallbacks
 {

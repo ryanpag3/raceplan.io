@@ -8,17 +8,11 @@
     xmlns:tools="http://schemas.android.com/tools">
 
 
-    <fragment
-        android:name="com.race.planner.fragments.SelectRaceTypeFragment"
-        android:id="@+id/fragment_select_race_type"
+    <FrameLayout
+        android:id="@+id/fragment_swap"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-    <fragment
-        android:name="com.race.planner.fragments.SelectExperienceLevelFragment"
-        android:id="@+id/fragment_select_experience_level"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent">
+    </FrameLayout>
 
 
 
