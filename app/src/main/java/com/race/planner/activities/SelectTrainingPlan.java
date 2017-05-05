@@ -133,7 +133,7 @@ public class SelectTrainingPlan extends Activity implements FragmentListener// i
     {
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left);
+        fragmentTransaction.setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left, R.animator.enter_from_left, R.animator.exit_to_right);
         SelectExperienceLevelFragment selectExperienceLevelFragment = new SelectExperienceLevelFragment();
         String tag = selectExperienceLevelFragment.toString();
         Log.e(TAG, tag);
@@ -145,15 +145,17 @@ public class SelectTrainingPlan extends Activity implements FragmentListener// i
     @Override
     public void onBackButtonClicked()
     {
-        int index = SelectTrainingPlan.this.getFragmentManager().getBackStackEntryCount() - 1;
-        FragmentManager.BackStackEntry backEntry = getFragmentManager().getBackStackEntryAt(index);
-        String tag = backEntry.getName();
-        Log.e(TAG, "Back Button: " + tag);
-        Fragment fragment = getFragmentManager().findFragmentByTag(tag);
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left);
-        fragmentTransaction.replace(R.id.fragment_swap, fragment, tag);
-        fragmentTransaction.commit();
+        getFragmentManager().popBackStack();
+//        int index = SelectTrainingPlan.this.getFragmentManager().getBackStackEntryCount() - 1;
+//        getFragmentManager().popBackStack();
+//        FragmentManager.BackStackEntry backEntry = getFragmentManager().getBackStackEntryAt(index);
+//        String tag = backEntry.getName();
+//        Log.e(TAG, "Back Button: " + tag);
+//        Fragment fragment = getFragmentManager().findFragmentByTag(tag);
+//        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+//        fragmentTransaction.setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left);
+//        fragmentTransaction.replace(R.id.fragment_swap, fragment, tag);
+//        fragmentTransaction.commit();
     }
 
 

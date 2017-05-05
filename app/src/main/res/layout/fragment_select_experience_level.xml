@@ -1,59 +1,57 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
              tools:context="com.race.planner.fragments.SelectExperienceLevelFragment"
              >
-    <RelativeLayout
-        android:id="@+id/select_experience_level_fragment_container"
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select experience level"/>
+
+    <LinearLayout
+        android:layout_above="@+id/inner_layout_menu_buttons"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <TextView
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <Button
+            android:id="@+id/button_expBeginner"
+            android:text="Beginner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+        <Button
+            android:id="@+id/button_expIntermediate"
+            android:text="Intermediate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+        <Button
+            android:id="@+id/button_expExpert"
+            android:text="Expert"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/inner_layout_menu_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:layout_margin="12dp">
+        <Button
+            android:text="back"
+            android:id="@+id/button_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Select race type"/>
-
-        <LinearLayout
-            android:layout_above="@+id/inner_layout_menu_buttons"
-            android:layout_width="match_parent"
+            android:layout_weight="1"/>
+        <Button
+            android:text="restart"
+            android:id="@+id/button_restart"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <Button
-                android:id="@+id/button_expBeginner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                />
-            <Button
-                android:id="@+id/button_expIntermediate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                />
-            <Button
-                android:id="@+id/button_expExpert"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/inner_layout_menu_buttons"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:orientation="horizontal"
-            android:layout_margin="12dp">
-            <Button
-                android:text="back"
-                android:id="@+id/button_back"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"/>
-            <Button
-                android:text="restart"
-                android:id="@+id/button_restart"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"/>
-        </LinearLayout>
-    </RelativeLayout>
-</FrameLayout>
+            android:layout_weight="1"/>
+    </LinearLayout>
+</RelativeLayout>

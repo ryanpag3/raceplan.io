@@ -79,7 +79,6 @@ public class SelectExperienceLevelFragment extends Fragment
 
         // beginner button
         Button buttonExpBeginner = (Button) view.findViewById(R.id.button_expBeginner);
-        buttonExpBeginner.setText(EXPERIENCE_BEGINNER);
         buttonExpBeginner.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -91,7 +90,6 @@ public class SelectExperienceLevelFragment extends Fragment
 
         // intermediate button
         Button buttonExpIntermediate = (Button) view.findViewById(R.id.button_expIntermediate);
-        buttonExpBeginner.setText(EXPERIENCE_INTERMEDIATE);
         buttonExpIntermediate.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -103,7 +101,6 @@ public class SelectExperienceLevelFragment extends Fragment
 
         // expert button
         Button buttonExpExpert = (Button) view.findViewById(R.id.button_expExpert);
-        buttonExpBeginner.setText(EXPERIENCE_EXPERT);
         buttonExpExpert.setOnClickListener(new View.OnClickListener()
         {
             @Override
