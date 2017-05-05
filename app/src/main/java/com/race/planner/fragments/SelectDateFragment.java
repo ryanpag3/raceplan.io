@@ -1,17 +1,27 @@
 package com.race.planner.fragments;
 
+import android.app.DatePickerDialog;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.TextView;
 
 import com.race.planner.R;
 import com.race.planner.activities.MainActivity;
+import com.race.planner.activities.SelectTrainingPlan;
 import com.race.planner.utils.FragmentListener;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,6 +34,7 @@ import com.race.planner.utils.FragmentListener;
 public class SelectDateFragment extends Fragment
 {
     FragmentListener mListener;
+    private DatePicker datePicker;
 
     public SelectDateFragment()
     {
@@ -33,12 +44,7 @@ public class SelectDateFragment extends Fragment
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SelectDateFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static SelectDateFragment newInstance(String param1, String param2)
     {
         SelectDateFragment fragment = new SelectDateFragment();
@@ -49,8 +55,6 @@ public class SelectDateFragment extends Fragment
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
-
     }
 
     @Override
@@ -58,6 +62,33 @@ public class SelectDateFragment extends Fragment
                              Bundle savedInstanceState)
     {
         View view = inflater.inflate(R.layout.fragment_select_date, container, false);
+        final String fragmentName = SelectDateFragment.class.getName();
+        final Calendar cal = Calendar.getInstance();
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+
+        datePicker = (DatePicker) view.findViewById(R.id.date_picker_widget);
+        datePicker.init(year, month, day, new DatePicker.OnDateChangedListener() {
+            @Override
+            public void onDateChanged(DatePicker datePicker, int i, int i1, int i2) {
+                Date date = new GregorianCalendar(i, i1, i2).getTime();
+                mListener.passDate(date);
+                Log.i(getActivity().getLocalClassName(), date.toString());
+                // do something with the date here
+            }
+        });
+
+        TextView okTextClickable = (TextView) view.findViewById(R.id.ok_clickable_textview);
+        okTextClickable.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                mListener.onFragmentClicked(SelectTrainingPlan.class.getName());
+            }
+        });
+
 
         // back button
         Button buttonBack = (Button) view.findViewById(R.id.button_back);

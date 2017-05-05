@@ -118,8 +118,7 @@ public class SelectRaceTypeFragment extends Fragment
             @Override
             public void onClick(View v)
             {
-                Intent intent = new Intent(getActivity(), MainActivity.class);
-                startActivity(intent);
+                mListener.onFragmentClicked(getActivity().getLocalClassName());
 
             }
         });

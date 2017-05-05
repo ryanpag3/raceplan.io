@@ -4,15 +4,20 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Spinner;
+import android.widget.Toast;
+
 import java.util.Date;
 
 import com.race.planner.R;
+import com.race.planner.data_models.GlobalVariables;
 import com.race.planner.data_models.Racer;
 import com.race.planner.fragments.SelectDateFragment;
 import com.race.planner.fragments.SelectExperienceLevelFragment;
+import com.race.planner.fragments.SelectNameFragment;
 import com.race.planner.fragments.SelectRaceTypeFragment;
 import com.race.planner.utils.FragmentListener;
 
@@ -32,10 +37,9 @@ public class SelectTrainingPlan extends Activity implements FragmentListener// i
 
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        SelectRaceTypeFragment selectRaceTypeFragment = new SelectRaceTypeFragment();
-        String tag = selectRaceTypeFragment.toString();
-        fragmentTransaction.add(R.id.fragment_swap, selectRaceTypeFragment, tag);
-        fragmentTransaction.addToBackStack(tag);
+        SelectNameFragment selectNameFragment = new SelectNameFragment();
+        String tag = selectNameFragment.toString();
+        fragmentTransaction.add(R.id.fragment_swap, selectNameFragment, tag);
         fragmentTransaction.commit();
 
 
@@ -112,6 +116,12 @@ public class SelectTrainingPlan extends Activity implements FragmentListener// i
 //        });
     }
     @Override
+    public void passName(String n)
+    {
+        racer.nameOfPlan = n;
+    }
+
+    @Override
     public void passRaceType(String s)
     {
         racer.raceType = s;
@@ -120,7 +130,7 @@ public class SelectTrainingPlan extends Activity implements FragmentListener// i
     @Override
     public void passDate(Date d)
     {
-        // set up racer date object first
+        racer.date = d;
     }
 
     @Override
@@ -137,28 +147,37 @@ public class SelectTrainingPlan extends Activity implements FragmentListener// i
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left, R.animator.enter_from_left, R.animator.exit_to_right);
 
+        if (nameOfCurrentFragment.equals(SelectNameFragment.class.getName()))
+        {
+            SelectRaceTypeFragment selectRaceTypeFragment = new SelectRaceTypeFragment();
+            tag = selectRaceTypeFragment.toString();
+            fragmentTransaction.replace(R.id.fragment_swap, selectRaceTypeFragment, tag);
+            fragmentTransaction.addToBackStack(tag);
+            fragmentTransaction.commit();
 
-        if (nameOfCurrentFragment == SelectRaceTypeFragment.class.getName())
+        } else if (nameOfCurrentFragment.equals(SelectRaceTypeFragment.class.getName()))
         {
             SelectExperienceLevelFragment selectExperienceLevelFragment = new SelectExperienceLevelFragment();
             tag = selectExperienceLevelFragment.toString();
-            Log.e(TAG, tag);
             fragmentTransaction.replace(R.id.fragment_swap, selectExperienceLevelFragment, tag);
-
-        } else if (nameOfCurrentFragment == SelectExperienceLevelFragment.class.getName())
+            fragmentTransaction.addToBackStack(tag);
+            fragmentTransaction.commit();
+        } else if (nameOfCurrentFragment.equals(SelectExperienceLevelFragment.class.getName()))
         {
-            SelectDateFragment selectDateFragment = new SelectDateFragment();
+            Fragment selectDateFragment = new SelectDateFragment();
             tag = selectDateFragment.toString();
-            Log.e(TAG, tag);
             fragmentTransaction.replace(R.id.fragment_swap, selectDateFragment, tag);
-
+            fragmentTransaction.addToBackStack(tag);
+            fragmentTransaction.commit();
         } else
         {
-
+            Intent intent = new Intent(SelectTrainingPlan.this, AuthenticateAndCallAPI.class);
+            intent.putExtra(GlobalVariables.RACER_INFO_ID, racer);
+            intent.putExtra(GlobalVariables.CREDENTIAL_ACCOUNT_NAME, getIntent()
+                    .getExtras().getString(GlobalVariables.CREDENTIAL_ACCOUNT_NAME));
+            intent.putExtra(GlobalVariables.CREATE_CALENDAR_BOOL, createNewCalendar);
+            startActivity(intent);
         }
-
-        fragmentTransaction.addToBackStack(tag);
-        fragmentTransaction.commit();
 
     }
 

@@ -3,6 +3,9 @@ package com.race.planner.data_models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
+
+import java.util.Date;
 
 /**
  * Created by ryan on 4/7/17.
@@ -11,6 +14,8 @@ import android.os.Parcelable;
 public class Racer implements Parcelable
 {
     private static final String TAG = Racer.class.getName();
+
+    public Date date;
 
     public String raceType;
     public String experienceLevel;
@@ -23,11 +28,9 @@ public class Racer implements Parcelable
     public int day;
     public int databaseID; // sql id
 
-    public Racer(int y, int m, int d, String r, String e, String n, int id)
+    public Racer(Date d, String r, String e, String n, int id)
     {
-        year = y;
-        month = m;
-        day = d;
+        date = d;
         raceType = r;
         experienceLevel = e;
         nameOfPlan = n;
@@ -36,9 +39,6 @@ public class Racer implements Parcelable
 
     public Racer()
     {
-        year = -1;
-        month = -1;
-        day = -1;
         raceType = null;
         experienceLevel = null;
     }
@@ -46,7 +46,7 @@ public class Racer implements Parcelable
     // Getters && Setters
     public String getDate()
     {
-        return year + "-" + month + "-" + day;
+        return date.toString();
     }
 
     public boolean isComplete()
@@ -58,6 +58,7 @@ public class Racer implements Parcelable
     public Racer(Parcel in)
     {
         // Order needs to be the same as the writeToParcel() method
+        date = new Date(in.readLong());
         int[] data = new int[3];
         in.readIntArray(data);
         year = data[0];
@@ -79,6 +80,7 @@ public class Racer implements Parcelable
 
     public void writeToParcel(Parcel out, int flags)
     {
+        out.writeLong(date.getTime());
         out.writeIntArray(new int[]{this.year, this.month, this.day});
         out.writeString(raceType);
         out.writeString(experienceLevel);

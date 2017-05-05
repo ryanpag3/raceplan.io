@@ -115,7 +115,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
         cal.set(java.util.Calendar.YEAR, racer.year);
         cal.set(java.util.Calendar.MONTH, racer.month);
         cal.set(java.util.Calendar.DAY_OF_MONTH, racer.day);
-        raceDate = cal.getTime();
+        raceDate = racer.date;
 
         mOutputText = (TextView) findViewById(R.id.mOutputText);
         mOutputText.setMovementMethod(new ScrollingMovementMethod());

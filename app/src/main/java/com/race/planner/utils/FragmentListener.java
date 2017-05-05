@@ -10,6 +10,7 @@ public interface FragmentListener
 {
     void onFragmentClicked(String s);
     void onBackButtonClicked();
+    void passName(String n);
     void passRaceType(String s);
     void passDate(Date d);
     void passExperienceLevel(String e);

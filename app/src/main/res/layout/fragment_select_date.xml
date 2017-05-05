@@ -4,54 +4,54 @@
                 android:layout_height="match_parent"
                 tools:context="com.race.planner.fragments.SelectDateFragment"
                 android:orientation="vertical">
+    <!--<TextView-->
+        <!--android:text="Select the race date"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--/>-->
 
-    <TextView
-        android:text="Select the race date"
+    <DatePicker
+        android:id="@+id/date_picker_widget"
+        android:layout_centerHorizontal="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        />
+        android:scaleX="1"
+        android:scaleY="1">
+    </DatePicker>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="bottom">
+        <TextView
+            android:text="OK"
+            android:id="@+id/ok_clickable_textview"
+            android:layout_gravity="center_horizontal"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"/>
 
         <LinearLayout
+            android:id="@+id/inner_layout_menu_buttons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_alignParentBottom="true">
-
-            <DatePicker
-            android:id="@+id/datepicker"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:calendarViewShown="false"
-            android:datePickerMode="spinner"/>
+            android:orientation="horizontal"
+            android:layout_margin="12dp">
             <Button
-                android:text="Confirm selection"
-                android:layout_gravity="center_horizontal"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
+                android:text="back"
+                android:id="@+id/button_back"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-            <LinearLayout
-                android:id="@+id/inner_layout_menu_buttons"
-                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:orientation="horizontal"
-                android:layout_margin="12dp">
-                <Button
-                    android:text="back"
-                    android:id="@+id/button_back"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"/>
-                <Button
-                    android:text="restart"
-                    android:id="@+id/button_restart"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"/>
-            </LinearLayout>
+                android:layout_weight="1"/>
+            <Button
+                android:text="restart"
+                android:id="@+id/button_restart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
         </LinearLayout>
-
+    </LinearLayout>
 </RelativeLayout>
