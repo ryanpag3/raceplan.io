@@ -8,7 +8,7 @@ import java.util.Date;
 
 public interface FragmentListener
 {
-    void onNextFragmentClicked();
+    void onFragmentClicked(String s);
     void onBackButtonClicked();
     void passRaceType(String s);
     void passDate(Date d);

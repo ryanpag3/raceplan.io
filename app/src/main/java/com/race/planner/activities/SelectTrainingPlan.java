@@ -11,6 +11,7 @@ import java.util.Date;
 
 import com.race.planner.R;
 import com.race.planner.data_models.Racer;
+import com.race.planner.fragments.SelectDateFragment;
 import com.race.planner.fragments.SelectExperienceLevelFragment;
 import com.race.planner.fragments.SelectRaceTypeFragment;
 import com.race.planner.utils.FragmentListener;
@@ -129,17 +130,36 @@ public class SelectTrainingPlan extends Activity implements FragmentListener// i
     }
 
     @Override
-    public void onNextFragmentClicked()
+    public void onFragmentClicked(String nameOfCurrentFragment)
     {
+        String tag = null;
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left, R.animator.enter_from_left, R.animator.exit_to_right);
-        SelectExperienceLevelFragment selectExperienceLevelFragment = new SelectExperienceLevelFragment();
-        String tag = selectExperienceLevelFragment.toString();
-        Log.e(TAG, tag);
-        fragmentTransaction.replace(R.id.fragment_swap, selectExperienceLevelFragment, tag);
+
+
+        if (nameOfCurrentFragment == SelectRaceTypeFragment.class.getName())
+        {
+            SelectExperienceLevelFragment selectExperienceLevelFragment = new SelectExperienceLevelFragment();
+            tag = selectExperienceLevelFragment.toString();
+            Log.e(TAG, tag);
+            fragmentTransaction.replace(R.id.fragment_swap, selectExperienceLevelFragment, tag);
+
+        } else if (nameOfCurrentFragment == SelectExperienceLevelFragment.class.getName())
+        {
+            SelectDateFragment selectDateFragment = new SelectDateFragment();
+            tag = selectDateFragment.toString();
+            Log.e(TAG, tag);
+            fragmentTransaction.replace(R.id.fragment_swap, selectDateFragment, tag);
+
+        } else
+        {
+
+        }
+
         fragmentTransaction.addToBackStack(tag);
         fragmentTransaction.commit();
+
     }
 
     @Override

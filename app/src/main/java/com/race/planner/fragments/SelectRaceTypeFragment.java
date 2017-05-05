@@ -43,11 +43,9 @@ public class SelectRaceTypeFragment extends Fragment
      * @return A new instance of fragment SelectRaceTypeFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static SelectRaceTypeFragment newInstance(String param1, String param2)
+    public static SelectRaceTypeFragment newInstance()
     {
-        SelectRaceTypeFragment fragment = new SelectRaceTypeFragment();
-        Bundle args = new Bundle();
-        return fragment;
+        return new SelectRaceTypeFragment();
     }
 
     @Override
@@ -62,6 +60,7 @@ public class SelectRaceTypeFragment extends Fragment
     {
         // inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_select_race_type, container, false);
+        final String fragmentName = SelectRaceTypeFragment.class.getName();
 
 
         // 5k button
@@ -72,7 +71,7 @@ public class SelectRaceTypeFragment extends Fragment
             public void onClick(View v)
             {
                 mListener.passRaceType(RACE_5K);
-                mListener.onNextFragmentClicked();
+                mListener.onFragmentClicked(fragmentName);
             }
         });
 
@@ -84,7 +83,7 @@ public class SelectRaceTypeFragment extends Fragment
             public void onClick(View v)
             {
                 mListener.passRaceType(RACE_10K);
-                mListener.onNextFragmentClicked();
+                mListener.onFragmentClicked(fragmentName);
             }
         });
 
@@ -96,7 +95,7 @@ public class SelectRaceTypeFragment extends Fragment
             public void onClick(View v)
             {
                 mListener.passRaceType(RACE_HALF);
-                mListener.onNextFragmentClicked();
+                mListener.onFragmentClicked(fragmentName);
             }
         });
 
@@ -108,7 +107,7 @@ public class SelectRaceTypeFragment extends Fragment
             public void onClick(View v)
             {
                 mListener.passRaceType(RACE_MARATHON);
-                mListener.onNextFragmentClicked();
+                mListener.onFragmentClicked(fragmentName);
             }
         });
 

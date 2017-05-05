@@ -1,13 +1,16 @@
 package com.race.planner.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.race.planner.R;
+import com.race.planner.activities.MainActivity;
 import com.race.planner.utils.FragmentListener;
 
 /**
@@ -20,16 +23,7 @@ import com.race.planner.utils.FragmentListener;
  */
 public class SelectDateFragment extends Fragment
 {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    FragmentListener comm;
+    FragmentListener mListener;
 
     public SelectDateFragment()
     {
@@ -48,10 +42,6 @@ public class SelectDateFragment extends Fragment
     public static SelectDateFragment newInstance(String param1, String param2)
     {
         SelectDateFragment fragment = new SelectDateFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
         return fragment;
     }
 
@@ -67,8 +57,31 @@ public class SelectDateFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_select_date, container, false);
+        View view = inflater.inflate(R.layout.fragment_select_date, container, false);
+
+        // back button
+        Button buttonBack = (Button) view.findViewById(R.id.button_back);
+        buttonBack.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                mListener.onBackButtonClicked();
+            }
+        });
+
+        // restart button
+        Button buttonRestart = (Button) view.findViewById(R.id.button_restart);
+        buttonRestart.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                startActivity(intent);
+            }
+        });
+        return view;
     }
 
     @Override
@@ -77,7 +90,7 @@ public class SelectDateFragment extends Fragment
         super.onAttach(context);
         if (context instanceof FragmentListener)
         {
-            comm = (FragmentListener) context;
+            mListener = (FragmentListener) context;
         } else
         {
             throw new RuntimeException(context.toString()
@@ -89,6 +102,6 @@ public class SelectDateFragment extends Fragment
     public void onDetach()
     {
         super.onDetach();
-        comm = null;
+        mListener = null;
     }
 }

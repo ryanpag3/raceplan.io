@@ -25,15 +25,6 @@ import static com.race.planner.data_models.GlobalVariables.*;
  */
 public class SelectExperienceLevelFragment extends Fragment
 {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
     private FragmentListener mListener;
 
     public SelectExperienceLevelFragment()
@@ -52,23 +43,13 @@ public class SelectExperienceLevelFragment extends Fragment
     // TODO: Rename and change types and number of parameters
     public static SelectExperienceLevelFragment newInstance(String param1, String param2)
     {
-        SelectExperienceLevelFragment fragment = new SelectExperienceLevelFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+        return new SelectExperienceLevelFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null)
-        {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -76,6 +57,7 @@ public class SelectExperienceLevelFragment extends Fragment
                              Bundle savedInstanceState)
     {
         View view = inflater.inflate(R.layout.fragment_select_experience_level, container, false);
+        final String fragmentName = SelectExperienceLevelFragment.class.getName();
 
         // beginner button
         Button buttonExpBeginner = (Button) view.findViewById(R.id.button_expBeginner);
@@ -85,6 +67,8 @@ public class SelectExperienceLevelFragment extends Fragment
             public void onClick(View v)
             {
                 mListener.passExperienceLevel(EXPERIENCE_BEGINNER);
+                mListener.onFragmentClicked(fragmentName);
+
             }
         });
 
@@ -96,6 +80,7 @@ public class SelectExperienceLevelFragment extends Fragment
             public void onClick(View v)
             {
                 mListener.passExperienceLevel(EXPERIENCE_INTERMEDIATE);
+                mListener.onFragmentClicked(fragmentName);
             }
         });
 
@@ -107,6 +92,7 @@ public class SelectExperienceLevelFragment extends Fragment
             public void onClick(View v)
             {
                 mListener.passExperienceLevel(EXPERIENCE_EXPERT);
+                mListener.onFragmentClicked(fragmentName);
             }
         });
 
