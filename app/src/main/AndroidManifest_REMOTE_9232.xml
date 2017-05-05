@@ -17,15 +17,10 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        >
+        android:theme="@style/AppTheme">
 
         <activity
-<<<<<<< HEAD
-            android:name=".activities.SelectTrainingPlan"
-=======
             android:name="com.race.planner.activities.SelectTrainingPlan"
->>>>>>> eb735ff748415c65dcafae5e9fd59a82e6f98a6e
             android:screenOrientation="portrait">
         </activity>
 
@@ -35,21 +30,13 @@
         <!--</activity>-->
 
         <activity
-<<<<<<< HEAD
-            android:name=".activities.AuthenticateAndCallAPI"
-=======
             android:name="com.race.planner.activities.AuthenticateAndCallAPI"
->>>>>>> eb735ff748415c65dcafae5e9fd59a82e6f98a6e
             android:screenOrientation="portrait">
         </activity>
 
 
         <activity
-<<<<<<< HEAD
-            android:name=".activities.MainActivity"
-=======
             android:name="com.race.planner.activities.MainActivity"
->>>>>>> eb735ff748415c65dcafae5e9fd59a82e6f98a6e
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -57,12 +44,7 @@
             </intent-filter>
         </activity>
 
-<<<<<<< HEAD
-        <activity
-            android:name=".activities.ListTrainingPlans">
-=======
         <activity android:name="com.race.planner.activities.ListTrainingPlans">
->>>>>>> eb735ff748415c65dcafae5e9fd59a82e6f98a6e
         </activity>
 
 
