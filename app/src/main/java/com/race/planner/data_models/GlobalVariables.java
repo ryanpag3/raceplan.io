@@ -18,4 +18,12 @@ public class GlobalVariables extends Application
     public static final int MY_PERMISSIONS_REQUEST_WRITE_CALENDAR = 2;
     public static final int MY_PERMISSIONS_REQUEST_READ_SYNC_SETTINGS = 3;
 
+    public static final String RACE_5K = "5k";
+    public static final String RACE_10K = "10k";
+    public static final String RACE_HALF = "Half Marathon";
+    public static final String RACE_MARATHON = "Marathon";
+
+    public static final String EXPERIENCE_BEGINNER = "Beginner";
+    public static final String EXPERIENCE_INTERMEDIATE = "Intermediate";
+    public static final String EXPERIENCE_EXPERT = "Expert";
 }

@@ -17,10 +17,11 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        >
 
         <activity
-            android:name="com.race.planner.activities.SelectTrainingPlan"
+            android:name=".activities.SelectTrainingPlan"
             android:screenOrientation="portrait">
         </activity>
 
@@ -30,13 +31,13 @@
         <!--</activity>-->
 
         <activity
-            android:name="com.race.planner.activities.AuthenticateAndCallAPI"
+            android:name=".activities.AuthenticateAndCallAPI"
             android:screenOrientation="portrait">
         </activity>
 
 
         <activity
-            android:name="com.race.planner.activities.MainActivity"
+            android:name=".activities.MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -44,7 +45,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.race.planner.activities.ListTrainingPlans">
+        <activity
+            android:name=".activities.ListTrainingPlans">
         </activity>
 
 

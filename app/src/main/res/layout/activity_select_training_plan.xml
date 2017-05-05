@@ -1,103 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout
+    android:id="@+id/activity_select_training_plan"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.ryan.race.planner.com.race.planner.SelectTrainingPlan">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <TextView
-        android:id="@+id/title_placeholder"
+
+    <fragment
+        android:name="com.race.planner.fragments.SelectRaceTypeFragment"
+        android:id="@+id/fragment_select_race_type"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2"
-        android:gravity="center"
-        android:text="@string/main_todo_title"
-        android:textSize="24sp" />
+        android:layout_height="match_parent"/>
 
-    <LinearLayout
-        android:id="@+id/layout_name_entry"
+    <fragment
+        android:name="com.race.planner.fragments.SelectExperienceLevelFragment"
+        android:id="@+id/fragment_select_experience_level"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp">
-        <TextView
-            android:id="@+id/text_enter_name"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:text="Plan name:"
-            android:textColor="@android:color/black"
-            />
+        android:layout_height="match_parent"/>
 
-        <EditText
-            android:id="@+id/edit_enter_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Enter your text here"
-            android:textSize="12dp"
-            android:layout_toRightOf="@+id/text_enter_name"
-            />
-    </LinearLayout>
 
-    <TextView
-        android:id="@+id/select_type"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Select Race Type"
-        android:textSize="16sp" />
 
-    <Spinner
-        android:id="@+id/spinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:spinnerMode="dropdown" />
+    <!--<TextView-->
+        <!--android:id="@+id/title_placeholder"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:layout_weight="2"-->
+        <!--android:gravity="center"-->
+        <!--android:text="@string/main_todo_title"-->
+        <!--android:textSize="24sp" />-->
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Select Date of Race"
-        android:textSize="16sp" />
+    <!--<LinearLayout-->
+        <!--android:id="@+id/layout_name_entry"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:padding="16dp">-->
+        <!--<TextView-->
+            <!--android:id="@+id/text_enter_name"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="36dp"-->
+            <!--android:text="Plan name:"-->
+            <!--android:textColor="@android:color/black"-->
+            <!--/>-->
 
-    <DatePicker
-        android:id="@+id/datepicker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:calendarViewShown="false"
-        android:datePickerMode="spinner"/>
+        <!--<EditText-->
+            <!--android:id="@+id/edit_enter_name"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:hint="Enter your text here"-->
+            <!--android:textSize="12dp"-->
+            <!--android:layout_toRightOf="@+id/text_enter_name"-->
+            <!--/>-->
+    <!--</LinearLayout>-->
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Select Experience Level"
-        android:textSize="16sp" />
+    <!--<TextView-->
+        <!--android:id="@+id/select_type"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:gravity="center"-->
+        <!--android:text="Select Race Type"-->
+        <!--android:textSize="16sp" />-->
 
-    <Spinner
-        android:id="@+id/expSpinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:spinnerMode="dropdown" />
+    <!--<Spinner-->
+        <!--android:id="@+id/spinner"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:gravity="center"-->
+        <!--android:spinnerMode="dropdown" />-->
 
-    <Switch
-        android:id="@+id/main_switch_new_calendar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/main_switch_sidetext"
-        android:switchPadding="90dp"/>
+    <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:gravity="center"-->
+        <!--android:text="Select Date of Race"-->
+        <!--android:textSize="16sp" />-->
 
-    <Button
-        android:id="@+id/generateButton"
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:background="@android:color/holo_blue_dark"
-        android:text="Build Training Plan"
-        android:textAlignment="center"
-        android:textColor="@android:color/white"
-        android:textSize="24sp" />
+    <!--<DatePicker-->
+        <!--android:id="@+id/datepicker"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="center"-->
+        <!--android:calendarViewShown="false"-->
+        <!--android:datePickerMode="spinner"/>-->
+
+    <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:gravity="center"-->
+        <!--android:text="Select Experience Level"-->
+        <!--android:textSize="16sp" />-->
+
+    <!--<Spinner-->
+        <!--android:id="@+id/expSpinner"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:gravity="center"-->
+        <!--android:spinnerMode="dropdown" />-->
+
+    <!--<Switch-->
+        <!--android:id="@+id/main_switch_new_calendar"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="@string/main_switch_sidetext"-->
+        <!--android:switchPadding="90dp"/>-->
+
+    <!--<Button-->
+        <!--android:id="@+id/generateButton"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="64dp"-->
+        <!--android:background="@android:color/holo_blue_dark"-->
+        <!--android:text="Build Training Plan"-->
+        <!--android:textAlignment="center"-->
+        <!--android:textColor="@android:color/white"-->
+        <!--android:textSize="24sp" />-->
 
 
 </LinearLayout>

@@ -9,24 +9,24 @@
     android:orientation="vertical"
     tools:context="com.ryan.race.planner.com.race.planner.GenerateTrainingPlan">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Please select the calendar you would like to export to"/>
+    <!--<TextView-->
+        <!--android:id="@+id/textView"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Please select the calendar you would like to export to"/>-->
 
-    <Spinner
-        android:id="@+id/spinner_calendar_select"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:spinnerMode="dropdown"/>
+    <!--<Spinner-->
+        <!--android:id="@+id/spinner_calendar_select"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:gravity="center"-->
+        <!--android:spinnerMode="dropdown"/>-->
 
-    <Button
-        android:id="@+id/confirmCalendar"
-        android:text="@string/generate_event_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        />
+    <!--<Button-->
+        <!--android:id="@+id/confirmCalendar"-->
+        <!--android:text="@string/generate_event_button"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="center"-->
+        <!--/>-->
 </LinearLayout>

@@ -142,16 +142,16 @@ public class ListTrainingPlans extends AppCompatActivity
                         e.printStackTrace();
                     }
 
-                    // create new RacerInfo object to pass to AsyncTask
+                    // create new Racer object to pass to AsyncTask
                     int year = Integer.parseInt((String) DateFormat.format("yyyy", date));
                     int month = Integer.parseInt((String) DateFormat.format("MM", date));
                     int day = Integer.parseInt((String) DateFormat.format("dd", date));
 
-                    RacerInfo racerInfo = new RacerInfo(year, month, day, raceType, experienceLevel, name, id);
+                    Racer racer = new Racer(year, month, day, raceType, experienceLevel, name, id);
                     // creates new asynctask for deleting a training plan
-                    //new CalendarTask(mCredential, racerInfo, ListTrainingPlans.this).execute();
+                    //new CalendarTask(mCredential, racer, ListTrainingPlans.this).execute();
 
-                    new DeleteTrainingPlanTask(mCredential, racerInfo, ListTrainingPlans.this).execute();
+                    new DeleteTrainingPlanTask(mCredential, racer, ListTrainingPlans.this).execute();
                     // deletes plan from the database
                     db.deletePlanFromDatabase(id);
                 }

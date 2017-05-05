@@ -59,6 +59,8 @@ import com.race.planner.utils.*;
 import com.race.planner.data_models.*;
 import com.race.planner.R;
 
+import static com.race.planner.data_models.GlobalVariables.*;
+
 
 public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.PermissionCallbacks
 {
@@ -82,7 +84,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
     GoogleAccountCredential mCredential;
     ProgressDialog mProgress;
     Boolean createCal = false;
-    RacerInfo racerInfo;
+    Racer racer;
     Date raceDate;
     private TextView mOutputText;
     Button buttonCreatePlanOnSelected;
@@ -94,7 +96,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authenticate_calendar_api);
 
-        racerInfo = getIntent().getExtras().getParcelable(GlobalVariables.RACER_INFO_ID);
+        racer = getIntent().getExtras().getParcelable(GlobalVariables.RACER_INFO_ID);
         createCal = getIntent().getExtras().getBoolean(GlobalVariables.CREATE_CALENDAR_BOOL);
         calendarSelect = (Spinner) findViewById(R.id.spinner_calendar_select_2);
         calendarSelect.setVisibility(View.GONE);
@@ -111,9 +113,9 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
         }
 
         java.util.Calendar cal = java.util.Calendar.getInstance();
-        cal.set(java.util.Calendar.YEAR, racerInfo.year);
-        cal.set(java.util.Calendar.MONTH, racerInfo.month);
-        cal.set(java.util.Calendar.DAY_OF_MONTH, racerInfo.day);
+        cal.set(java.util.Calendar.YEAR, racer.year);
+        cal.set(java.util.Calendar.MONTH, racer.month);
+        cal.set(java.util.Calendar.DAY_OF_MONTH, racer.day);
         raceDate = cal.getTime();
 
         mOutputText = (TextView) findViewById(R.id.mOutputText);
@@ -150,7 +152,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
                 Intent intent = new Intent(AuthenticateAndCallAPI.this, MainActivity.class);
                 intent.putExtra(GlobalVariables.RACER_INFO_ID, getIntent().getExtras().getParcelable(GlobalVariables.RACER_INFO_ID));
                 intent.putExtra(GlobalVariables.CALENDAR_CREATED_ID, createCal);
-                intent.putExtra(GlobalVariables.CALENDAR_ID, racerInfo.calendarID);
+                intent.putExtra(GlobalVariables.CALENDAR_ID, racer.calendarID);
                 intent.putExtra(GlobalVariables.CREDENTIAL_ACCOUNT_NAME, mCredential.getSelectedAccountName());
                 startActivity(intent);
             }
@@ -300,8 +302,8 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
                 {
-                    racerInfo.calendarName = names.get(position);
-                    racerInfo.calendarID = calendarIDs.get(position);
+                    racer.calendarName = names.get(position);
+                    racer.calendarID = calendarIDs.get(position);
                     buttonCreatePlanOnSelected.setVisibility(View.VISIBLE);
                 }
 
@@ -368,8 +370,8 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
                     {
-                        racerInfo.calendarName = names.get(position);
-                        racerInfo.calendarID = calendarIDs.get(position);
+                        racer.calendarName = names.get(position);
+                        racer.calendarID = calendarIDs.get(position);
                         buttonCreatePlanOnSelected.setVisibility(View.VISIBLE);
                     }
 
@@ -453,8 +455,8 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
                     calendar.setTimeZone("America/Los_Angeles");
                     com.google.api.services.calendar.model.Calendar createdCalendar = mService.calendars().insert(calendar).execute();
 
-                    racerInfo.calendarID = createdCalendar.getId();
-                    racerInfo.calendarName = "race-planner";
+                    racer.calendarID = createdCalendar.getId();
+                    racer.calendarName = "race-planner";
                 }
             } catch (Exception e)
             {
@@ -483,9 +485,9 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
                         if (calendarListEntry.getSummary().equals("race-planner"))
                         {
 
-                            racerInfo.calendarID = calendarListEntry.getId();
-                            racerInfo.calendarName = "race-planner";
-                            Log.e(TAG,"inside israceplannercreated: " + racerInfo.calendarID);
+                            racer.calendarID = calendarListEntry.getId();
+                            racer.calendarName = "race-planner";
+                            Log.e(TAG,"inside israceplannercreated: " + racer.calendarID);
                             return true;
                         }
                     }
@@ -581,7 +583,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
         {
             try
             {
-                createPlan(racerInfo.calendarID);
+                createPlan(racer.calendarID);
             } catch (IOException e)
             {
                 mLastError = e;
@@ -605,12 +607,12 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
             Date startDate; // amount of millis in a week * 8 weeks
             Date tuesday;
             SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
-            Log.e(TAG, "YOOOOOOO THIS IS THE NAME: " + racerInfo.nameOfPlan);
+            Log.e(TAG, "YOOOOOOO THIS IS THE NAME: " + racer.nameOfPlan);
             //DatabaseHelper db = new DatabaseHelper(context);
-            //Log.i(TAG, racerInfo.nameOfPlan + " " + racerInfo.getDate() + " " + racerInfo.raceType + " " + racerInfo.experienceLevel);
+            //Log.i(TAG, racer.nameOfPlan + " " + racer.getDate() + " " + racer.raceType + " " + racer.experienceLevel);
 
-            Log.e(TAG, "inside createPlan: " + racerInfo.calendarID);
-            db.insertNewPlanToDatabase(racerInfo);
+            Log.e(TAG, "inside createPlan: " + racer.calendarID);
+            db.insertNewPlanToDatabase(racer);
 
             Cursor c = db.query("SELECT * FROM " + DatabaseHelper.TRAINING_PLAN_TABLE_NAME, null);
 
@@ -620,51 +622,50 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
             }
 
             c.moveToLast();
-            racerInfo.databaseID = c.getInt(0);
-            Log.e(TAG, "YOOOOOOO THIS IS THE ID: " + racerInfo.databaseID);
+            racer.databaseID = c.getInt(0);
             c.close();
             db.close();
 
-            switch (racerInfo.experienceLevel)
+            switch (racer.experienceLevel)
             {
-                case "Beginner":
+                case EXPERIENCE_BEGINNER:
                     startingMiles = 1;
                     sundayMiles = 2;
                     bumpMileageUp = 1;
                     break;
-                case "Intermediate":
+                case EXPERIENCE_INTERMEDIATE:
                     startingMiles = 3;
                     sundayMiles = 3;
                     bumpMileageUp = 1;
                     break;
-                case "Expert":
+                case EXPERIENCE_EXPERT:
                     startingMiles = 3;
                     sundayMiles = 5;
                     bumpMileageUp = 1;
                     break;
             }
 
-            switch(racerInfo.raceType)
+            switch(racer.raceType)
             {
-                case "5k":
+                case RACE_5K:
                     weeksOfTraining = 8;
                     goalMiles = 5;
                     tuesThursMileCap = 2;
                     wedMileCap = 3;
                     break;
-                case "10k":
+                case RACE_10K:
                     weeksOfTraining = 12;
                     goalMiles = 7;
                     tuesThursMileCap = 3;
                     wedMileCap = 5;
                     break;
-                case "Half-Marathon":
+                case RACE_HALF:
                     weeksOfTraining = 12;
                     goalMiles = 13;
                     tuesThursMileCap = 5;
                     wedMileCap = 7;
                     break;
-                case "Marathon":
+                case RACE_MARATHON:
                     weeksOfTraining = 18;
                     goalMiles = 26;
                     tuesThursMileCap = 5;
@@ -750,10 +751,10 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
                     event.setStart(startEventDateTime);
                     event.setEnd(endEventDateTime);
                     // insert event into Calendar via API
-                    event = mService.events().insert(racerInfo.calendarID, event).execute();
+                    event = mService.events().insert(racer.calendarID, event).execute();
 
                     // insert event info into database
-                    db.insertEventToDatabase(racerInfo.databaseID, event.getId(), racerInfo.calendarID);
+                    db.insertEventToDatabase(racer.databaseID, event.getId(), racer.calendarID);
 
                 } catch (IOException e)
                 {

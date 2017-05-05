@@ -8,9 +8,9 @@ import android.os.Parcelable;
  * Created by ryan on 4/7/17.
  */
 
-public class RacerInfo implements Parcelable
+public class Racer implements Parcelable
 {
-    private static final String TAG = RacerInfo.class.getName();
+    private static final String TAG = Racer.class.getName();
 
     public String raceType;
     public String experienceLevel;
@@ -23,7 +23,7 @@ public class RacerInfo implements Parcelable
     public int day;
     public int databaseID; // sql id
 
-    public RacerInfo(int y, int m, int d, String r, String e, String n, int id)
+    public Racer(int y, int m, int d, String r, String e, String n, int id)
     {
         year = y;
         month = m;
@@ -34,7 +34,7 @@ public class RacerInfo implements Parcelable
         databaseID = id;
     }
 
-    public RacerInfo()
+    public Racer()
     {
         year = -1;
         month = -1;
@@ -55,7 +55,7 @@ public class RacerInfo implements Parcelable
     }
 
     // Parcelable Implementation
-    public RacerInfo(Parcel in)
+    public Racer(Parcel in)
     {
         // Order needs to be the same as the writeToParcel() method
         int[] data = new int[3];
@@ -89,14 +89,14 @@ public class RacerInfo implements Parcelable
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator()
     {
-        public RacerInfo createFromParcel(Parcel in)
+        public Racer createFromParcel(Parcel in)
         {
-            return new RacerInfo(in);
+            return new Racer(in);
         }
 
-        public RacerInfo[] newArray(int size)
+        public Racer[] newArray(int size)
         {
-            return new RacerInfo[size];
+            return new Racer[size];
         }
     };
 }

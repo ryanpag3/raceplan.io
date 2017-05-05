@@ -107,15 +107,15 @@ public class DatabaseHelper extends SQLiteOpenHelper
 //    long result = db.insert(TRAINING_PLAN_TABLE_NAME, null, values);
 //    return result != -1;
 //}
-    public boolean insertNewPlanToDatabase(RacerInfo racerInfo)
+    public boolean insertNewPlanToDatabase(Racer racer)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(TRAINING_PLAN_COL_2, racerInfo.nameOfPlan);
-        values.put(TRAINING_PLAN_COL_3, racerInfo.getDate());
-        values.put(TRAINING_PLAN_COL_4, racerInfo.raceType);
-        values.put(TRAINING_PLAN_COL_5, racerInfo.experienceLevel);
-        values.put(TRAINING_PLAN_COL_6, racerInfo.calendarName);
+        values.put(TRAINING_PLAN_COL_2, racer.nameOfPlan);
+        values.put(TRAINING_PLAN_COL_3, racer.getDate());
+        values.put(TRAINING_PLAN_COL_4, racer.raceType);
+        values.put(TRAINING_PLAN_COL_5, racer.experienceLevel);
+        values.put(TRAINING_PLAN_COL_6, racer.calendarName);
         long result = db.insert(TRAINING_PLAN_TABLE_NAME, null, values);
         return result != -1;
     }

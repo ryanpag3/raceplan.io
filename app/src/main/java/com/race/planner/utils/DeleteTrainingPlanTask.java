@@ -27,13 +27,13 @@ public class DeleteTrainingPlanTask extends AsyncTask<Void, Void, Void>
 {
     private com.google.api.services.calendar.Calendar mService = null;
     private Exception mLastError = null;
-    private RacerInfo racerInfo;
+    private Racer racer;
     private DatabaseHelper db;
     private TextView mOutput;
     private ProgressDialog mProgress;
     private Activity mContext;
 
-    public DeleteTrainingPlanTask(GoogleAccountCredential credential, RacerInfo r, Activity context)
+    public DeleteTrainingPlanTask(GoogleAccountCredential credential, Racer r, Activity context)
     {
         if(android.os.Debug.isDebuggerConnected())
             android.os.Debug.waitForDebugger();
@@ -53,7 +53,7 @@ public class DeleteTrainingPlanTask extends AsyncTask<Void, Void, Void>
                 .build();
 
         // update with info of race to-be-deleted
-        racerInfo = r;
+        racer = r;
         // instantiate new database
         db = new DatabaseHelper(context);
 
@@ -65,7 +65,7 @@ public class DeleteTrainingPlanTask extends AsyncTask<Void, Void, Void>
     {
         // query through all events where the database ID matches the training plan database ID
         Cursor c = db.query("SELECT * FROM " + DatabaseHelper.EVENT_ID_TABLE_NAME + " WHERE "
-                + DatabaseHelper.EVENT_ID_COL_1 + "= ?", new String[] {String.valueOf(racerInfo.databaseID)});
+                + DatabaseHelper.EVENT_ID_COL_1 + "= ?", new String[] {String.valueOf(racer.databaseID)});
 
         while (c.moveToNext())
         {
@@ -73,7 +73,7 @@ public class DeleteTrainingPlanTask extends AsyncTask<Void, Void, Void>
             deleteEventByID(c.getString(1), c.getString(2));
         }
         // finally remove the training plan from database
-        db.deletePlanFromDatabase(racerInfo.databaseID);
+        db.deletePlanFromDatabase(racer.databaseID);
         return null;
     }
 

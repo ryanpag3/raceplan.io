@@ -1,3 +1,10 @@
+/**
+ * DEPRECATED
+ */
+
+
+
+
 //package com.race.planner;
 //
 //
@@ -34,7 +41,7 @@
 //{
 //    private static final String TAG = GenerateTrainingPlan.class.getName();
 //    List<String> namesOfCalendars = new ArrayList<>();
-//    RacerInfo racerInfo;
+//    Racer racer;
 //    String calName;
 //    Long id;
 //    private boolean calCreated;
@@ -47,7 +54,7 @@
 //        setContentView(R.layout.activity_generate_training_plan);
 //
 //        // grab data from previous activity
-//        racerInfo  = getIntent().getExtras().getParcelable(GlobalVariables.RACER_INFO_ID);
+//        racer  = getIntent().getExtras().getParcelable(GlobalVariables.RACER_INFO_ID);
 //        calCreated = getIntent().getExtras().getBoolean(GlobalVariables.CALENDAR_CREATED_ID);
 //
 //        List<CalendarInfo> calendars = getCalendarList();
@@ -59,9 +66,9 @@
 //        if (calCreated)
 //        {
 //            TextView textView = (TextView) findViewById(R.id.textView);
-//            textView.setText("Your race type is: " + racerInfo.raceType + '\n'
-//                    + "Your experience level is: " + racerInfo.experienceLevel + '\n'
-//                    + "The date of your race is: " + racerInfo.year + "/" + racerInfo.month + "/" + racerInfo.day);
+//            textView.setText("Your race type is: " + racer.raceType + '\n'
+//                    + "Your experience level is: " + racer.experienceLevel + '\n'
+//                    + "The date of your race is: " + racer.year + "/" + racer.month + "/" + racer.day);
 //            Spinner spinner = (Spinner) findViewById(R.id.spinner_calendar_select);
 //            //spinner.setVisibility(View.GONE);
 //            id = getCalendar("race-planner");
@@ -210,7 +217,7 @@
 //            {
 //                id = getCalendar(calName);
 //                // create dummy event for testing
-//                new MakeTrainingPlanTask(racerInfo, id).execute();
+//                new MakeTrainingPlanTask(racer, id).execute();
 //
 //            }
 //        });
@@ -220,7 +227,7 @@
 //     * This creates a new event for the selected calendar. This should be put on an asyncronous
 //     * task for optimization.
 //     * @param curActivity current activity
-//     * @param racerInfo the date of the event
+//     * @param racer the date of the event
 //     */
 //
 //    /**
@@ -248,30 +255,30 @@
 //        private String raceType;
 //        private String experienceLevel;
 //
-//        MakeTrainingPlanTask(RacerInfo racerInfo, Long i)
+//        MakeTrainingPlanTask(Racer racer, Long i)
 //        {
-//            year = racerInfo.year;
-//            month = racerInfo.month;
-//            day = racerInfo.day;
-//            raceType = racerInfo.raceType;
-//            experienceLevel = racerInfo.experienceLevel;
+//            year = racer.year;
+//            month = racer.month;
+//            day = racer.day;
+//            raceType = racer.raceType;
+//            experienceLevel = racer.experienceLevel;
 //            id = i;
 //        }
 //
 //        @Override
 //        public Void doInBackground(Long... params)
 //        {
-//            createEvent(id, racerInfo);
+//            createEvent(id, racer);
 //            return null;
 //        }
 //    }
 //
-//    public void createEvent(Long calID, RacerInfo racerInfo)
+//    public void createEvent(Long calID, Racer racer)
 //    {
 //        Calendar beginTime = Calendar.getInstance();
-//        beginTime.set(racerInfo.year, racerInfo.month - 1, racerInfo.day, 0, 0);
+//        beginTime.set(racer.year, racer.month - 1, racer.day, 0, 0);
 //        Calendar endTime = Calendar.getInstance();
-//        endTime.set(racerInfo.year, racerInfo.month - 1, racerInfo.day, 0, 0);
+//        endTime.set(racer.year, racer.month - 1, racer.day, 0, 0);
 //
 //        long startMillis = beginTime.getTimeInMillis();
 //        long endMillis = endTime.getTimeInMillis();

@@ -15,10 +15,14 @@
         <item>Half-Marathon</item>
         <item>Marathon</item>
     </string-array>
+
     <string name="main_todo_title">ALPHA RELEASE 0.1a</string>
 
     <string name="generate_event_button">FINISH</string>
 
     <string name="main_switch_sidetext">Use default race-planner calendar?</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
