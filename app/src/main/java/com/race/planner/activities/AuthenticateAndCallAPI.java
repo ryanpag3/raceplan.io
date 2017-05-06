@@ -672,7 +672,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
                     break;
             }
 
-            startDate = new Date(raceDate.getTime() - (604800000L * weeksOfTraining));
+            startDate = new Date(racer.date.getTime() - (604800000L * weeksOfTraining));
             tuesday = startDate;
 
             // push tuesday to correct day of week
