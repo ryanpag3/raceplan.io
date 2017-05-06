@@ -11,14 +11,21 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -31,6 +38,8 @@ import com.race.planner.R;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -57,7 +66,7 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
     private TextView mOutputText;
     private ProgressDialog mProgress;
     private GoogleAccountCredential mCredential;
-    ScrollView scrollView;
+    int currentPage;
 
 
 
@@ -69,20 +78,44 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
 
-        // instantiate TextView object for user directions
-        mOutputText = (TextView) findViewById(R.id.mOutputText);
-        mOutputText.setMovementMethod(new ScrollingMovementMethod());
-        scrollView = (ScrollView) findViewById(R.id.scroll_view);
-//        ViewTreeObserver vto = scrollView.getViewTreeObserver();
-//        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
-//        {
-//            @Override
-//            public void onGlobalLayout()
-//            {
-//                scrollView.smoothScrollTo(0, scrollView.getBottom());
-//            }
-//        });
+        // instantiate main menu splash image
+        ImageView imageView = (ImageView) findViewById(R.id.splash_pic);
+        imageView.setImageResource(R.drawable.splashpic);
 
+        /**
+         * This is the viewpager adapter. The view pager holds the four TextViews. The adapter
+         * converts those into the viewpager object through the ViewPagerAdapter inner class.
+         */
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter();
+        final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        viewPager.setAdapter(viewPagerAdapter);
+        viewPager.setOffscreenPageLimit(5); // required to prevent TextViews from disappearing
+
+        /**
+         * This handler moves the ViewPager to the next element in a specified amount of time.
+         */
+        final Handler handler = new Handler();
+        final Runnable update = new Runnable() {
+            public void run() {
+                if (currentPage == 5 - 1) {
+                    currentPage = 0;
+                }
+                viewPager.setCurrentItem(currentPage++, true);
+            }
+        };
+        new Timer().schedule(new TimerTask() {
+
+            @Override
+            public void run() {
+                handler.post(update);
+            }
+        }, 100, 4000); // update second int to adjust time between viewpager swaps
+
+        // instantiate TextView object for user directions
+        //TODO: determine whether this is necessary
+        mOutputText = (TextView) findViewById(R.id.mOutputText);
+
+        // TODO: determine whether this is necessary
         mProgress = new ProgressDialog(this);
         mProgress.setMessage("Calling Google Calendar API ...");
 
@@ -96,6 +129,7 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
             mCredential.setSelectedAccountName(getIntent().getExtras().getString(GlobalVariables.CREDENTIAL_ACCOUNT_NAME));
         }
 
+        // TODO: check location, possibly move it to bottom of onCreate()
         requestPermissions();
 
 
@@ -157,41 +191,6 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
                             Manifest.permission.READ_SYNC_SETTINGS,
                             Manifest.permission.GET_ACCOUNTS},
                     GlobalVariables.MY_PERMISSIONS_REQUEST_READ_CALENDAR);
-        }
-    }
-
-    /**
-     * Attempts to set the account used with the API credentials. If an account
-     * name was previously saved it will use that one; otherwise an account
-     * picker dialog will be shown to the user. Note that the setting the
-     * account to use with the credentials object requires the app to have the
-     * GET_ACCOUNTS permission, which is requested here if it is not already
-     * present. The AfterPermissionGranted annotation indicates that this
-     * function will be rerun automatically whenever the GET_ACCOUNTS permission
-     * is granted.
-     */
-    @AfterPermissionGranted(REQUEST_PERMISSION_GET_ACCOUNTS)
-    private void chooseAccount() {
-        if (EasyPermissions.hasPermissions(
-                this, Manifest.permission.GET_ACCOUNTS)) {
-            String accountName = getPreferences(Context.MODE_PRIVATE)
-                    .getString(PREF_ACCOUNT_NAME, null);
-            if (accountName != null) {
-                mCredential.setSelectedAccountName(accountName);
-                meetsPreReqs();
-            } else {
-                // Start a dialog from which the user can choose an account
-                startActivityForResult(
-                        mCredential.newChooseAccountIntent(),
-                        REQUEST_ACCOUNT_PICKER);
-            }
-        } else {
-            // Request the GET_ACCOUNTS permission via a user dialog
-            EasyPermissions.requestPermissions(
-                    this,
-                    "This app needs to access your Google account (via Contacts).",
-                    REQUEST_PERMISSION_GET_ACCOUNTS,
-                    Manifest.permission.GET_ACCOUNTS);
         }
     }
 
@@ -338,17 +337,52 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
         dialog.show();
     }
 
-    @Override
-    public void onResume()
+    /**
+     * Custom adapter for view pager widget
+     */
+    private class ViewPagerAdapter extends PagerAdapter
     {
-        super.onResume();
-        scrollView.post(new Runnable()
+        // instantiates based on panel position
+        public Object instantiateItem(ViewGroup collection, int position)
         {
-            @Override
-            public void run()
+            int resId = 0;
+            switch(position)
             {
-                scrollView.smoothScrollTo(0, scrollView.getBottom());
+                case 0:
+                    resId = R.id.string_main_intro_1;
+                    break;
+                case 1:
+                    resId = R.id.string_main_intro_2;
+                    break;
+                case 2:
+                    resId = R.id.string_main_intro_3;
+                    break;
+                case 3:
+                    resId = R.id.string_main_intro_4;
+                    break;
             }
-        });
+            return findViewById(resId);
+        }
+
+        // not used because we increased the limit of how many objects can be instantiated at a time
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+                container.removeView((View)object);
+
+        }
+
+        // determines the amount of panels to create
+        @Override
+        public int getCount()
+        {
+            return 4;
+        }
+
+        // checks to see if the current view on the view pager is from the object called
+        @Override
+        public boolean isViewFromObject(View view, Object object)
+        {
+            return view == (View) object;
+        }
     }
 }

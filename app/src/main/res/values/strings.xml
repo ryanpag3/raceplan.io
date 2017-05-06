@@ -9,6 +9,10 @@
         If you need to uninstall the app, it is highly recommended to delete all training plans first. If you do not do this, you will need to do it through google calendar, which could potentially take a long time.\n\n
 
         Thanks again for trying out my app and please send all feedback to raceplannerapp@gmail.com</string>
+    <string name="string_main_intro_1">Welcome to Race Planner training plan generator. Please choose one of the options below.\n\n</string>
+    <string name="string_main_intro_2">This application is in ALPHA and with it comes frequent updates, crashes, and potential errors.\n\n</string>
+    <string name="string_main_intro_3">If you need to uninstall the app, it is highly recommended to delete all training plans first. If you do not do this, you will need to do it through google calendar, which could potentially take a long time.\n\n</string>
+    <string name="string_main_intro_4">Thanks again for trying out my app and please send all feedback to raceplannerapp@gmail.com</string>
 
     <string name="string_main_todo_title">ALPHA RELEASE 0.1a</string>
     <string name="string_generate_event_button">FINISH</string>
