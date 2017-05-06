@@ -125,15 +125,6 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
                     startActivity(intent);
             }
         });
-
-        scrollView.post(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                scrollView.smoothScrollTo(0, scrollView.getBottom());
-            }
-        });
     }
 
     /**
@@ -345,5 +336,19 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
                 connectionStatusCode,
                 REQUEST_GOOGLE_PLAY_SERVICES);
         dialog.show();
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        scrollView.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                scrollView.smoothScrollTo(0, scrollView.getBottom());
+            }
+        });
     }
 }

@@ -35,6 +35,7 @@ public class SelectDateFragment extends Fragment
 {
     FragmentListener mListener;
     private DatePicker datePicker;
+    Date date;
 
     public SelectDateFragment()
     {
@@ -67,12 +68,17 @@ public class SelectDateFragment extends Fragment
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH);
         int day = cal.get(Calendar.DAY_OF_MONTH);
+        date = cal.getTime();
+        // set default race date to avoid crashing on pressing back button
+        mListener.passDate(date);
+
+
 
         datePicker = (DatePicker) view.findViewById(R.id.date_picker_widget);
         datePicker.init(year, month, day, new DatePicker.OnDateChangedListener() {
             @Override
             public void onDateChanged(DatePicker datePicker, int i, int i1, int i2) {
-                Date date = new GregorianCalendar(i, i1, i2).getTime();
+                date = new GregorianCalendar(i, i1, i2).getTime();
                 mListener.passDate(date);
                 Log.i(getActivity().getLocalClassName(), date.toString());
                 // do something with the date here

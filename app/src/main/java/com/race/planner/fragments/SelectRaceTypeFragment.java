@@ -118,8 +118,7 @@ public class SelectRaceTypeFragment extends Fragment
             @Override
             public void onClick(View v)
             {
-                mListener.onFragmentClicked(getActivity().getLocalClassName());
-
+            mListener.onBackButtonClicked();
             }
         });
 
