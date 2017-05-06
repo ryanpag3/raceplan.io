@@ -1,28 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-    <string name="app_name">RacePlanner</string>
+    <string name="app_name">Race Planner</string>
+    <string name="string_main_intro_text">
+        Welcome to Race Planner training plan generator. Please choose one of the options below.\n\n
 
-    <string-array name="main_experience_spinner_strings">
-        <item>Please Select Item</item>
-        <item>Beginner</item>
-        <item>Intermediate</item>
-        <item>Expert</item>
-    </string-array>
-    <string-array name="main_race_type_spinner_strings">
-        <item>Please Select Item</item>
-        <item>5k</item>
-        <item>10k</item>
-        <item>Half-Marathon</item>
-        <item>Marathon</item>
-    </string-array>
+        This application is in ALPHA and with it comes frequent updates, crashes, and potential errors.\n\n
 
-    <string name="main_todo_title">ALPHA RELEASE 0.1a</string>
+        If you need to uninstall the app, it is highly recommended to delete all training plans first. If you do not do this, you will need to do it through google calendar, which could potentially take a long time.\n\n
 
-    <string name="generate_event_button">FINISH</string>
+        Thanks again for trying out my app and please send all feedback to raceplannerapp@gmail.com</string>
 
-    <string name="main_switch_sidetext">Use default race-planner calendar?</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
+    <string name="string_main_todo_title">ALPHA RELEASE 0.1a</string>
+    <string name="string_generate_event_button">FINISH</string>
+    <string name="string_main_switch_sidetext">Use default race-planner calendar?</string>
 </resources>

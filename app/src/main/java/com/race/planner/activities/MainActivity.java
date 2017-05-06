@@ -16,8 +16,10 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -34,6 +36,8 @@ import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
 import com.race.planner.data_models.*;
+
+import org.w3c.dom.Text;
 
 /**
  * The MainActivity class currently allows users to choose between creating a new training plan and
@@ -53,6 +57,7 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
     private TextView mOutputText;
     private ProgressDialog mProgress;
     private GoogleAccountCredential mCredential;
+    ScrollView scrollView;
 
 
 
@@ -64,16 +69,19 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
 
-
-
         // instantiate TextView object for user directions
         mOutputText = (TextView) findViewById(R.id.mOutputText);
         mOutputText.setMovementMethod(new ScrollingMovementMethod());
-        mOutputText.setText(
-                "Welcome to Race Planner training plan generator. Please choose one of the options below. \n \n \n"
-        + "This application is in ALPHA and with it comes frequent updates, crashes, and potential errors. \n \n \n"
-        + "If you need to uninstall the app, it is highly recommended to delete all training plans first. If you do not do this, you will need to do it through google calendar, which could potentially take a long time. \n \n \n"
-        + "Thanks again for trying out my app and please send all feedback to raceplannerapp@gmail.com");
+        scrollView = (ScrollView) findViewById(R.id.scroll_view);
+//        ViewTreeObserver vto = scrollView.getViewTreeObserver();
+//        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
+//        {
+//            @Override
+//            public void onGlobalLayout()
+//            {
+//                scrollView.smoothScrollTo(0, scrollView.getBottom());
+//            }
+//        });
 
         mProgress = new ProgressDialog(this);
         mProgress.setMessage("Calling Google Calendar API ...");
@@ -115,6 +123,15 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
                     Intent intent = new Intent(MainActivity.this, ListTrainingPlans.class);
                     intent.putExtra(GlobalVariables.CREDENTIAL_ACCOUNT_NAME, mCredential.getSelectedAccountName());
                     startActivity(intent);
+            }
+        });
+
+        scrollView.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                scrollView.smoothScrollTo(0, scrollView.getBottom());
             }
         });
     }
