@@ -2,6 +2,8 @@ package com.race.planner.activities;
 
 import android.Manifest;
 import android.accounts.AccountManager;
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -9,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.media.Image;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
@@ -18,6 +21,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -25,6 +29,7 @@ import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -55,6 +60,8 @@ import org.w3c.dom.Text;
 public class MainActivity extends Activity implements EasyPermissions.PermissionCallbacks
 {
 
+    static final int VIEW_PAGER_FIRST_ELEMENT = 0;
+    static final int VIEW_PAGER_LAST_ELEMENT = 3;
     static final int REQUEST_ACCOUNT_PICKER = 1000;
     static final int REQUEST_AUTHORIZATION = 1001;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
@@ -67,7 +74,11 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
     private ProgressDialog mProgress;
     private GoogleAccountCredential mCredential;
     int currentPage;
-
+    ImageButton backViewPagers;
+    ImageButton forwardViewPager;
+    ViewPager viewPager;
+    TextView viewMoreTextHint;
+    Boolean isHintTextFaded = false;
 
 
 
@@ -78,38 +89,20 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
 
-        // instantiate main menu splash image
-        ImageView imageView = (ImageView) findViewById(R.id.splash_pic);
-        imageView.setImageResource(R.drawable.splashpic);
-
         /**
          * This is the viewpager adapter. The view pager holds the four TextViews. The adapter
          * converts those into the viewpager object through the ViewPagerAdapter inner class.
          */
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter();
-        final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        final ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter();
+        viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(viewPagerAdapter);
         viewPager.setOffscreenPageLimit(5); // required to prevent TextViews from disappearing
 
-        /**
-         * This handler moves the ViewPager to the next element in a specified amount of time.
-         */
-        final Handler handler = new Handler();
-        final Runnable update = new Runnable() {
-            public void run() {
-                if (currentPage == 5 - 1) {
-                    currentPage = 0;
-                }
-                viewPager.setCurrentItem(currentPage++, true);
-            }
-        };
-        new Timer().schedule(new TimerTask() {
+        viewMoreTextHint = (TextView) findViewById(R.id.text_view_more_info);
+        viewMoreTextHint.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
 
-            @Override
-            public void run() {
-                handler.post(update);
-            }
-        }, 100, 4000); // update second int to adjust time between viewpager swaps
+
+
 
         // instantiate TextView object for user directions
         //TODO: determine whether this is necessary
@@ -131,6 +124,55 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
 
         // TODO: check location, possibly move it to bottom of onCreate()
         requestPermissions();
+
+        backViewPagers = (ImageButton) findViewById(R.id.button_back_view_pager);
+        backViewPagers.setVisibility(View.INVISIBLE); // invisible until on 2nd view, as defined in adapter
+        backViewPagers.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                // back on view pager
+                viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
+                if (viewPager.getCurrentItem() == VIEW_PAGER_FIRST_ELEMENT)
+                {
+                    backViewPagers.setVisibility(View.INVISIBLE);
+                }
+
+                if (viewPager.getCurrentItem() == VIEW_PAGER_LAST_ELEMENT - 1)
+                {
+                    forwardViewPager.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        forwardViewPager = (ImageButton) findViewById(R.id.button_forward_view_pager);
+        forwardViewPager.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if (!isHintTextFaded)
+                {
+                    viewMoreTextHint.startAnimation(AnimationUtils.loadAnimation(MainActivity.this, android.R.anim.fade_out));
+                    viewMoreTextHint.setVisibility(View.INVISIBLE);
+                    isHintTextFaded = true;
+                }
+                // forward on view pager
+                viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
+                if (viewPager.getCurrentItem() == VIEW_PAGER_FIRST_ELEMENT + 1)
+                {
+                    backViewPagers.setVisibility(View.VISIBLE);
+                }
+
+                if (viewPager.getCurrentItem() == VIEW_PAGER_LAST_ELEMENT)
+                {
+                    forwardViewPager.setVisibility(View.INVISIBLE);
+                }
+
+
+            }
+        });
 
 
         // instantiate button for creating a new training plan
@@ -159,6 +201,26 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
                     startActivity(intent);
             }
         });
+//
+//        Handler handler = new Handler();
+//        handler.postDelayed(new Runnable()
+//        {
+//            @Override
+//            public void run()
+//            {
+//                viewPager.beginFakeDrag();
+//                viewPager.fakeDragBy(100000);
+//                Handler handler1 = new Handler();
+//                handler1.postDelayed(new Runnable()
+//                {
+//                    @Override
+//                    public void run()
+//                    {
+//                        viewPager.endFakeDrag();
+//                    }
+//                }, 1000);
+//            }
+//        }, 1000);
     }
 
     /**

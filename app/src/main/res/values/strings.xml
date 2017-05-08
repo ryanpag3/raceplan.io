@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-    <string name="app_name">Race Planner</string>
+    <string name="app_name">Race Planner.</string>
     <string name="string_main_intro_text">
         Welcome to Race Planner training plan generator. Please choose one of the options below.\n\n
 
@@ -17,4 +17,5 @@
     <string name="string_main_todo_title">ALPHA RELEASE 0.1a</string>
     <string name="string_generate_event_button">FINISH</string>
     <string name="string_main_switch_sidetext">Use default race-planner calendar?</string>
+    <string name="press_to_view_more">Press to view more...</string>
 </resources>
