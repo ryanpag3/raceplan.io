@@ -1,7 +1,5 @@
 package com.race.planner.fragments;
 
-import android.app.DatePickerDialog;
-import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,7 +15,7 @@ import android.widget.TextView;
 import com.race.planner.R;
 import com.race.planner.activities.MainActivity;
 import com.race.planner.activities.SelectTrainingPlan;
-import com.race.planner.utils.FragmentListener;
+import com.race.planner.utils.FragmentListenerInterface;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -26,14 +24,14 @@ import java.util.GregorianCalendar;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link FragmentListener} interface
+ * {@link FragmentListenerInterface} interface
  * to handle interaction events.
  * Use the {@link SelectDateFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
 public class SelectDateFragment extends Fragment
 {
-    FragmentListener mListener;
+    FragmentListenerInterface mListener;
     private DatePicker datePicker;
     Date date;
 
@@ -91,7 +89,7 @@ public class SelectDateFragment extends Fragment
             @Override
             public void onClick(View v)
             {
-                mListener.onFragmentClicked(SelectTrainingPlan.class.getName());
+                mListener.onFragmentClicked(SelectDateFragment.class.getName());
             }
         });
 
@@ -125,9 +123,9 @@ public class SelectDateFragment extends Fragment
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if (context instanceof FragmentListener)
+        if (context instanceof FragmentListenerInterface)
         {
-            mListener = (FragmentListener) context;
+            mListener = (FragmentListenerInterface) context;
         } else
         {
             throw new RuntimeException(context.toString()

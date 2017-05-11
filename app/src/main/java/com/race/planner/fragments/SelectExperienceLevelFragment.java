@@ -25,7 +25,7 @@ import static com.race.planner.data_models.GlobalVariables.*;
  */
 public class SelectExperienceLevelFragment extends Fragment
 {
-    private FragmentListener mListener;
+    private FragmentListenerInterface mListener;
 
     public SelectExperienceLevelFragment()
     {
@@ -127,9 +127,9 @@ public class SelectExperienceLevelFragment extends Fragment
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if (context instanceof FragmentListener)
+        if (context instanceof FragmentListenerInterface)
         {
-            mListener = (FragmentListener) context;
+            mListener = (FragmentListenerInterface) context;
         } else
         {
             throw new RuntimeException(context.toString()

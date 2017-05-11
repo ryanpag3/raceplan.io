@@ -5,5 +5,6 @@
     <color name="colorAccent">#FF4081</color>
     <color name="backgroundBlue">#1565c0</color>
     <color name="textPrimary">#ffffff</color>
-    <color name="buttonColor">#0d47a1</color>
+    <color name="buttonColor">#01579b</color>
+    <color name="testColor">#FF5733</color>
 </resources>

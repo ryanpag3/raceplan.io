@@ -2,17 +2,13 @@ package com.race.planner.fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,11 +17,11 @@ import android.widget.Toast;
 
 import com.race.planner.R;
 import com.race.planner.activities.MainActivity;
-import com.race.planner.utils.FragmentListener;
+import com.race.planner.utils.FragmentListenerInterface;
 
 public class SelectNameFragment extends Fragment
 {
-    private FragmentListener mListener;
+    private FragmentListenerInterface mListener;
     private EditText editText;
 
     public SelectNameFragment()
@@ -63,9 +59,9 @@ public class SelectNameFragment extends Fragment
                     final InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
                     mListener.passName(editText.getText().toString());
-                    Toast toast = Toast.makeText(getActivity(), "Calendar name set to: " + editText.getText().toString(), Toast.LENGTH_SHORT);
-                    toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 0);
-                    toast.show();
+//                    Toast toast = Toast.makeText(getActivity(), "Calendar name set to: " + editText.getText().toString(), Toast.LENGTH_SHORT);
+//                    toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 0);
+//                    toast.show();
                     mListener.onFragmentClicked(SelectNameFragment.class.getName());
                     return true;
                 }
@@ -105,9 +101,9 @@ public class SelectNameFragment extends Fragment
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if (context instanceof FragmentListener)
+        if (context instanceof FragmentListenerInterface)
         {
-            mListener = (FragmentListener) context;
+            mListener = (FragmentListenerInterface) context;
         } else
         {
             throw new RuntimeException(context.toString()

@@ -50,6 +50,7 @@ import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
 import com.race.planner.data_models.*;
+import com.race.planner.utils.WrapContentViewPager;
 
 import org.w3c.dom.Text;
 
@@ -61,7 +62,7 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
 {
 
     static final int VIEW_PAGER_FIRST_ELEMENT = 0;
-    static final int VIEW_PAGER_LAST_ELEMENT = 3;
+    static final int VIEW_PAGER_LAST_ELEMENT = 1;
     static final int REQUEST_ACCOUNT_PICKER = 1000;
     static final int REQUEST_AUTHORIZATION = 1001;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
@@ -404,6 +405,11 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
      */
     private class ViewPagerAdapter extends PagerAdapter
     {
+        private Context mContext;
+
+        public ViewPagerAdapter()
+        { }
+
         // instantiates based on panel position
         public Object instantiateItem(ViewGroup collection, int position)
         {
@@ -411,17 +417,17 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
             switch(position)
             {
                 case 0:
-                    resId = R.id.string_main_intro_1;
+                    resId = R.id.text_splash_1;
                     break;
                 case 1:
-                    resId = R.id.string_main_intro_2;
+                    resId = R.id.text_splash_2;
                     break;
-                case 2:
-                    resId = R.id.string_main_intro_3;
-                    break;
-                case 3:
-                    resId = R.id.string_main_intro_4;
-                    break;
+//                case 2:
+//                    resId = R.id.string_main_intro_3;
+//                    break;
+//                case 3:
+//                    resId = R.id.string_main_intro_4;
+//                    break;
             }
             return findViewById(resId);
         }
@@ -437,7 +443,7 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
         @Override
         public int getCount()
         {
-            return 4;
+            return 2;
         }
 
         // checks to see if the current view on the view pager is from the object called
@@ -446,5 +452,6 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
         {
             return view == (View) object;
         }
+
     }
 }
