@@ -1,0 +1,115 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             tools:context="com.race.planner.fragments.SelectCalendarFragment">
+
+    <com.race.planner.utils.CustomTextViewSansation
+        android:id="@+id/date_title_text"
+        android:text="calendar"
+        android:textColor="@color/textPrimary"
+        android:textSize="14sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="12dp"
+        />
+
+    <com.race.planner.utils.CustomTextViewSansation
+        android:id="@+id/name_instructions"
+        android:text="@string/cal_select_instructions"
+        android:textSize="32sp"
+        android:textColor="@color/textPrimary"
+        android:layout_below="@id/date_title_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:textAlignment="center"
+        android:background="@color/text_box_background"
+        android:padding="10dp"/>
+
+    <LinearLayout
+        android:layout_above="@+id/inner_layout_menu_buttons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="48dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="70dp"
+            android:orientation="horizontal"
+            android:background="@color/backgroundGrey"
+            android:padding="6dp"
+            android:layout_margin="12dp">
+            <com.race.planner.utils.CustomTextViewSansation
+                android:text="I would like to keep this training plan on one of my own calendars."
+                android:textColor="#424242"
+                android:textSize="16dp"
+                android:textAlignment="center"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"/>
+            <Button
+                android:id="@+id/button_choose_own_cal"
+                android:text="choose"
+                android:textColor="#424242"
+                android:layout_width="90dp"
+                android:layout_height="54dp"
+                android:layout_gravity="center_vertical"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="70dp"
+            android:orientation="horizontal"
+            android:background="@color/backgroundGrey"
+            android:padding="6dp"
+            android:layout_margin="12dp">
+            <com.race.planner.utils.CustomTextViewSansation
+                android:text="I would like this training plan to live on the dedicated 'race-planner' calendar."
+                android:textColor="#424242"
+                android:textSize="16dp"
+                android:textAlignment="center"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"/>
+            <Button
+                android:id="@+id/button_choose_new_cal"
+                android:text="choose"
+                android:textColor="#424242"
+                android:layout_width="90dp"
+                android:layout_height="54dp"
+                android:layout_gravity="center_vertical"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/inner_layout_menu_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="12dp"
+        android:layout_alignParentBottom="true">
+        <Button
+            android:text="back"
+            android:id="@+id/button_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+        <Button
+            android:text="restart"
+            android:id="@+id/button_restart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+
+</RelativeLayout>

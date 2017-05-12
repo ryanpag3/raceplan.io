@@ -16,4 +16,5 @@ public interface FragmentListenerInterface
     void passRaceType(String s);
     void passDate(Date d);
     void passExperienceLevel(String e);
+    void passCalCreatedBool(Boolean b);
 }

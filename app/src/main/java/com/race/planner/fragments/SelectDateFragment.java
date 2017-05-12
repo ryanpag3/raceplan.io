@@ -83,8 +83,8 @@ public class SelectDateFragment extends Fragment
             }
         });
 
-        TextView okTextClickable = (TextView) view.findViewById(R.id.ok_clickable_textview);
-        okTextClickable.setOnClickListener(new View.OnClickListener()
+        Button okButton = (Button) view.findViewById(R.id.ok_clickable_textview);
+        okButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)

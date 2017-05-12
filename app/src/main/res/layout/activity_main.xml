@@ -47,7 +47,7 @@
                     android:textAlignment="center"
                     android:padding="10dp"
                     android:layout_margin="10dp"
-                    android:background="#8C2C3E50"
+                    android:background="@color/text_box_background"
                     android:fontFamily="sans-serif-light"/>
             </RelativeLayout>
 
@@ -67,7 +67,7 @@
                     android:gravity="bottom"
                     android:padding="10dp"
                     android:layout_margin="10dp"
-                    android:background="#8C2C3E50"
+                    android:background="@color/text_box_background"
                     android:fontFamily="sans-serif-light"/>
             </RelativeLayout>
             <!--<TextView-->

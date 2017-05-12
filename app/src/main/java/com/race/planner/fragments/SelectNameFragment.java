@@ -23,6 +23,7 @@ public class SelectNameFragment extends Fragment
 {
     private FragmentListenerInterface mListener;
     private EditText editText;
+    private String editTextEntry = "";
 
     public SelectNameFragment()
     {
@@ -45,8 +46,7 @@ public class SelectNameFragment extends Fragment
                              Bundle savedInstanceState)
     {
         View view = inflater.inflate(R.layout.fragment_select_name, container, false);
-        // force open keyboard on fragment call
-        ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+
         editText = (EditText) view.findViewById(R.id.edit_text);
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener()
         {
@@ -57,18 +57,36 @@ public class SelectNameFragment extends Fragment
                 if (event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER))
                 {
                     final InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    // assign current name to variable, variable is saved to backstack and used for
+                    // preventing keyboard opening on back button pressed
+                    editTextEntry = editText.getText().toString();
                     imm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
-                    mListener.passName(editText.getText().toString());
-//                    Toast toast = Toast.makeText(getActivity(), "Calendar name set to: " + editText.getText().toString(), Toast.LENGTH_SHORT);
-//                    toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 0);
-//                    toast.show();
-                    mListener.onFragmentClicked(SelectNameFragment.class.getName());
                     return true;
                 }
                 return false;
             }
         });
 
+        // force open keyboard on fragment call
+        // editTextEntry is defined when the enter key on the keyboard is pressed
+        if (editTextEntry.equals(""))
+        {
+            ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        }
+
+        Button buttonConfirm = (Button) view.findViewById(R.id.button_confirm);
+        buttonConfirm.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                mListener.passName(editText.getText().toString());
+//                    Toast toast = Toast.makeText(getActivity(), "Calendar name set to: " + editText.getText().toString(), Toast.LENGTH_SHORT);
+//                    toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 0);
+//                    toast.show();
+                mListener.onFragmentClicked(SelectNameFragment.class.getName());
+            }
+        });
 
         // back button
         Button buttonBack = (Button) view.findViewById(R.id.button_back);

@@ -17,7 +17,8 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import java.io.IOException;
 
 import com.race.planner.R;
-import com.race.planner.data_models.*;
+import com.race.planner.data_models.Racer;
+import static com.race.planner.data_models.GlobalVariables.*;
 
 /**
  * DeleteTrainingPlanTask is an AsyncTask much like the inner classes of AuthenticateAndCallAPI.
@@ -42,7 +43,10 @@ public class DeleteTrainingPlanTask extends AsyncTask<Void, Void, Void>
 
         // mProgress is a simple progress spinner
         mProgress = new ProgressDialog(context);
-        mProgress.setMessage("Working...");
+        mProgress.setMessage("Deleting runs from calendar...");
+        mProgress.setIndeterminate(false);
+        mProgress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        mProgress.setProgress(0);
 
         // instantiate google api service
         HttpTransport transport = AndroidHttp.newCompatibleTransport();
@@ -63,12 +67,29 @@ public class DeleteTrainingPlanTask extends AsyncTask<Void, Void, Void>
     @Override
     protected Void doInBackground(Void... params)
     {
+        int progress = 0;
         // query through all events where the database ID matches the training plan database ID
         Cursor c = db.query("SELECT * FROM " + DatabaseHelper.EVENT_ID_TABLE_NAME + " WHERE "
                 + DatabaseHelper.EVENT_ID_COL_1 + "= ?", new String[] {String.valueOf(racer.databaseID)});
+        switch (racer.raceType)
+        {
+            case RACE_5K:
+                mProgress.setMax(PROGRESS_MAX_5K);
+                break;
+            case RACE_10K:
+                mProgress.setMax(PROGRESS_MAX_10K);
+                break;
+            case RACE_HALF:
+                mProgress.setMax(PROGRESS_MAX_HALF);
+                break;
+            case RACE_MARATHON:
+                mProgress.setMax(PROGRESS_MAX_MARATHON);
+                break;
+        }
 
         while (c.moveToNext())
         {
+            mProgress.setProgress(++progress);
             // delete by database ID and eventID
             deleteEventByID(c.getString(1), c.getString(2));
         }

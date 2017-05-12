@@ -13,6 +13,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -22,6 +23,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -57,7 +59,8 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 import com.race.planner.R;
 import com.race.planner.utils.*;
-import com.race.planner.data_models.*;
+import com.race.planner.data_models.GlobalVariables;
+import com.race.planner.data_models.Racer;
 
 import static com.race.planner.data_models.GlobalVariables.*;
 
@@ -122,7 +125,11 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
         mOutputText.setText("");
 
         mProgress = new ProgressDialog(this);
-        mProgress.setMessage("Working...");
+        mProgress.setMessage("Generating training runs and pushing to calendar...");
+        mProgress.setIndeterminate(false);
+        mProgress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        mProgress.setProgress(0);
+
 
         // Initialize credentials and service object.
         mCredential = GoogleAccountCredential.usingOAuth2(
@@ -175,7 +182,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
     private void chooseAccount() {
         if (EasyPermissions.hasPermissions(
                 this, Manifest.permission.GET_ACCOUNTS)) {
-            String accountName = getPreferences(Context.MODE_PRIVATE)
+            String accountName = PreferenceManager.getDefaultSharedPreferences(this)
                     .getString(PREF_ACCOUNT_NAME, null);
             if (accountName != null) {
                 mCredential.setSelectedAccountName(accountName);
@@ -603,6 +610,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
             int wedMileCap = -1;
             long dayInMillis = 86400000;
             int weeksOfTraining = -1;
+            int progress = 0;
             Date startDate; // amount of millis in a week * 8 weeks
             Date tuesday;
             SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
@@ -647,24 +655,28 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
             switch(racer.raceType)
             {
                 case RACE_5K:
+                    mProgress.setMax(PROGRESS_MAX_5K);
                     weeksOfTraining = 8;
                     goalMiles = 5;
                     tuesThursMileCap = 2;
                     wedMileCap = 3;
                     break;
                 case RACE_10K:
+                    mProgress.setMax(PROGRESS_MAX_10K);
                     weeksOfTraining = 12;
                     goalMiles = 7;
                     tuesThursMileCap = 3;
                     wedMileCap = 5;
                     break;
                 case RACE_HALF:
+                    mProgress.setMax(PROGRESS_MAX_HALF);
                     weeksOfTraining = 12;
                     goalMiles = 13;
                     tuesThursMileCap = 5;
                     wedMileCap = 7;
                     break;
                 case RACE_MARATHON:
+                    mProgress.setMax(PROGRESS_MAX_MARATHON);
                     weeksOfTraining = 18;
                     goalMiles = 26;
                     tuesThursMileCap = 5;
@@ -692,7 +704,12 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
 
             for (int i = 0; i < weeksOfTraining; i++)
             {
-                if (tuesday.getTime()   < raceDate.getTime())createEventInAPI(calID, tuesday, Double.toString(tuesdayMiles));
+                if (tuesday.getTime()   < raceDate.getTime())
+                {
+                    mProgress.setProgress(++progress);
+                    createEventInAPI(calID, tuesday, Double.toString(tuesdayMiles) + "M");
+                }
+
                 if (tuesdayMiles < goalMiles && tuesdayMiles < tuesThursMileCap) { tuesdayMiles = tuesdayMiles + (bumpMileageUp / 2); }
                 tuesday   = getOneWeekLater(tuesday);
                 if (tuesday.getTime() > raceDate.getTime()) break;
@@ -700,7 +717,11 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
 
             for (int i = 0; i < weeksOfTraining; i++)
             {
-                if (wednesday.getTime()   < raceDate.getTime())createEventInAPI(calID, wednesday, Double.toString(wednesdayMiles));
+                if (wednesday.getTime()   < raceDate.getTime())
+                {
+                    mProgress.setProgress(++progress);
+                    createEventInAPI(calID, wednesday, Double.toString(wednesdayMiles) + "M");
+                }
                 if (wednesdayMiles < goalMiles && wednesdayMiles < wedMileCap) { wednesdayMiles = wednesdayMiles + (bumpMileageUp / 2); }
                 wednesday   = getOneWeekLater(wednesday);
                 if (wednesday.getTime() > raceDate.getTime()) break;
@@ -708,7 +729,11 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
 
             for (int i = 0; i < weeksOfTraining; i++)
             {
-                if (thursday.getTime()   < raceDate.getTime())createEventInAPI(calID, thursday, Double.toString(thursdayMiles));
+                if (thursday.getTime() < raceDate.getTime())
+                {
+                    mProgress.setProgress(++progress);
+                    createEventInAPI(calID, thursday, Double.toString(thursdayMiles) + "M");
+                }
                 if (thursdayMiles < goalMiles && thursdayMiles < tuesThursMileCap) { thursdayMiles = thursdayMiles + (bumpMileageUp / 2); }
                 thursday   = getOneWeekLater(thursday);
                 if (thursday.getTime() > raceDate.getTime()) break;
@@ -716,11 +741,20 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
 
             for (int i = 0; i < weeksOfTraining; i++)
             {
-                if (sunday.getTime()   < raceDate.getTime())createEventInAPI(calID, sunday, Double.toString(sundayMiles));
+                if (sunday.getTime() < raceDate.getTime())
+                {
+                    mProgress.setProgress(++progress);
+                    createEventInAPI(calID, sunday, Double.toString(sundayMiles) + "M");
+                }
                 if (sundayMiles < goalMiles) { sundayMiles = sundayMiles + 1; }
                 sunday   = getOneWeekLater(sunday);
                 if (sunday.getTime() > raceDate.getTime()) break;
             }
+
+            mProgress.setProgress(++progress);
+            // create event for race
+            createEventInAPI(calID, raceDate, "RACE DAY!!!");
+            Log.e(TAG, "TOTAL PROGRESS: " + progress);
         }
 
         private Date getOneWeekLater(Date date)
@@ -728,12 +762,12 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
             return new Date(date.getTime() + 604800000L);
         }
 
-        private void createEventInAPI(String calID, Date date, String mileage) throws IOException
+        private void createEventInAPI(String calID, Date date, String eventName) throws IOException
         {
                 try
                 {
                     Event event = new Event()
-                            .setSummary(mileage + "M")
+                            .setSummary(eventName)
                             .setDescription("race-planner");
 
                     Date startDate = date;

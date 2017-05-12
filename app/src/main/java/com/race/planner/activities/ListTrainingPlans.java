@@ -1,9 +1,15 @@
 package com.race.planner.activities;
 
+import android.accounts.AccountManager;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +35,13 @@ import com.race.planner.utils.*;
 
 public class ListTrainingPlans extends AppCompatActivity
 {
+    static final int VIEW_PAGER_FIRST_ELEMENT = 0;
+    static final int VIEW_PAGER_LAST_ELEMENT = 1;
     static final int REQUEST_ACCOUNT_PICKER = 1000;
+    static final int REQUEST_AUTHORIZATION = 1001;
+    static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
+    static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
+    private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String[] SCOPES = { CalendarScopes.CALENDAR };
     private final String TAG = this.getClass().getSimpleName();
     GoogleAccountCredential mCredential;
@@ -46,6 +58,18 @@ public class ListTrainingPlans extends AppCompatActivity
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
 
+        // grab account name from preferences set in MainActivity
+        String accountName = PreferenceManager.getDefaultSharedPreferences(this)
+                .getString(PREF_ACCOUNT_NAME, null);
+        if (accountName != null)
+        {
+            mCredential.setSelectedAccountName(accountName);
+
+        } else
+        {
+            Log.e(TAG, "account name not set");
+        }
+
         // instantiate DatabaseHelper object for accessing sqlite databases
         DatabaseHelper db = new DatabaseHelper(this);
 
@@ -57,15 +81,6 @@ public class ListTrainingPlans extends AppCompatActivity
         // MyCursorAdapter holds the custom layout for each training plan
         final MyCursorAdapter cursorAdapter = new MyCursorAdapter(this, c);
         listView.setAdapter(cursorAdapter); // ties the custom adapter to the listview
-
-        // store account name as intent for next activity
-        mCredential.setSelectedAccountName(getIntent().getExtras().getString(GlobalVariables.CREDENTIAL_ACCOUNT_NAME));
-//        if(mCredential.getSelectedAccountName() == null)
-//        {
-//            Toast toast = Toast.makeText(this, "Uh oh, no training plans created! Come back later!", Toast.LENGTH_LONG);
-//            toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 0);
-//            toast.show();
-//        }
 
         // instantiate button for refreshing listview
         Button refreshButton = (Button) findViewById(R.id.button_refresh);
@@ -79,9 +94,7 @@ public class ListTrainingPlans extends AppCompatActivity
                 cursorAdapter.changeCursor(t);
             }
         });
-
     }
-
 
     /**
      * adapter for custom listview layout

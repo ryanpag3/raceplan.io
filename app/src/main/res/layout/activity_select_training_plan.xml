@@ -1,31 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     android:id="@+id/activity_select_training_plan"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/backgroundBlue">
+    android:background="#01579b">
 
+    <com.race.planner.utils.CustomTextViewSansation
+    android:text="@string/app_name"
+    android:textColor="@color/textPrimary"
+    android:textSize="36dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:layout_marginTop="8dp"/>
 
-
-    <ImageView
-        android:id="@+id/img_selection_stage_bar"
-        android:src="@drawable/selection_stage_bar"
+    <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:alpha=".5"/>
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/img_selection_stage_bar"
+            android:src="@drawable/selection_stage_bar_white"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:alpha=".5"/>
 
-    <ImageView
-        android:id="@+id/logo_icon"
-        android:src="@drawable/logo_icon"
-        android:layout_alignLeft="@+id/img_selection_stage_bar"
-        android:layout_marginTop="3dp"
-        android:layout_marginLeft="-12dp"
-        android:layout_width="48dp"
-        android:layout_height="48dp"/>
+        <ImageView
+            android:id="@+id/logo_icon"
+            android:src="@drawable/logo_icon"
+            android:layout_alignLeft="@+id/img_selection_stage_bar"
+            android:layout_marginTop="3dp"
+            android:layout_marginLeft="-12dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"/>
+    </RelativeLayout>
+
+
 
     <FrameLayout
         android:id="@+id/fragment_swap"
@@ -130,4 +143,4 @@
         <!--android:textSize="24sp" />-->
 
 
-</RelativeLayout>
+</LinearLayout>

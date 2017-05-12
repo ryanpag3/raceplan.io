@@ -3,55 +3,90 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:context="com.race.planner.fragments.SelectDateFragment"
-                android:orientation="vertical">
-    <!--<TextView-->
-        <!--android:text="Select the race date"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--/>-->
-
-    <DatePicker
-        android:id="@+id/date_picker_widget"
-        android:layout_centerHorizontal="true"
+                android:orientation="vertical"
+                android:background="@android:color/transparent">
+    <com.race.planner.utils.CustomTextViewSansation
+        android:id="@+id/date_title_text"
+        android:text="date"
+        android:textColor="@color/textPrimary"
+        android:textSize="14sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:scaleX="1"
-        android:scaleY="1">
-    </DatePicker>
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="99dp"
+        />
+
+    <com.race.planner.utils.CustomTextViewSansation
+        android:id="@+id/name_instructions"
+        android:text="@string/date_instructions"
+        android:textSize="32sp"
+        android:textColor="@color/textPrimary"
+        android:layout_below="@+id/date_title_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:textAlignment="center"
+        android:background="@color/text_box_background"
+        android:padding="10dp"/>
 
     <LinearLayout
+        android:layout_above="@+id/inner_layout_menu_buttons"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="bottom">
-        <TextView
-            android:text="OK"
-            android:id="@+id/ok_clickable_textview"
+        android:layout_margin="12dp"
+        android:background="@color/backgroundGrey">
+
+        <DatePicker
+            android:id="@+id/date_picker_widget"
+            android:calendarTextColor="@color/textPrimary"
+            android:layout_below="@id/date_title_text"
             android:layout_gravity="center_horizontal"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:clickable="true"/>
+            android:scaleX="1"
+            android:scaleY="1"
+            android:calendarViewShown="false"
+            android:datePickerMode="spinner">
+        </DatePicker>
 
-        <LinearLayout
-            android:id="@+id/inner_layout_menu_buttons"
-            android:layout_width="match_parent"
+        <Button
+            android:text="OK"
+            android:textSize="24dp"
+            android:textColor="@color/textPrimary"
+            android:background="#43a047"
+            android:id="@+id/ok_clickable_textview"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:clickable="true"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:layout_gravity="center"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/inner_layout_menu_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="12dp"
+        android:layout_alignParentBottom="true">
+        <Button
+            android:text="back"
+            android:id="@+id/button_back"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_margin="12dp">
-            <Button
-                android:text="back"
-                android:id="@+id/button_back"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"/>
-            <Button
-                android:text="restart"
-                android:id="@+id/button_restart"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"/>
-        </LinearLayout>
+            android:layout_weight="1"/>
+        <Button
+            android:text="restart"
+            android:id="@+id/button_restart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
     </LinearLayout>
 </RelativeLayout>

@@ -1,13 +1,35 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             tools:context="com.race.planner.fragments.SelectExperienceLevelFragment"
-             >
-    <TextView
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.race.planner.fragments.SelectExperienceLevelFragment"
+    android:background="@android:color/transparent">
+
+    <com.race.planner.utils.CustomTextViewSansation
+        android:id="@+id/name_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Select experience level"/>
+        android:text="experience level"
+        android:textSize="14sp"
+        android:textColor="@color/textPrimary"
+        android:layout_marginLeft="128dp"/>
+
+    <com.race.planner.utils.CustomTextViewSansation
+        android:id="@+id/name_instructions"
+        android:text="@string/experience_level_instructions"
+        android:textSize="32sp"
+        android:textColor="@color/textPrimary"
+        android:layout_below="@+id/name_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:textAlignment="center"
+        android:background="@color/text_box_background"
+        android:padding="10dp"/>
 
     <LinearLayout
         android:layout_above="@+id/inner_layout_menu_buttons"

@@ -26,4 +26,9 @@ public class GlobalVariables extends Application
     public static final String EXPERIENCE_BEGINNER = "Beginner";
     public static final String EXPERIENCE_INTERMEDIATE = "Intermediate";
     public static final String EXPERIENCE_EXPERT = "Expert";
+
+    public static final int PROGRESS_MAX_5K = 31;
+    public static final int PROGRESS_MAX_10K = 47;
+    public static final int PROGRESS_MAX_HALF = 47;
+    public static final int PROGRESS_MAX_MARATHON = 71;
 }
