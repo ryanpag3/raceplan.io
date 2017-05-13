@@ -8,6 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.race.planner.R;
 import com.race.planner.activities.MainActivity;
@@ -50,30 +53,37 @@ public class SelectCalendarFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_select_calendar, container, false);
         final String fragmentName = SelectCalendarFragment.class.getName();
 
-        Button chooseOwnCalendar = (Button) view.findViewById(R.id.button_choose_own_cal);
-        chooseOwnCalendar.setOnClickListener(new View.OnClickListener()
+        final CheckBox checkBoxOwnCalendar = (CheckBox) view.findViewById(R.id.checkbox_own_cal);
+        final CheckBox checkBoxNewCalendar = (CheckBox) view.findViewById(R.id.checkbox_new_cal);
+
+        checkBoxOwnCalendar.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                mListener.passCalCreatedBool(false);
-                mListener.onFragmentClicked(fragmentName);
+                if (checkBoxOwnCalendar.isChecked())
+                {
+                    mListener.passCalCreatedBool(false);
+                    checkBoxNewCalendar.setChecked(false);
+                }
             }
         });
 
-        Button chooseNewCalendar = (Button) view.findViewById(R.id.button_choose_new_cal);
-        chooseNewCalendar.setOnClickListener(new View.OnClickListener()
+        checkBoxNewCalendar.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                mListener.passCalCreatedBool(true);
-                mListener.onFragmentClicked(fragmentName);
+                if (checkBoxNewCalendar.isChecked())
+                {
+                    mListener.passCalCreatedBool(true);
+                    checkBoxOwnCalendar.setChecked(false);
+                }
             }
         });
 
         // back button
-        Button buttonBack = (Button) view.findViewById(R.id.button_back);
+        ImageButton buttonBack = (ImageButton) view.findViewById(R.id.button_back);
         buttonBack.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -84,7 +94,7 @@ public class SelectCalendarFragment extends Fragment
         });
 
         // restart button
-        Button buttonRestart = (Button) view.findViewById(R.id.button_restart);
+        ImageButton buttonRestart = (ImageButton) view.findViewById(R.id.button_restart);
         buttonRestart.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -95,6 +105,21 @@ public class SelectCalendarFragment extends Fragment
             }
         });
 
+        ImageButton buttonConfirm = (ImageButton) view.findViewById(R.id.button_confirm);
+        buttonConfirm.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if (checkBoxNewCalendar.isChecked() || checkBoxOwnCalendar.isChecked())
+                {
+                    mListener.onFragmentClicked(fragmentName);
+                } else
+                {
+                    Toast.makeText(getActivity(), "please select an option", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
 
         return view;
     }

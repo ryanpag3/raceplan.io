@@ -3,9 +3,13 @@ package com.race.planner.activities;
 import android.Manifest;
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -15,7 +19,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -23,9 +26,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -58,20 +59,19 @@ import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
 import com.race.planner.R;
+import com.race.planner.fragments.DisplayFinalInfo;
 import com.race.planner.utils.*;
 import com.race.planner.data_models.GlobalVariables;
 import com.race.planner.data_models.Racer;
 
 import static com.race.planner.data_models.GlobalVariables.*;
 
-public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.PermissionCallbacks
+public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.PermissionCallbacks, FragmentListenerInterface
 {
     static final int REQUEST_ACCOUNT_PICKER = 1000;
     static final int REQUEST_AUTHORIZATION = 1001;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
-
-    private static final String BUTTON_TEXT = "Call Google Calendar API";
     private static final String PREF_ACCOUNT_NAME = "accountName";
 
     private com.google.api.services.calendar.Calendar mService = null;
@@ -84,11 +84,11 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
     private static final int CREATE_PLAN_ID = 3;
 
     GoogleAccountCredential mCredential;
-    ProgressDialog mProgress;
+    ProgressDialog mProgressBarDialog;
+    ProgressDialog mProgressCircle;
     Boolean createCal = false;
     Racer racer;
     Date raceDate;
-    private TextView mOutputText;
     Button buttonCreatePlanOnSelected;
     Spinner calendarSelect;
 
@@ -101,7 +101,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
         racer = getIntent().getExtras().getParcelable(GlobalVariables.RACER_INFO_ID);
         createCal = getIntent().getExtras().getBoolean(GlobalVariables.CREATE_CALENDAR_BOOL);
         calendarSelect = (Spinner) findViewById(R.id.spinner_calendar_select_2);
-        calendarSelect.setVisibility(View.GONE);
+        calendarSelect.setVisibility(View.INVISIBLE);
         // set task ID for callAPI switch
         // create calendar == 1
         // choose calendar == 2
@@ -110,7 +110,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
             TASK_ID =  CREATE_CALENDAR_ID;
         } else
         {
-            calendarSelect.setVisibility(View.VISIBLE);
+            //calendarSelect.setVisibility(View.VISIBLE);
             TASK_ID = CHOOSE_CALENDAR_ID;
         }
 
@@ -120,15 +120,14 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
         cal.set(java.util.Calendar.DAY_OF_MONTH, racer.day);
         raceDate = racer.date;
 
-        mOutputText = (TextView) findViewById(R.id.mOutputText);
-        mOutputText.setMovementMethod(new ScrollingMovementMethod());
-        mOutputText.setText("");
+        mProgressCircle = new ProgressDialog(this);
+        mProgressCircle.setMessage("Creating calendar...");
 
-        mProgress = new ProgressDialog(this);
-        mProgress.setMessage("Generating training runs and pushing to calendar...");
-        mProgress.setIndeterminate(false);
-        mProgress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        mProgress.setProgress(0);
+        mProgressBarDialog = new ProgressDialog(this);
+        mProgressBarDialog.setMessage("Generating training runs and pushing to calendar...");
+        mProgressBarDialog.setIndeterminate(false);
+        mProgressBarDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        mProgressBarDialog.setProgress(0);
 
 
         // Initialize credentials and service object.
@@ -136,21 +135,22 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
 
-
-        buttonCreatePlanOnSelected = (Button) findViewById(R.id.button_create_calendar_on_selected);
-        buttonCreatePlanOnSelected.setVisibility(View.GONE);
-        buttonCreatePlanOnSelected.setOnClickListener(new View.OnClickListener()
+        Button buttonUndo = (Button) findViewById(R.id.button_undo);
+        buttonUndo.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                new CreatePlanTask(mCredential).execute();
+                DatabaseHelper db = new DatabaseHelper(AuthenticateAndCallAPI.this);
+                // deletes training plan based on racer info
+                new DeleteTrainingPlanTask(mCredential, racer, AuthenticateAndCallAPI.this).execute();
+                // deletes plan from the database by database id
+                db.deletePlanFromDatabase(racer.databaseID);
             }
         });
 
-
-        Button buttonFinishActivity = (Button) findViewById(R.id.button_finish_authenticate_api);
-        buttonFinishActivity.setOnClickListener(new View.OnClickListener()
+        Button buttonMainMenu = (Button) findViewById(R.id.button_main_menu);
+        buttonMainMenu.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -247,6 +247,98 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
     }
 
     /**
+     * callAPI runs a series of checks and finally calls an AsyncTask based on the value of TASK_ID
+     * TASK_ID is adjusted in OnCreate based on the choice of the user to create a new calendar or not.
+     */
+    private void callAPI()
+    {
+        if (!isGooglePlayServicesAvailable())
+        {
+            acquireGooglePlayServices();
+        } else if (mCredential.getSelectedAccountName() == null)
+        {
+            chooseAccount();
+        } else if (!isDeviceOnline())
+        {
+            Log.e(TAG, "No network connection available...");
+        } else
+        {
+            Log.e(TAG, "Call API executed...");
+            //
+            switch (TASK_ID)
+            {
+                case CREATE_CALENDAR_ID:
+                    new CreateCalendarTask(mCredential).execute();
+                    break;
+                case CHOOSE_CALENDAR_ID:
+                    new ChooseCalendarTask(mCredential).execute();
+                    break;
+
+            }
+
+        }
+    }
+
+
+    /**
+     * These methods are overloaded from the ListenerInterface. It might be more efficient to
+     * create new listener for just the FinalInfoFragment so you dont have all this code bloat.
+     */
+    @Override
+    public void moveProgressIconLeft()
+    {
+        // do nothing
+    }
+
+    @Override
+    public void moveProgressIconRight()
+    {
+        // do nothing
+    }
+
+    @Override
+    public void onFragmentClicked(String s)
+    {
+        // do nothing
+    }
+
+    @Override
+    public void onBackButtonClicked()
+    {
+        // do nothing
+    }
+
+    @Override
+    public void passName(String n)
+    {
+        // do nothing
+    }
+
+    @Override
+    public void passRaceType(String s)
+    {
+        // do nothing
+    }
+
+    @Override
+    public void passDate(Date d)
+    {
+        // do nothing
+    }
+
+    @Override
+    public void passExperienceLevel(String e)
+    {
+        // do nothing
+    }
+
+    @Override
+    public void passCalCreatedBool(Boolean b)
+    {
+        // do nothing
+    }
+
+    /**
      * Asynchronous task for choosing a calendar to create a plan on.
      */
     public class ChooseCalendarTask extends AsyncTask<Void, Void, Void>
@@ -271,6 +363,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
 
             if (android.os.Debug.isDebuggerConnected())
                 android.os.Debug.waitForDebugger();
+            // needs abstraction
             try
             {
                 String pageToken = null;
@@ -298,136 +391,26 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
         protected void onPostExecute(Void result)
         {
             Log.i(TAG, String.valueOf(names.size()));
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(AuthenticateAndCallAPI.this, android.R.layout.simple_spinner_item, names);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            calendarSelect = (Spinner) findViewById(R.id.spinner_calendar_select_2);
-            calendarSelect.setAdapter(adapter);
-            calendarSelect.setEnabled(true);
-            calendarSelect.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-            {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
-                {
-                    racer.calendarName = names.get(position);
-                    racer.calendarID = calendarIDs.get(position);
-                    buttonCreatePlanOnSelected.setVisibility(View.VISIBLE);
-                }
+            AlertDialog.Builder b = new AlertDialog.Builder(AuthenticateAndCallAPI.this);
+            b.setTitle("Select Calendar");
+            String[] sNames = new String[names.size()];
+            sNames = names.toArray(sNames);
+
+            b.setItems(sNames, new DialogInterface.OnClickListener() {
 
                 @Override
-                public void onNothingSelected(AdapterView<?> parent)
-                {
-
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    racer.calendarName = names.get(which);
+                    racer.calendarID = calendarIDs.get(which);
+                    new CreatePlanTask(mCredential).execute();
                 }
+
             });
 
+            b.show();
         }
     }
-
-
-    // turn into inner class
-    private void chooseCalendar()
-    {
-        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>()
-        {
-            List<String> names = new ArrayList<>();
-            List<String> calendarIDs = new ArrayList<>();
-
-            @Override
-            protected Void doInBackground(Void... params)
-            {
-                List<CalendarListEntry> items = new ArrayList<>();
-
-                if (android.os.Debug.isDebuggerConnected())
-                    android.os.Debug.waitForDebugger();
-                try
-                {
-                    String pageToken = null;
-                    do
-                    {
-                        CalendarList calendarList = mService.calendarList().list().setPageToken(pageToken).execute();
-                        items = calendarList.getItems();
-
-                        for (CalendarListEntry calendarListEntry : items)
-                        {
-                            names.add(calendarListEntry.getSummary());
-                            calendarIDs.add(calendarListEntry.getId());
-                            Log.i(TAG, calendarListEntry.getSummary());
-                        }
-                        pageToken = calendarList.getNextPageToken();
-                    } while (pageToken != null);
-                } catch (IOException e)
-                {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-
-            protected void onPostExecute(Void result)
-            {
-                Log.i(TAG, String.valueOf(names.size()));
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(AuthenticateAndCallAPI.this, android.R.layout.simple_spinner_item, names);
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                calendarSelect = (Spinner) findViewById(R.id.spinner_calendar_select_2);
-                calendarSelect.setAdapter(adapter);
-                calendarSelect.setEnabled(true);
-                //calendarSelect.setVisibility(View.VISIBLE);
-                calendarSelect.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-                {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
-                    {
-                        racer.calendarName = names.get(position);
-                        racer.calendarID = calendarIDs.get(position);
-                        buttonCreatePlanOnSelected.setVisibility(View.VISIBLE);
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent)
-                    {
-
-                    }
-                });
-
-            }
-        };
-
-        task.execute();
-    }
-
-    /**
-     * callAPI runs a series of checks and finally calls an AsyncTask based on the value of TASK_ID
-     * TASK_ID is adjusted in OnCreate based on the choice of the user to create a new calendar or not.
-     */
-    private void callAPI()
-    {
-            if (!isGooglePlayServicesAvailable())
-            {
-                acquireGooglePlayServices();
-            } else if (mCredential.getSelectedAccountName() == null)
-            {
-                chooseAccount();
-            } else if (!isDeviceOnline())
-            {
-                mOutputText.setText("No network connection available.");
-            } else
-            {
-                mOutputText.setText("Call API executed...");
-                Log.e(TAG, "Call API executed...");
-                //
-                switch (TASK_ID)
-                {
-                    case CREATE_CALENDAR_ID:
-                        new CreateCalendarTask(mCredential).execute();
-                        break;
-                    case CHOOSE_CALENDAR_ID:
-                        new ChooseCalendarTask(mCredential).execute();
-                        break;
-
-                }
-
-            }
-    }
-
     public class CreateCalendarTask extends AsyncTask<Void, Void, Void>
     {
         private com.google.api.services.calendar.Calendar mService = null;
@@ -511,8 +494,8 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
         protected void onPreExecute()
         {
             // set ui as non-intractable
-            mProgress.setCancelable(false);
-            mProgress.show();
+            mProgressCircle.setCancelable(false);
+            mProgressCircle.show();
 
 
         }
@@ -522,7 +505,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
         {
             // set ui as interactable
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-            mProgress.hide();
+            mProgressCircle.hide();
 
             // set callAPI to create training plan now
             TASK_ID = CREATE_PLAN_ID;
@@ -540,7 +523,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
         {
                 // make ui interactable again
                 getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                mProgress.hide();
+                mProgressBarDialog.hide();
                 if (mLastError != null)
                 {
                     if (mLastError instanceof GooglePlayServicesAvailabilityIOException)
@@ -555,12 +538,12 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
                                 MainActivity.REQUEST_AUTHORIZATION);
                     } else
                     {
-                        mOutputText.setText("The following error occurred:\n"
+                        Log.e(TAG, "The following error occurred:\n"
                                 + mLastError.getMessage());
                     }
                 } else
                 {
-                    mOutputText.setText("Request cancelled.");
+                    Log.e(TAG, "Request cancelled.");
                 }
         }
     }
@@ -655,31 +638,37 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
             switch(racer.raceType)
             {
                 case RACE_5K:
-                    mProgress.setMax(PROGRESS_MAX_5K);
+                    mProgressBarDialog.setMax(PROGRESS_MAX_5K);
                     weeksOfTraining = 8;
                     goalMiles = 5;
                     tuesThursMileCap = 2;
                     wedMileCap = 3;
                     break;
                 case RACE_10K:
-                    mProgress.setMax(PROGRESS_MAX_10K);
+                    mProgressBarDialog.setMax(PROGRESS_MAX_10K);
                     weeksOfTraining = 12;
                     goalMiles = 7;
                     tuesThursMileCap = 3;
                     wedMileCap = 5;
                     break;
                 case RACE_HALF:
-                    mProgress.setMax(PROGRESS_MAX_HALF);
+                    mProgressBarDialog.setMax(PROGRESS_MAX_HALF);
                     weeksOfTraining = 12;
                     goalMiles = 13;
                     tuesThursMileCap = 5;
                     wedMileCap = 7;
                     break;
                 case RACE_MARATHON:
-                    mProgress.setMax(PROGRESS_MAX_MARATHON);
+                    mProgressBarDialog.setMax(PROGRESS_MAX_MARATHON);
                     weeksOfTraining = 18;
+                    // increase training length if beginner
+                    if (racer.experienceLevel.equals(EXPERIENCE_BEGINNER))
+                    {
+                        weeksOfTraining = 22;
+                        mProgressBarDialog.setMax(PROGRESS_MAX_MARATHON + 16);
+                    }
                     goalMiles = 26;
-                    tuesThursMileCap = 5;
+                    tuesThursMileCap = 6;
                     wedMileCap = 10;
                     break;
             }
@@ -702,11 +691,27 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
             wednesdayMiles = startingMiles + 1;
             thursdayMiles = startingMiles;
 
+            /**
+             * All of these for loops are separated to be able to be put into separate threads,
+             * I just havent set it up yet so it's ugly.
+             */
+            int recovery = 0;
             for (int i = 0; i < weeksOfTraining; i++)
             {
-                if (tuesday.getTime()   < raceDate.getTime())
+                // every fourth week decrease mileage
+                if (i % 3 == 0 && tuesday.getTime()   < raceDate.getTime())
                 {
-                    mProgress.setProgress(++progress);
+                    double recoveryMiles = tuesdayMiles - recovery;
+                    mProgressBarDialog.setProgress(++progress);
+                    createEventInAPI(calID, tuesday, Double.toString(recoveryMiles) + "M");
+                    if (recovery < (tuesThursMileCap/2))
+                    {
+                        recovery++;
+                    }
+
+                } else if (tuesday.getTime()   < raceDate.getTime())
+                {
+                    mProgressBarDialog.setProgress(++progress);
                     createEventInAPI(calID, tuesday, Double.toString(tuesdayMiles) + "M");
                 }
 
@@ -715,43 +720,79 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
                 if (tuesday.getTime() > raceDate.getTime()) break;
             }
 
+            recovery = 0;
             for (int i = 0; i < weeksOfTraining; i++)
             {
-                if (wednesday.getTime()   < raceDate.getTime())
+                if (i % 3 == 0 && wednesday.getTime()   < raceDate.getTime())
                 {
-                    mProgress.setProgress(++progress);
+                    double recoveryMiles = wednesdayMiles - recovery;
+                    mProgressBarDialog.setProgress(++progress);
+                    createEventInAPI(calID, wednesday, Double.toString(recoveryMiles) + "M");
+
+                    if (recovery < (wedMileCap/2))
+                    {
+                        recovery++;
+                    }
+                } else if (wednesday.getTime()   < raceDate.getTime())
+                {
+                    mProgressBarDialog.setProgress(++progress);
                     createEventInAPI(calID, wednesday, Double.toString(wednesdayMiles) + "M");
                 }
+
                 if (wednesdayMiles < goalMiles && wednesdayMiles < wedMileCap) { wednesdayMiles = wednesdayMiles + (bumpMileageUp / 2); }
                 wednesday   = getOneWeekLater(wednesday);
                 if (wednesday.getTime() > raceDate.getTime()) break;
             }
 
+            recovery = 0;
             for (int i = 0; i < weeksOfTraining; i++)
             {
-                if (thursday.getTime() < raceDate.getTime())
+                if (i % 3 == 0 && thursday.getTime()   < raceDate.getTime())
                 {
-                    mProgress.setProgress(++progress);
+                    double recoveryMiles = thursdayMiles - recovery;
+                    mProgressBarDialog.setProgress(++progress);
+                    createEventInAPI(calID, thursday, Double.toString(recoveryMiles) + "M");
+
+                    if (recovery < (tuesThursMileCap/2))
+                    {
+                        recovery++;
+                    }
+
+                } else if (thursday.getTime()   < raceDate.getTime())
+                {
+                    mProgressBarDialog.setProgress(++progress);
                     createEventInAPI(calID, thursday, Double.toString(thursdayMiles) + "M");
                 }
+
                 if (thursdayMiles < goalMiles && thursdayMiles < tuesThursMileCap) { thursdayMiles = thursdayMiles + (bumpMileageUp / 2); }
                 thursday   = getOneWeekLater(thursday);
                 if (thursday.getTime() > raceDate.getTime()) break;
             }
 
+            recovery = 0;
             for (int i = 0; i < weeksOfTraining; i++)
             {
-                if (sunday.getTime() < raceDate.getTime())
+                if (i % 3 == 0 && sunday.getTime()   < raceDate.getTime())
                 {
-                    mProgress.setProgress(++progress);
+                    double recoveryMiles = sundayMiles - recovery;
+                    mProgressBarDialog.setProgress(++progress);
+                    createEventInAPI(calID, sunday, Double.toString(recoveryMiles) + "M");
+                    if (recovery < 4)
+                    {
+                        recovery++;
+                    }
+                } else if (sunday.getTime()   < raceDate.getTime())
+                {
+                    mProgressBarDialog.setProgress(++progress);
                     createEventInAPI(calID, sunday, Double.toString(sundayMiles) + "M");
                 }
+
                 if (sundayMiles < goalMiles) { sundayMiles = sundayMiles + 1; }
                 sunday   = getOneWeekLater(sunday);
                 if (sunday.getTime() > raceDate.getTime()) break;
             }
 
-            mProgress.setProgress(++progress);
+            mProgressBarDialog.setProgress(++progress);
             // create event for race
             createEventInAPI(calID, raceDate, "RACE DAY!!!");
             Log.e(TAG, "TOTAL PROGRESS: " + progress);
@@ -799,8 +840,8 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
         protected void onPreExecute()
         {
             // set UI not interactable
-            mProgress.setCancelable(false);
-            mProgress.show();
+            mProgressBarDialog.setCancelable(false);
+            mProgressBarDialog.show();
         }
 
         @Override
@@ -808,8 +849,9 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
         {
             // set ui as interactable
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-            mProgress.hide();
+            mProgressBarDialog.hide();
 
+            callFinalInfoFragment();
 
             Toast toast = Toast.makeText(AuthenticateAndCallAPI.this, "Training plan created succesfully!" +
                     " Refresh your google calendar by using the top right button on the app to see changes!", Toast.LENGTH_LONG);
@@ -817,12 +859,25 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
             toast.show();
         }
 
+        private void callFinalInfoFragment()
+        {
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left, R.animator.enter_from_left, R.animator.exit_to_right);
+            DisplayFinalInfo displayFinalInfo = new DisplayFinalInfo();
+            String tag = displayFinalInfo.toString();
+            fragmentTransaction.replace(R.id.fragment_container, displayFinalInfo, tag);
+            fragmentTransaction.addToBackStack(tag);
+            fragmentTransaction.commit();
+            Log.e(TAG, "callFinalInfoFragment");
+        }
+
         @Override
         protected void onCancelled()
         {
             // make ui interactive again
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-            mProgress.hide();
+            mProgressBarDialog.hide();
             if (mLastError != null)
             {
                 if (mLastError instanceof GooglePlayServicesAvailabilityIOException)
@@ -837,12 +892,12 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
                             MainActivity.REQUEST_AUTHORIZATION);
                 } else
                 {
-                    mOutputText.setText("The following error occurred:\n"
+                    Log.e(TAG, "The following error occurred:\n"
                             + mLastError.getMessage());
                 }
             } else
             {
-                mOutputText.setText("Request cancelled.");
+                Log.e(TAG, "Request cancelled.");
             }
         }
     }
@@ -919,7 +974,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
         switch(requestCode) {
             case REQUEST_GOOGLE_PLAY_SERVICES:
                 if (resultCode != RESULT_OK) {
-                    mOutputText.setText(
+                    Log.e(TAG,
                             "This app requires Google Play Services. Please install " +
                                     "Google Play Services on your device and relaunch this app.");
                 } else {
@@ -933,7 +988,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
                             data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
                     if (accountName != null) {
                         SharedPreferences settings =
-                                getPreferences(Context.MODE_PRIVATE);
+                                PreferenceManager.getDefaultSharedPreferences(this);
                         SharedPreferences.Editor editor = settings.edit();
                         editor.putString(PREF_ACCOUNT_NAME, accountName);
                         editor.apply();

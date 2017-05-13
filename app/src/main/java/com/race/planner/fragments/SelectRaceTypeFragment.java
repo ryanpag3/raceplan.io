@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.race.planner.R;
 import com.race.planner.activities.MainActivity;
@@ -101,7 +102,7 @@ public class SelectRaceTypeFragment extends Fragment
         });
 
         // back button
-        Button buttonBack = (Button) view.findViewById(R.id.button_back);
+        ImageButton buttonBack = (ImageButton) view.findViewById(R.id.button_back);
         buttonBack.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -112,7 +113,7 @@ public class SelectRaceTypeFragment extends Fragment
         });
 
         // restart button
-        Button buttonRestart = (Button) view.findViewById(R.id.button_restart);
+        ImageButton buttonRestart = (ImageButton) view.findViewById(R.id.button_restart);
         buttonRestart.setOnClickListener(new View.OnClickListener()
         {
             @Override

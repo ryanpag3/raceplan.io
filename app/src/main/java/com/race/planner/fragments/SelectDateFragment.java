@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.race.planner.R;
@@ -83,7 +84,7 @@ public class SelectDateFragment extends Fragment
             }
         });
 
-        Button okButton = (Button) view.findViewById(R.id.ok_clickable_textview);
+        ImageButton okButton = (ImageButton) view.findViewById(R.id.ok_confirm);
         okButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -95,7 +96,7 @@ public class SelectDateFragment extends Fragment
 
 
         // back button
-        Button buttonBack = (Button) view.findViewById(R.id.button_back);
+        ImageButton buttonBack = (ImageButton) view.findViewById(R.id.button_back);
         buttonBack.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -106,7 +107,7 @@ public class SelectDateFragment extends Fragment
         });
 
         // restart button
-        Button buttonRestart = (Button) view.findViewById(R.id.button_restart);
+        ImageButton buttonRestart = (ImageButton) view.findViewById(R.id.button_restart);
         buttonRestart.setOnClickListener(new View.OnClickListener()
         {
             @Override

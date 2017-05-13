@@ -6,16 +6,17 @@
                 tools:context="com.race.planner.fragments.SelectRaceTypeFragment"
                 android:id="@+id/race_type_container"
                 android:background="@android:color/transparent">
-    <com.race.planner.utils.CustomTextViewSansation
+    <TextView
         android:id="@+id/name_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="race type"
         android:textSize="14sp"
         android:textColor="@color/textPrimary"
-        android:layout_marginLeft="75dp"/>
+        android:layout_marginLeft="75dp"
+        android:fontFamily="sans-serif-light"/>
 
-    <com.race.planner.utils.CustomTextViewSansation
+    <TextView
         android:id="@+id/name_instructions"
         android:text="@string/race_type_instructions"
         android:textSize="32sp"
@@ -29,7 +30,8 @@
         android:layout_marginRight="10dp"
         android:textAlignment="center"
         android:background="@color/text_box_background"
-        android:padding="10dp"/>
+        android:padding="10dp"
+        android:fontFamily="sans-serif-light"/>
 
     <LinearLayout
         android:layout_above="@+id/inner_layout_menu_buttons"
@@ -39,47 +41,60 @@
             <Button
                 android:id="@+id/button_5k"
                 android:text="5k"
+                android:textColor="@color/textPrimary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@color/buttonColor"
+                android:layout_margin="6dp"
                 />
             <Button
                 android:id="@+id/button_10k"
                 android:text="10k"
+                android:textColor="@color/textPrimary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@color/buttonColor"
+                android:layout_margin="6dp"
                 />
             <Button
                 android:id="@+id/button_half_marathon"
                 android:text="Half-Marathon"
+                android:textColor="@color/textPrimary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@color/buttonColor"
+                android:layout_margin="6dp"
                 />
             <Button
                 android:id="@+id/button_marathon"
                 android:text="Marathon"
+                android:textColor="@color/textPrimary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@color/buttonColor"
+                android:layout_margin="6dp"
                 />
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/inner_layout_menu_buttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:layout_margin="12dp">
-            <Button
-                android:text="back"
+            <ImageButton
                 android:id="@+id/button_back"
+                android:src="@drawable/ic_arrow_back_white_48dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"/>
-            <Button
-                android:text="restart"
+                android:background="@android:color/transparent"/>
+            <ImageButton
+                android:src="@drawable/ic_restart_white_48dp"
                 android:id="@+id/button_restart"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"/>
-    </LinearLayout>
+                android:layout_alignParentRight="true"
+                android:background="@android:color/transparent"/>
+    </RelativeLayout>
 </RelativeLayout>

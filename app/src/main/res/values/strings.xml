@@ -17,4 +17,10 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="cal_select_instructions">Choose to create plan on dedicated calendar or your own.</string>
+
+    <string name="prompt_calendar_spinner">Select your calendar</string>
+    <string name="text_thanks">Thanks again for trying out Race Planner. I hope it has provided you with an easy and effective tool for planning your training. I sure have had a great time building it. Again if you have any feedback, feel free to leave a review or send an email to raceplannerapp@gmail.com.\n\nHappy running!\n- Ryan</string>
+
+    <string name="banner_ad_unit_id">ca-app-pub-6074390067340927/7125083890</string>
+
 </resources>

@@ -1,42 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
-    tools:context="com.race.planner.activities.AuthenticateAndCallAPI">
+    tools:context="com.race.planner.activities.AuthenticateAndCallAPI"
+    android:background="@drawable/finished_image">
 
     <Spinner
         android:id="@+id/spinner_calendar_select_2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:gravity="center"
-        android:spinnerMode="dropdown"
-        android:layout_marginBottom="24dp"/>
+        android:spinnerMode="dialog"
+        android:prompt="@string/prompt_calendar_spinner"/>
 
-    <TextView
-        android:id="@+id/mOutputText"
-        android:layout_below="@+id/spinner_calendar_select_2"
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+    </FrameLayout>
+
+    <RelativeLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:scrollbars="vertical"/>
+        android:layout_gravity="center_vertical"
+        android:layout_margin="6dp">
+        <Button
+            android:id="@+id/button_undo"
+            android:text="undo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="64dp"
+            />
 
-    <Button
-        android:id="@+id/button_create_calendar_on_selected"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="create plan on selected calendar"
-        android:layout_above="@+id/button_finish_authenticate_api"/>
+        <Button
+            android:id="@+id/button_main_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="main menu"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="64dp"
+            />
+    </RelativeLayout>
 
-    <Button
-        android:id="@+id/button_finish_authenticate_api"
-        android:layout_alignParentBottom="true"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="main menu"
-        />
-</RelativeLayout>
+</LinearLayout>

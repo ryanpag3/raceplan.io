@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "138460800792",
+    "firebase_url": "https://brave-idea-164323.firebaseio.com",
+    "project_id": "brave-idea-164323",
+    "storage_bucket": "brave-idea-164323.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:138460800792:android:8312f2b09ff399dd",
+        "android_client_info": {
+          "package_name": "com.race.planner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "138460800792-p363150vaddbi4ff1hieqms6bkml9a9c.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "138460800792-jifsatcgi4cpluoapjfrj82c90m13kqb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.race.planner",
+            "certificate_hash": "c77c0933711a0c3c2750922ea0ae931f1c75221b"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAltv6Yemp-G-H13TFcXXIl1BsK0sfbj_Y"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "138460800792-p363150vaddbi4ff1hieqms6bkml9a9c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

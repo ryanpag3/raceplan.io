@@ -4,7 +4,7 @@
              android:layout_height="match_parent"
              tools:context="com.race.planner.fragments.SelectCalendarFragment">
 
-    <com.race.planner.utils.CustomTextViewSansation
+    <TextView
         android:id="@+id/date_title_text"
         android:text="calendar"
         android:textColor="@color/textPrimary"
@@ -13,9 +13,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_marginRight="12dp"
+        android:fontFamily="sans-serif-light"
         />
 
-    <com.race.planner.utils.CustomTextViewSansation
+    <TextView
         android:id="@+id/name_instructions"
         android:text="@string/cal_select_instructions"
         android:textSize="32sp"
@@ -29,7 +30,8 @@
         android:layout_marginRight="10dp"
         android:textAlignment="center"
         android:background="@color/text_box_background"
-        android:padding="10dp"/>
+        android:padding="10dp"
+        android:fontFamily="sans-serif-light"/>
 
     <LinearLayout
         android:layout_above="@+id/inner_layout_menu_buttons"
@@ -45,22 +47,26 @@
             android:background="@color/backgroundGrey"
             android:padding="6dp"
             android:layout_margin="12dp">
-            <com.race.planner.utils.CustomTextViewSansation
+            <TextView
                 android:text="I would like to keep this training plan on one of my own calendars."
                 android:textColor="#424242"
                 android:textSize="16dp"
                 android:textAlignment="center"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:layout_weight="1"
-                android:layout_gravity="center_vertical"/>
-            <Button
-                android:id="@+id/button_choose_own_cal"
-                android:text="choose"
-                android:textColor="#424242"
-                android:layout_width="90dp"
-                android:layout_height="54dp"
-                android:layout_gravity="center_vertical"/>
+                android:layout_margin="6dp"
+                android:fontFamily="sans-serif-light"
+                />
+            <CheckBox
+                android:id="@+id/checkbox_own_cal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleX="1.5"
+                android:scaleY="1.5"
+                android:layout_gravity="center"
+                android:layout_margin="4dp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -70,7 +76,7 @@
             android:background="@color/backgroundGrey"
             android:padding="6dp"
             android:layout_margin="12dp">
-            <com.race.planner.utils.CustomTextViewSansation
+            <TextView
                 android:text="I would like this training plan to live on the dedicated 'race-planner' calendar."
                 android:textColor="#424242"
                 android:textSize="16dp"
@@ -78,38 +84,53 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_gravity="center_vertical"/>
-            <Button
-                android:id="@+id/button_choose_new_cal"
-                android:text="choose"
-                android:textColor="#424242"
-                android:layout_width="90dp"
-                android:layout_height="54dp"
-                android:layout_gravity="center_vertical"/>
+                android:layout_gravity="center_vertical"
+                android:fontFamily="sans-serif-light"/>
+            <CheckBox
+                android:id="@+id/checkbox_new_cal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleX="1.5"
+                android:scaleY="1.5"
+                android:layout_gravity="center"
+                android:layout_margin="4dp"/>
         </LinearLayout>
 
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/inner_layout_menu_buttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:orientation="horizontal"
-        android:layout_margin="12dp"
-        android:layout_alignParentBottom="true">
-        <Button
-            android:text="back"
+        android:layout_margin="12dp">
+        <ImageButton
             android:id="@+id/button_back"
+            android:src="@drawable/ic_arrow_back_white_48dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"/>
-        <Button
-            android:text="restart"
+            android:background="@android:color/transparent"/>
+        <ImageButton
+            android:src="@drawable/ic_restart_white_48dp"
             android:id="@+id/button_restart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"/>
-    </LinearLayout>
+            android:layout_centerHorizontal="true"
+            android:background="@android:color/transparent"/>
+        <ImageButton
+            android:src="@drawable/ic_check_white_48dp"
+            android:textColor="@color/textPrimary"
+            android:background="@android:color/transparent"
+            android:id="@+id/button_confirm"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:layout_gravity="center"
+            android:layout_alignParentRight="true"/>
+    </RelativeLayout>
 
 
 </RelativeLayout>

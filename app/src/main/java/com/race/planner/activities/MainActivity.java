@@ -100,15 +100,8 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
         viewPager.setAdapter(viewPagerAdapter);
         viewPager.setOffscreenPageLimit(5); // required to prevent TextViews from disappearing
 
-        viewMoreTextHint = (TextView) findViewById(R.id.text_view_more_info);
-        viewMoreTextHint.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
-
-
-
-
-        // instantiate TextView object for user directions
-        //TODO: determine whether this is necessary
-        mOutputText = (TextView) findViewById(R.id.mOutputText);
+//        viewMoreTextHint = (TextView) findViewById(R.id.text_view_more_info);
+//        viewMoreTextHint.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
 
         // TODO: determine whether this is necessary
         mProgress = new ProgressDialog(this);
@@ -127,54 +120,54 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
         // TODO: check location, possibly move it to bottom of onCreate()
         requestPermissions();
 
-        backViewPagers = (ImageButton) findViewById(R.id.button_back_view_pager);
-        backViewPagers.setVisibility(View.INVISIBLE); // invisible until on 2nd view, as defined in adapter
-        backViewPagers.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                // back on view pager
-                viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
-                if (viewPager.getCurrentItem() == VIEW_PAGER_FIRST_ELEMENT)
-                {
-                    backViewPagers.setVisibility(View.INVISIBLE);
-                }
-
-                if (viewPager.getCurrentItem() == VIEW_PAGER_LAST_ELEMENT - 1)
-                {
-                    forwardViewPager.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-
-        forwardViewPager = (ImageButton) findViewById(R.id.button_forward_view_pager);
-        forwardViewPager.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                if (!isHintTextFaded)
-                {
-                    viewMoreTextHint.startAnimation(AnimationUtils.loadAnimation(MainActivity.this, android.R.anim.fade_out));
-                    viewMoreTextHint.setVisibility(View.INVISIBLE);
-                    isHintTextFaded = true;
-                }
-                // forward on view pager
-                viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
-                if (viewPager.getCurrentItem() == VIEW_PAGER_FIRST_ELEMENT + 1)
-                {
-                    backViewPagers.setVisibility(View.VISIBLE);
-                }
-
-                if (viewPager.getCurrentItem() == VIEW_PAGER_LAST_ELEMENT)
-                {
-                    forwardViewPager.setVisibility(View.INVISIBLE);
-                }
-
-
-            }
-        });
+//        backViewPagers = (ImageButton) findViewById(R.id.button_back_view_pager);
+//        backViewPagers.setVisibility(View.INVISIBLE); // invisible until on 2nd view, as defined in adapter
+//        backViewPagers.setOnClickListener(new View.OnClickListener()
+//        {
+//            @Override
+//            public void onClick(View v)
+//            {
+//                // back on view pager
+//                viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
+//                if (viewPager.getCurrentItem() == VIEW_PAGER_FIRST_ELEMENT)
+//                {
+//                    backViewPagers.setVisibility(View.INVISIBLE);
+//                }
+//
+//                if (viewPager.getCurrentItem() == VIEW_PAGER_LAST_ELEMENT - 1)
+//                {
+//                    forwardViewPager.setVisibility(View.VISIBLE);
+//                }
+//            }
+//        });
+//
+//        forwardViewPager = (ImageButton) findViewById(R.id.button_forward_view_pager);
+//        forwardViewPager.setOnClickListener(new View.OnClickListener()
+//        {
+//            @Override
+//            public void onClick(View v)
+//            {
+//                if (!isHintTextFaded)
+//                {
+//                    viewMoreTextHint.startAnimation(AnimationUtils.loadAnimation(MainActivity.this, android.R.anim.fade_out));
+//                    viewMoreTextHint.setVisibility(View.INVISIBLE);
+//                    isHintTextFaded = true;
+//                }
+//                // forward on view pager
+//                viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
+//                if (viewPager.getCurrentItem() == VIEW_PAGER_FIRST_ELEMENT + 1)
+//                {
+//                    backViewPagers.setVisibility(View.VISIBLE);
+//                }
+//
+//                if (viewPager.getCurrentItem() == VIEW_PAGER_LAST_ELEMENT)
+//                {
+//                    forwardViewPager.setVisibility(View.INVISIBLE);
+//                }
+//
+//
+//            }
+//        });
 
 
         // instantiate button for creating a new training plan
@@ -434,10 +427,10 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
             switch(position)
             {
                 case 0:
-                    resId = R.id.text_splash_1;
+                    resId = R.id.view_pager_slide_1;
                     break;
                 case 1:
-                    resId = R.id.text_splash_2;
+                    resId = R.id.view_pager_slide_2;
                     break;
 //                case 2:
 //                    resId = R.id.string_main_intro_3;

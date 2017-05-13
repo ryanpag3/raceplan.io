@@ -2,6 +2,7 @@ package com.race.planner.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.Gravity;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -74,7 +76,7 @@ public class SelectNameFragment extends Fragment
             ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
         }
 
-        Button buttonConfirm = (Button) view.findViewById(R.id.button_confirm);
+        ImageButton buttonConfirm = (ImageButton) view.findViewById(R.id.button_confirm);
         buttonConfirm.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -89,7 +91,7 @@ public class SelectNameFragment extends Fragment
         });
 
         // back button
-        Button buttonBack = (Button) view.findViewById(R.id.button_back);
+        ImageButton buttonBack = (ImageButton) view.findViewById(R.id.button_back);
         buttonBack.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -100,7 +102,7 @@ public class SelectNameFragment extends Fragment
         });
 
         // restart button
-        Button buttonRestart = (Button) view.findViewById(R.id.button_restart);
+        ImageButton buttonRestart = (ImageButton) view.findViewById(R.id.button_restart);
         buttonRestart.setOnClickListener(new View.OnClickListener()
         {
             @Override

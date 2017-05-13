@@ -1,12 +1,11 @@
 package com.race.planner.activities;
 
-import android.accounts.AccountManager;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CursorAdapter;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -22,18 +22,19 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.util.ExponentialBackOff;
+import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
-
-import android.text.format.DateFormat;
 
 import com.race.planner.R;
 import com.race.planner.data_models.*;
 import com.race.planner.utils.*;
 
-public class ListTrainingPlans extends AppCompatActivity
+public class ListTrainingPlans extends Activity
 {
     static final int VIEW_PAGER_FIRST_ELEMENT = 0;
     static final int VIEW_PAGER_LAST_ELEMENT = 1;
@@ -94,6 +95,17 @@ public class ListTrainingPlans extends AppCompatActivity
                 cursorAdapter.changeCursor(t);
             }
         });
+
+        ImageButton backButton = (ImageButton) findViewById(R.id.button_back);
+        backButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Intent intent = new Intent(ListTrainingPlans.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     /**
@@ -111,7 +123,7 @@ public class ListTrainingPlans extends AppCompatActivity
         @Override
         public View newView(Context context, Cursor cursor, ViewGroup parent)
         {
-            return LayoutInflater.from(context).inflate(R.layout.layout_training_plan_row, parent, false);
+            return LayoutInflater.from(context).inflate(R.layout.view_training_plan_row, parent, false);
         }
 
         // binds data to the custom layout
@@ -123,7 +135,7 @@ public class ListTrainingPlans extends AppCompatActivity
             TextView tvRaceType = (TextView) view.findViewById(R.id.row_text_race_type);
             TextView tvExperienceLevel = (TextView) view.findViewById(R.id.row_text_experience_level);
             TextView tvCalendar = (TextView) view.findViewById(R.id.row_text_calendar);
-            Button bDeleteTrainingPlan = (Button) view.findViewById(R.id.row_button_delete_training_plan);
+            ImageButton bDeleteTrainingPlan = (ImageButton) view.findViewById(R.id.row_button_delete_training_plan);
             // assigns values based on cursor object position
             final int id = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.TRAINING_PLAN_COL_1));
             final String name = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TRAINING_PLAN_COL_2));
@@ -132,9 +144,21 @@ public class ListTrainingPlans extends AppCompatActivity
             final String experienceLevel = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TRAINING_PLAN_COL_5));
             String calendar = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TRAINING_PLAN_COL_6));
 
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+            dateFormat.setTimeZone(TimeZone.getTimeZone("PST"));
+            String convertedDate;
+            Date date = new Date();
+            try
+            {
+                date = dateFormat.parse(raceDate);
+            } catch (ParseException e)
+            {
+            }
+            convertedDate = dateFormat.format(date);
+
             // assign values to ui elements
             tvName.setText(name);
-            tvRaceDate.setText(raceDate);
+            tvRaceDate.setText(convertedDate);
             tvRaceType.setText(raceType);
             tvExperienceLevel.setText(experienceLevel);
             tvCalendar.setText(calendar);

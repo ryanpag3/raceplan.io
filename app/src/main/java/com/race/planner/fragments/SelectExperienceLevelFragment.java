@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.race.planner.R;
 import com.race.planner.activities.MainActivity;
@@ -15,14 +16,6 @@ import com.race.planner.utils.*;
 
 import static com.race.planner.data_models.GlobalVariables.*;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link SelectExperienceLevelFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link SelectExperienceLevelFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class SelectExperienceLevelFragment extends Fragment
 {
     private FragmentListenerInterface mListener;
@@ -30,20 +23,6 @@ public class SelectExperienceLevelFragment extends Fragment
     public SelectExperienceLevelFragment()
     {
         // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SelectExperienceLevelFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static SelectExperienceLevelFragment newInstance(String param1, String param2)
-    {
-        return new SelectExperienceLevelFragment();
     }
 
     @Override
@@ -97,7 +76,7 @@ public class SelectExperienceLevelFragment extends Fragment
         });
 
         // back button
-        Button buttonBack = (Button) view.findViewById(R.id.button_back);
+        ImageButton buttonBack = (ImageButton) view.findViewById(R.id.button_back);
         buttonBack.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -108,7 +87,7 @@ public class SelectExperienceLevelFragment extends Fragment
         });
 
         // restart button
-        Button buttonRestart = (Button) view.findViewById(R.id.button_restart);
+        ImageButton buttonRestart = (ImageButton) view.findViewById(R.id.button_restart);
         buttonRestart.setOnClickListener(new View.OnClickListener()
         {
             @Override

@@ -38,8 +38,6 @@ public class DeleteTrainingPlanTask extends AsyncTask<Void, Void, Void>
     {
         if(android.os.Debug.isDebuggerConnected())
             android.os.Debug.waitForDebugger();
-        // mOutput provides debug info
-        mOutput = (TextView) context.findViewById(R.id.mOutputText);
 
         // mProgress is a simple progress spinner
         mProgress = new ProgressDialog(context);

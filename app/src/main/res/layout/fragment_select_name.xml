@@ -7,16 +7,17 @@
     android:background="@android:color/transparent"
     >
 
-    <com.race.planner.utils.CustomTextViewSansation
+    <TextView
         android:id="@+id/name_title"
         android:text="Race Name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/textPrimary"
         android:textSize="14sp"
-        android:layout_marginLeft="2dp"/>
+        android:layout_marginLeft="2dp"
+        android:fontFamily="sans-serif-light"/>
 
-    <com.race.planner.utils.CustomTextViewSansation
+    <TextView
         android:id="@+id/name_instructions"
         android:text="@string/name_instructions"
         android:textSize="32sp"
@@ -30,7 +31,8 @@
         android:layout_marginRight="10dp"
         android:textAlignment="center"
         android:background="@color/text_box_background"
-        android:padding="10dp"/>
+        android:padding="10dp"
+        android:fontFamily="sans-serif-light"/>
 
     <EditText
         android:id="@+id/edit_text"
@@ -46,22 +48,16 @@
         android:maxLines="1"
         android:layout_marginRight="10dp"
         android:layout_marginLeft="10dp"
-        android:layout_centerVertical="true"/>
+        android:layout_marginTop="6dp"
+        android:layout_below="@id/name_instructions"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:orientation="vertical">
-        <Button
-            android:id="@+id/button_confirm"
-            android:text="confirm"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
-            />
 
-        <LinearLayout
+
+        <RelativeLayout
             android:id="@+id/inner_layout_menu_buttons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -69,19 +65,32 @@
             android:layout_marginLeft="12dp"
             android:layout_marginRight="12dp"
             android:layout_marginBottom="12dp">
-            <Button
-                android:text="back"
+            <ImageButton
                 android:id="@+id/button_back"
+                android:src="@drawable/ic_arrow_back_white_48dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"/>
-            <Button
+                android:layout_weight="1"
+                android:background="@android:color/transparent"/>
+            <ImageButton
                 android:text="restart"
+                android:src="@drawable/ic_restart_white_48dp"
                 android:id="@+id/button_restart"
+                android:background="@android:color/transparent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"/>
-        </LinearLayout>
+                android:layout_centerHorizontal="true"/>
+            <ImageButton
+            android:id="@+id/button_confirm"
+            android:src="@drawable/ic_arrow_forward_white_48dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:background="@android:color/transparent"
+            android:layout_alignParentRight="true"
+            />
+        </RelativeLayout>
     </LinearLayout>
 
 </RelativeLayout>

@@ -6,19 +6,36 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.race.planner.activities.ListTrainingPlans">
+    tools:context="com.race.planner.activities.ListTrainingPlans"
+    android:background="@color/backgroundBlue">
 
     <ListView
         android:id="@+id/list_view_created_plans"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="10.0sp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp">
     </ListView>
-
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
     <Button
         android:id="@+id/button_refresh"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Refresh"/>
+        android:text="Refresh"
+        android:layout_alignParentRight="true"
+        />
+    <ImageButton
+        android:id="@+id/button_back"
+        android:src="@drawable/ic_arrow_back_white_48dp"
+        android:background="@android:color/transparent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+</RelativeLayout>
 
 </LinearLayout>
