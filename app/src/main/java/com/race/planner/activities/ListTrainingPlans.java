@@ -82,7 +82,8 @@ public class ListTrainingPlans extends Activity
         // MyCursorAdapter holds the custom layout for each training plan
         final MyCursorAdapter cursorAdapter = new MyCursorAdapter(this, c);
         listView.setAdapter(cursorAdapter); // ties the custom adapter to the listview
-
+        View view = findViewById(R.id.list_view_empty);
+        listView.setEmptyView(view);
         // instantiate button for refreshing listview
         Button refreshButton = (Button) findViewById(R.id.button_refresh);
         refreshButton.setOnClickListener(new View.OnClickListener()

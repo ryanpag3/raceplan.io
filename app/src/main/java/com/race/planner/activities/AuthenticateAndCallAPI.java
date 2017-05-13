@@ -471,11 +471,11 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
 
                     for (CalendarListEntry calendarListEntry : items)
                     {
-                        if (calendarListEntry.getSummary().equals("race-planner"))
+                        if (calendarListEntry.getSummary().equals("run-planner"))
                         {
 
                             racer.calendarID = calendarListEntry.getId();
-                            racer.calendarName = "race-planner";
+                            racer.calendarName = "run-planner";
                             Log.e(TAG,"inside israceplannercreated: " + racer.calendarID);
                             return true;
                         }
@@ -809,7 +809,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
                 {
                     Event event = new Event()
                             .setSummary(eventName)
-                            .setDescription("race-planner");
+                            .setDescription("run-planner");
 
                     Date startDate = date;
                     Date endDate = new Date(startDate.getTime() + 86400000);
