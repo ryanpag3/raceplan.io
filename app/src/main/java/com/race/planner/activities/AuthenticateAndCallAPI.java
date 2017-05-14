@@ -436,16 +436,17 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
             {
                 if (! isRacePlannerCalendarCreated())
                 {
+                    // TODO: turn calendarname and summary into hardcoded string value
                     Log.e(TAG, "createCalendarInAPI called.");
                     // BUG: when removing library definition and adding an import, calls the wrong constructor
                     // WORKAROUND: defined all manually
                     com.google.api.services.calendar.model.Calendar calendar = new com.google.api.services.calendar.model.Calendar();
-                    calendar.setSummary("race-planner");
+                    calendar.setSummary("run-planner");
                     calendar.setTimeZone("America/Los_Angeles");
                     com.google.api.services.calendar.model.Calendar createdCalendar = mService.calendars().insert(calendar).execute();
 
                     racer.calendarID = createdCalendar.getId();
-                    racer.calendarName = "race-planner";
+                    racer.calendarName = "run-planner";
                 }
             } catch (Exception e)
             {
