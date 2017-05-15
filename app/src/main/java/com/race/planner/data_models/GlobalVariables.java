@@ -18,6 +18,8 @@ public class GlobalVariables extends Application
     public static final int MY_PERMISSIONS_REQUEST_WRITE_CALENDAR = 2;
     public static final int MY_PERMISSIONS_REQUEST_READ_SYNC_SETTINGS = 3;
 
+    public static final String DEFAULT_CAL_NAME = "raceplan.io";
+
     public static final String RACE_5K = "5k";
     public static final String RACE_10K = "10k";
     public static final String RACE_HALF = "Half Marathon";

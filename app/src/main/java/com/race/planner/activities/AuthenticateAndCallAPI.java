@@ -64,8 +64,6 @@ import com.race.planner.utils.*;
 import com.race.planner.data_models.GlobalVariables;
 import com.race.planner.data_models.Racer;
 
-import static com.race.planner.data_models.GlobalVariables.*;
-
 public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.PermissionCallbacks, FragmentListenerInterface
 {
     static final int REQUEST_ACCOUNT_PICKER = 1000;
@@ -434,19 +432,21 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
 
             try
             {
-                if (! isRacePlannerCalendarCreated())
+                checkForDeprecatedCalendars();
+
+                if (! isRacePlanCalendarCreated())
                 {
                     // TODO: turn calendarname and summary into hardcoded string value
                     Log.e(TAG, "createCalendarInAPI called.");
                     // BUG: when removing library definition and adding an import, calls the wrong constructor
                     // WORKAROUND: defined all manually
                     com.google.api.services.calendar.model.Calendar calendar = new com.google.api.services.calendar.model.Calendar();
-                    calendar.setSummary("run-planner");
+                    calendar.setSummary(GlobalVariables.DEFAULT_CAL_NAME); // GlobalVariables
                     calendar.setTimeZone("America/Los_Angeles");
                     com.google.api.services.calendar.model.Calendar createdCalendar = mService.calendars().insert(calendar).execute();
 
                     racer.calendarID = createdCalendar.getId();
-                    racer.calendarName = "run-planner";
+                    racer.calendarName = GlobalVariables.DEFAULT_CAL_NAME;
                 }
             } catch (Exception e)
             {
@@ -458,7 +458,41 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
             return null;
         }
 
-        public boolean isRacePlannerCalendarCreated()
+        /**
+         * Checks for outdated versions of the calendar and deletes if necessary
+         */
+        private void checkForDeprecatedCalendars()
+        {
+            String pageToken = null;
+            do
+            {
+                try
+                {
+                    CalendarList calendarList = mService.calendarList().list().setPageToken(pageToken).execute();
+                    List<CalendarListEntry> items = calendarList.getItems();
+
+                    for (CalendarListEntry calendarListEntry : items)
+                    {
+                        if (calendarListEntry.getSummary().equals("race-planner"))
+                        {
+                            mService.calendars().delete(calendarListEntry.getId()).execute();
+                        }
+
+                        if (calendarListEntry.getSummary().equals("run-planner"))
+                        {
+                            mService.calendars().delete(calendarListEntry.getId()).execute();
+                        }
+                    }
+                    pageToken = calendarList.getNextPageToken();
+                } catch (IOException e)
+                {
+                    Log.e(TAG, "IOException:", e);
+                }
+            } while (pageToken != null);
+
+        }
+
+        public boolean isRacePlanCalendarCreated()
         {
 
             // iterate through entries in calendar list
@@ -472,12 +506,12 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
 
                     for (CalendarListEntry calendarListEntry : items)
                     {
-                        if (calendarListEntry.getSummary().equals("run-planner"))
+                        if (calendarListEntry.getSummary().equals(GlobalVariables.DEFAULT_CAL_NAME))
                         {
 
                             racer.calendarID = calendarListEntry.getId();
-                            racer.calendarName = "run-planner";
-                            Log.e(TAG,"inside israceplannercreated: " + racer.calendarID);
+                            racer.calendarName = GlobalVariables.DEFAULT_CAL_NAME;
+                            Log.e(TAG,"inside israceplancreated: " + racer.calendarID);
                             return true;
                         }
                     }
@@ -512,7 +546,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
             TASK_ID = CREATE_PLAN_ID;
 
             // display completed toast
-            Toast toast = Toast.makeText(AuthenticateAndCallAPI.this, "Calendar created successfully!", Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(AuthenticateAndCallAPI.this, "Calendar created successfully!", Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER | Gravity.TOP, 0, 0);
             toast.show();
 
@@ -619,17 +653,17 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
 
             switch (racer.experienceLevel)
             {
-                case EXPERIENCE_BEGINNER:
+                case GlobalVariables.EXPERIENCE_BEGINNER:
                     startingMiles = 1;
                     sundayMiles = 2;
                     bumpMileageUp = 1;
                     break;
-                case EXPERIENCE_INTERMEDIATE:
+                case GlobalVariables.EXPERIENCE_INTERMEDIATE:
                     startingMiles = 3;
                     sundayMiles = 3;
                     bumpMileageUp = 1;
                     break;
-                case EXPERIENCE_EXPERT:
+                case GlobalVariables.EXPERIENCE_EXPERT:
                     startingMiles = 3;
                     sundayMiles = 5;
                     bumpMileageUp = 1;
@@ -638,35 +672,35 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
 
             switch(racer.raceType)
             {
-                case RACE_5K:
-                    mProgressBarDialog.setMax(PROGRESS_MAX_5K);
+                case GlobalVariables.RACE_5K:
+                    mProgressBarDialog.setMax(GlobalVariables.PROGRESS_MAX_5K);
                     weeksOfTraining = 8;
                     goalMiles = 5;
                     tuesThursMileCap = 2;
                     wedMileCap = 3;
                     break;
-                case RACE_10K:
-                    mProgressBarDialog.setMax(PROGRESS_MAX_10K);
+                case GlobalVariables.RACE_10K:
+                    mProgressBarDialog.setMax(GlobalVariables.PROGRESS_MAX_10K);
                     weeksOfTraining = 12;
                     goalMiles = 7;
                     tuesThursMileCap = 3;
                     wedMileCap = 5;
                     break;
-                case RACE_HALF:
-                    mProgressBarDialog.setMax(PROGRESS_MAX_HALF);
+                case GlobalVariables.RACE_HALF:
+                    mProgressBarDialog.setMax(GlobalVariables.PROGRESS_MAX_HALF);
                     weeksOfTraining = 12;
                     goalMiles = 13;
                     tuesThursMileCap = 5;
                     wedMileCap = 7;
                     break;
-                case RACE_MARATHON:
-                    mProgressBarDialog.setMax(PROGRESS_MAX_MARATHON);
+                case GlobalVariables.RACE_MARATHON:
+                    mProgressBarDialog.setMax(GlobalVariables.PROGRESS_MAX_MARATHON);
                     weeksOfTraining = 18;
                     // increase training length if beginner
-                    if (racer.experienceLevel.equals(EXPERIENCE_BEGINNER))
+                    if (racer.experienceLevel.equals(GlobalVariables.EXPERIENCE_BEGINNER))
                     {
                         weeksOfTraining = 22;
-                        mProgressBarDialog.setMax(PROGRESS_MAX_MARATHON + 16);
+                        mProgressBarDialog.setMax(GlobalVariables.PROGRESS_MAX_MARATHON + 16);
                     }
                     goalMiles = 26;
                     tuesThursMileCap = 6;

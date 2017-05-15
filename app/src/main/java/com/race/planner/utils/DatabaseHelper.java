@@ -84,16 +84,6 @@ public class DatabaseHelper extends SQLiteOpenHelper
         Cursor c = db.rawQuery(query, selectionArgs);
         return c;
     }
-
-    /**
-     *
-     * @param name
-     * @param raceDate
-     * @param raceType
-     * @param experienceLevel
-     * @param calendarName
-     * @return
-     */
 //    public boolean insertNewPlanToDatabase(String name, String raceDate, String raceType,
 //                                                String experienceLevel, String calendarName)
 //{

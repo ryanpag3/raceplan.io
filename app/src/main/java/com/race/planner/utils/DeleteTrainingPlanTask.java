@@ -69,6 +69,8 @@ public class DeleteTrainingPlanTask extends AsyncTask<Void, Void, Void>
         // query through all events where the database ID matches the training plan database ID
         Cursor c = db.query("SELECT * FROM " + DatabaseHelper.EVENT_ID_TABLE_NAME + " WHERE "
                 + DatabaseHelper.EVENT_ID_COL_1 + "= ?", new String[] {String.valueOf(racer.databaseID)});
+
+        // change length of the progress bar based on the training plan being deleted
         switch (racer.raceType)
         {
             case RACE_5K:
@@ -84,6 +86,7 @@ public class DeleteTrainingPlanTask extends AsyncTask<Void, Void, Void>
                 mProgress.setMax(PROGRESS_MAX_MARATHON);
                 break;
         }
+
 
         while (c.moveToNext())
         {
