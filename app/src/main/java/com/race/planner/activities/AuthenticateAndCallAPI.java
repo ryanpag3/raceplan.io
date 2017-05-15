@@ -154,9 +154,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
             public void onClick(View v)
             {
                 Intent intent = new Intent(AuthenticateAndCallAPI.this, MainActivity.class);
-                intent.putExtra(GlobalVariables.RACER_INFO_ID, getIntent().getExtras().getParcelable(GlobalVariables.RACER_INFO_ID));
-                intent.putExtra(GlobalVariables.CALENDAR_CREATED_ID, createCal);
-                intent.putExtra(GlobalVariables.CALENDAR_ID, racer.calendarID);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 intent.putExtra(GlobalVariables.CREDENTIAL_ACCOUNT_NAME, mCredential.getSelectedAccountName());
                 startActivity(intent);
             }
