@@ -106,13 +106,14 @@ public class DisplayFinalInfo extends Fragment
         private Context mContext;
 
         public ViewPagerAdapter()
-        { }
+        {
+        }
 
         // instantiates based on panel position
         public Object instantiateItem(ViewGroup collection, int position)
         {
             int resId = 0;
-            switch(position)
+            switch (position)
             {
                 case 0:
                     resId = R.id.view_pager_slide_1;
@@ -126,8 +127,9 @@ public class DisplayFinalInfo extends Fragment
 
         // not used because we increased the limit of how many objects can be instantiated at a time
         @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeView((View)object);
+        public void destroyItem(ViewGroup container, int position, Object object)
+        {
+            container.removeView((View) object);
 
         }
 

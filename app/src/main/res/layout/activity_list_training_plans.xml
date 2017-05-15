@@ -38,6 +38,8 @@
     android:layout_alignParentBottom="true">
     <Button
         android:id="@+id/button_refresh"
+        android:background="@color/buttonColor"
+        android:textColor="@color/textPrimary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Refresh"

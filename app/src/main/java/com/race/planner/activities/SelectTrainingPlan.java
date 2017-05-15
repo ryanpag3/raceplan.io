@@ -54,6 +54,7 @@ public class SelectTrainingPlan extends Activity implements FragmentListenerInte
         fragmentTransaction.addToBackStack(tag);
         fragmentTransaction.commit();
     }
+
     @Override
     public void passName(String n)
     {
@@ -127,7 +128,7 @@ public class SelectTrainingPlan extends Activity implements FragmentListenerInte
 
         fragmentTransaction.addToBackStack(tag);
         String t = String.valueOf(getFragmentManager().getBackStackEntryCount());
-        Log.e(TAG,"backstack count " + t);
+        Log.e(TAG, "backstack count " + t);
         fragmentTransaction.commit();
 
     }
@@ -137,21 +138,21 @@ public class SelectTrainingPlan extends Activity implements FragmentListenerInte
     {
         moveProgressIconLeft();
         String t = String.valueOf(getFragmentManager().getBackStackEntryCount());
-        Log.e(TAG,"backstack count " + t);
+        Log.e(TAG, "backstack count " + t);
         getFragmentManager().popBackStack();
     }
 
     @Override
     public void moveProgressIconRight()
     {
-        ObjectAnimator animXIcon = ObjectAnimator.ofFloat(progressIcon, "x", progressIcon.getX()+215);
+        ObjectAnimator animXIcon = ObjectAnimator.ofFloat(progressIcon, "x", progressIcon.getX() + 215);
         animXIcon.start();
     }
 
     @Override
     public void moveProgressIconLeft()
     {
-        ObjectAnimator animXIcon = ObjectAnimator.ofFloat(progressIcon, "x", progressIcon.getX()-215);
+        ObjectAnimator animXIcon = ObjectAnimator.ofFloat(progressIcon, "x", progressIcon.getX() - 215);
         animXIcon.start();
     }
 }

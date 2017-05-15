@@ -8,6 +8,7 @@ import android.app.Fragment;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -20,6 +21,8 @@ import android.widget.Toast;
 import com.race.planner.R;
 import com.race.planner.activities.MainActivity;
 import com.race.planner.utils.FragmentListenerInterface;
+
+import static android.content.Context.INPUT_METHOD_SERVICE;
 
 public class SelectNameFragment extends Fragment
 {
@@ -49,6 +52,18 @@ public class SelectNameFragment extends Fragment
     {
         View view = inflater.inflate(R.layout.fragment_select_name, container, false);
 
+        // onTouchListener closes keyboard when user touches fragment background.
+        view.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                final InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
+                return true;
+            }
+        });
+
         editText = (EditText) view.findViewById(R.id.edit_text);
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener()
         {
@@ -58,7 +73,7 @@ public class SelectNameFragment extends Fragment
                 // close keyboard on enter key pressed
                 if (event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER))
                 {
-                    final InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    final InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(INPUT_METHOD_SERVICE);
                     // assign current name to variable, variable is saved to backstack and used for
                     // preventing keyboard opening on back button pressed
                     editTextEntry = editText.getText().toString();
@@ -73,7 +88,7 @@ public class SelectNameFragment extends Fragment
         // editTextEntry is defined when the enter key on the keyboard is pressed
         if (editTextEntry.equals(""))
         {
-            ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+            ((InputMethodManager) getActivity().getSystemService(INPUT_METHOD_SERVICE)).toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
         }
 
         ImageButton buttonConfirm = (ImageButton) view.findViewById(R.id.button_confirm);
@@ -98,7 +113,8 @@ public class SelectNameFragment extends Fragment
             public void onClick(View v)
             {
                 Intent intent = new Intent(getActivity(), MainActivity.class);
-                startActivity(intent);            }
+                startActivity(intent);
+            }
         });
 
         // restart button

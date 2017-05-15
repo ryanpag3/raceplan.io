@@ -33,9 +33,11 @@
         <Button
             android:id="@+id/button_undo"
             android:text="undo"
+            android:textColor="@color/textPrimary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="64dp"
+            android:background="@color/buttonColor"
             />
 
         <Button
@@ -43,8 +45,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="main menu"
+            android:textColor="@color/textPrimary"
             android:layout_alignParentRight="true"
             android:layout_marginRight="64dp"
+            android:background="@color/buttonColor"
             />
     </RelativeLayout>
 

@@ -9,12 +9,20 @@ import java.util.Date;
 public interface FragmentListenerInterface
 {
     void moveProgressIconLeft();
+
     void moveProgressIconRight();
+
     void onFragmentClicked(String s);
+
     void onBackButtonClicked();
+
     void passName(String n);
+
     void passRaceType(String s);
+
     void passDate(Date d);
+
     void passExperienceLevel(String e);
+
     void passCalCreatedBool(Boolean b);
 }

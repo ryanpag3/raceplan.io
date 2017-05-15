@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-    <string name="app_name">Race Planner</string>
-    <string name="string_main_intro_1">Welcome! Run Planner creates unique training plans for runners of all different experience levels, training for all types of distances. Please choose one of the options below to get started.</string>
+    <string name="app_name">raceplan.io</string>
+    <string name="string_main_intro_1">Welcome! raceplan.io creates unique training plans for runners of all different experience levels, training for all types of distances. Please choose one of the options below to get started.</string>
     <string name="string_main_intro_2">If you need to uninstall the app, it is highly recommended to delete all training plans first. If you do not do this, you will need to do it through Google Calendar, which could potentially take a long time.\n\n Thanks again for using Run Planner and please send all feedback to runplannerapp@gmail.com</string>
 
-    <string name="string_generate_event_button">FINISH</string>
-    <string name="string_main_switch_sidetext">Use default run-planner calendar?</string>
-    <string name="press_to_view_more">Press to view more...</string>
 
     <string name="name_instructions">Please enter a name for your training plan.</string>
     <string name="race_type_instructions">Please select the race you are training for.</string>
@@ -16,7 +13,7 @@
     <string name="cal_select_instructions">Choose to create plan on dedicated calendar or your own.</string>
 
     <string name="prompt_calendar_spinner">Select your calendar</string>
-    <string name="text_thanks">Thanks again for trying out Run Planner. I hope it has provided you with an easy and effective tool for planning your training. I sure have had a great time building it. Again if you have any feedback, feel free to leave a review or send an email to runplannerapp@gmail.com.\n\nHappy running!\n- Ryan</string>
+    <string name="text_thanks">Thanks again for trying out raceplan.io, I hope it has provided you with an easy and effective tool for planning your training. I sure have had a great time building it. Again if you have any feedback, feel free to leave a review or send an email to runplannerapp@gmail.com.\n\nHappy running!\n- Ryan</string>
 
     <string name="banner_ad_unit_id">ca-app-pub-6074390067340927/7125083890</string>
 

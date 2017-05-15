@@ -18,6 +18,7 @@ import java.io.IOException;
 
 import com.race.planner.R;
 import com.race.planner.data_models.Racer;
+
 import static com.race.planner.data_models.GlobalVariables.*;
 
 /**
@@ -36,7 +37,7 @@ public class DeleteTrainingPlanTask extends AsyncTask<Void, Void, Void>
 
     public DeleteTrainingPlanTask(GoogleAccountCredential credential, Racer r, Activity context)
     {
-        if(android.os.Debug.isDebuggerConnected())
+        if (android.os.Debug.isDebuggerConnected())
             android.os.Debug.waitForDebugger();
 
         // mProgress is a simple progress spinner
@@ -68,7 +69,7 @@ public class DeleteTrainingPlanTask extends AsyncTask<Void, Void, Void>
         int progress = 0;
         // query through all events where the database ID matches the training plan database ID
         Cursor c = db.query("SELECT * FROM " + DatabaseHelper.EVENT_ID_TABLE_NAME + " WHERE "
-                + DatabaseHelper.EVENT_ID_COL_1 + "= ?", new String[] {String.valueOf(racer.databaseID)});
+                + DatabaseHelper.EVENT_ID_COL_1 + "= ?", new String[]{String.valueOf(racer.databaseID)});
 
         // change length of the progress bar based on the training plan being deleted
         switch (racer.raceType)
@@ -109,7 +110,9 @@ public class DeleteTrainingPlanTask extends AsyncTask<Void, Void, Void>
             // remove event from event table
             db.deleteEventFromDatabase(ID);
         } catch (IOException e)
-        { mLastError = e; }
+        {
+            mLastError = e;
+        }
     }
 
     @Override
@@ -124,7 +127,7 @@ public class DeleteTrainingPlanTask extends AsyncTask<Void, Void, Void>
     {
         mProgress.hide();
         Toast toast = Toast.makeText(mContext, "Deleted successfully! Refresh your google calendar by using the top right button on the app to see changes!", Toast.LENGTH_LONG);
-        toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 0);
+        toast.setGravity(Gravity.CENTER | Gravity.TOP, 0, 0);
         toast.show();
     }
 

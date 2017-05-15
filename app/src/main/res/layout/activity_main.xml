@@ -146,7 +146,7 @@
 
             <Button
                 android:id="@+id/button_open_select_training_plan_activity"
-                android:text="create"
+                android:text="create new plan"
                 android:background="@color/buttonColor"
                 android:textColor="@color/buttonText"
                 android:layout_gravity="center_vertical"
@@ -156,7 +156,7 @@
                 android:layout_margin="8dp"/>
             <Button
                 android:id="@+id/button_open_list_training_plans_activity"
-                android:text="view plans"
+                android:text="view created plans"
                 android:background="@color/buttonColor"
                 android:textColor="@color/buttonText"
                 android:layout_gravity="center_vertical"

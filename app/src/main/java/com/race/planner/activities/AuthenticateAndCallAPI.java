@@ -105,7 +105,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
         // choose calendar == 2
         if (createCal)
         {
-            TASK_ID =  CREATE_CALENDAR_ID;
+            TASK_ID = CREATE_CALENDAR_ID;
         } else
         {
             //calendarSelect.setVisibility(View.VISIBLE);
@@ -122,8 +122,9 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
         mProgressCircle.setMessage("Creating calendar...");
 
         mProgressBarDialog = new ProgressDialog(this);
-        mProgressBarDialog.setMessage("Generating training runs and pushing to calendar...");
+        mProgressBarDialog.setMessage("Generating training runs...");
         mProgressBarDialog.setIndeterminate(false);
+        mProgressBarDialog.setProgressNumberFormat(null);
         mProgressBarDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         mProgressBarDialog.setProgress(0);
 
@@ -175,23 +176,28 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
      * is granted.
      */
     @AfterPermissionGranted(REQUEST_PERMISSION_GET_ACCOUNTS)
-    private void chooseAccount() {
+    private void chooseAccount()
+    {
         if (EasyPermissions.hasPermissions(
-                this, Manifest.permission.GET_ACCOUNTS)) {
+                this, Manifest.permission.GET_ACCOUNTS))
+        {
             String accountName = PreferenceManager.getDefaultSharedPreferences(this)
                     .getString(PREF_ACCOUNT_NAME, null);
-            if (accountName != null) {
+            if (accountName != null)
+            {
                 mCredential.setSelectedAccountName(accountName);
                 Log.e(TAG, "Create Calendar inside chooseAccount called");
                 callAPI();
 
-            } else {
+            } else
+            {
                 // Start a dialog from which the user can choose an account
                 startActivityForResult(
                         mCredential.newChooseAccountIntent(),
                         REQUEST_ACCOUNT_PICKER);
             }
-        } else {
+        } else
+        {
             // Request the GET_ACCOUNTS permission via a user dialog
             EasyPermissions.requestPermissions(
                     this,
@@ -203,16 +209,18 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
 
     /**
      * Respond to requests for permissions at runtime for API 23 and above.
-     * @param requestCode The request code passed in
-     *     requestPermissions(android.app.Activity, String, int, String[])
-     * @param permissions The requested permissions. Never null.
+     *
+     * @param requestCode  The request code passed in
+     *                     requestPermissions(android.app.Activity, String, int, String[])
+     * @param permissions  The requested permissions. Never null.
      * @param grantResults The grant results for the corresponding permissions
-     *     which is either PERMISSION_GRANTED or PERMISSION_DENIED. Never null.
+     *                     which is either PERMISSION_GRANTED or PERMISSION_DENIED. Never null.
      */
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
+                                           @NonNull int[] grantResults)
+    {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         EasyPermissions.onRequestPermissionsResult(
                 requestCode, permissions, grantResults, this);
@@ -221,24 +229,28 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
     /**
      * Callback for when a permission is granted using the EasyPermissions
      * library.
+     *
      * @param requestCode The request code associated with the requested
-     *         permission
-     * @param list The requested permission list. Never null.
+     *                    permission
+     * @param list        The requested permission list. Never null.
      */
     @Override
-    public void onPermissionsGranted(int requestCode, List<String> list) {
+    public void onPermissionsGranted(int requestCode, List<String> list)
+    {
         // do nothing
     }
 
     /**
      * Callback for when a permission is denied using the EasyPermissions
      * library.
+     *
      * @param requestCode The request code associated with the requested
-     *         permission
-     * @param list The requested permission list. Never null.
+     *                    permission
+     * @param list        The requested permission list. Never null.
      */
     @Override
-    public void onPermissionsDenied(int requestCode, List<String> list) {
+    public void onPermissionsDenied(int requestCode, List<String> list)
+    {
         // Do nothing.
     }
 
@@ -392,10 +404,12 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
             String[] sNames = new String[names.size()];
             sNames = names.toArray(sNames);
 
-            b.setItems(sNames, new DialogInterface.OnClickListener() {
+            b.setItems(sNames, new DialogInterface.OnClickListener()
+            {
 
                 @Override
-                public void onClick(DialogInterface dialog, int which) {
+                public void onClick(DialogInterface dialog, int which)
+                {
                     dialog.dismiss();
                     racer.calendarName = names.get(which);
                     racer.calendarID = calendarIDs.get(which);
@@ -407,6 +421,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
             b.show();
         }
     }
+
     public class CreateCalendarTask extends AsyncTask<Void, Void, Void>
     {
         private com.google.api.services.calendar.Calendar mService = null;
@@ -425,14 +440,14 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
         @Override
         protected Void doInBackground(Void... params)
         {
-            if(android.os.Debug.isDebuggerConnected())
-            android.os.Debug.waitForDebugger();
+            if (android.os.Debug.isDebuggerConnected())
+                android.os.Debug.waitForDebugger();
 
             try
             {
                 checkForDeprecatedCalendars();
 
-                if (! isRacePlanCalendarCreated())
+                if (!isRacePlanCalendarCreated())
                 {
                     // TODO: turn calendarname and summary into hardcoded string value
                     Log.e(TAG, "createCalendarInAPI called.");
@@ -509,7 +524,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
 
                             racer.calendarID = calendarListEntry.getId();
                             racer.calendarName = GlobalVariables.DEFAULT_CAL_NAME;
-                            Log.e(TAG,"inside israceplancreated: " + racer.calendarID);
+                            Log.e(TAG, "inside israceplancreated: " + racer.calendarID);
                             return true;
                         }
                     }
@@ -554,30 +569,30 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
         @Override
         protected void onCancelled()
         {
-                // make ui interactable again
-                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                mProgressBarDialog.hide();
-                if (mLastError != null)
+            // make ui interactable again
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            mProgressBarDialog.hide();
+            if (mLastError != null)
+            {
+                if (mLastError instanceof GooglePlayServicesAvailabilityIOException)
                 {
-                    if (mLastError instanceof GooglePlayServicesAvailabilityIOException)
-                    {
-                        showGooglePlayServicesAvailabilityErrorDialog(
-                                ((GooglePlayServicesAvailabilityIOException) mLastError)
-                                        .getConnectionStatusCode());
-                    } else if (mLastError instanceof UserRecoverableAuthIOException)
-                    {
-                        startActivityForResult(
-                                ((UserRecoverableAuthIOException) mLastError).getIntent(),
-                                MainActivity.REQUEST_AUTHORIZATION);
-                    } else
-                    {
-                        Log.e(TAG, "The following error occurred:\n"
-                                + mLastError.getMessage());
-                    }
+                    showGooglePlayServicesAvailabilityErrorDialog(
+                            ((GooglePlayServicesAvailabilityIOException) mLastError)
+                                    .getConnectionStatusCode());
+                } else if (mLastError instanceof UserRecoverableAuthIOException)
+                {
+                    startActivityForResult(
+                            ((UserRecoverableAuthIOException) mLastError).getIntent(),
+                            MainActivity.REQUEST_AUTHORIZATION);
                 } else
                 {
-                    Log.e(TAG, "Request cancelled.");
+                    Log.e(TAG, "The following error occurred:\n"
+                            + mLastError.getMessage());
                 }
+            } else
+            {
+                Log.e(TAG, "Request cancelled.");
+            }
         }
     }
 
@@ -586,6 +601,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
         private com.google.api.services.calendar.Calendar mService = null;
         private Exception mLastError = null;
         DatabaseHelper db;
+        private int progress;
 
         CreatePlanTask(GoogleAccountCredential credential)
         {
@@ -624,12 +640,11 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
             double bumpMileageUp = -1;
             int tuesThursMileCap = -1;
             int wedMileCap = -1;
+            int sunMileCap = -1;
             long dayInMillis = 86400000;
             int weeksOfTraining = -1;
-            int progress = 0;
             Date startDate; // amount of millis in a week * 8 weeks
-            Date tuesday;
-            SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
+//            Date tuesday;
             Log.e(TAG, "YOOOOOOO THIS IS THE NAME: " + racer.nameOfPlan);
             //DatabaseHelper db = new DatabaseHelper(context);
             //Log.i(TAG, racer.nameOfPlan + " " + racer.getDate() + " " + racer.raceType + " " + racer.experienceLevel);
@@ -639,7 +654,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
 
             Cursor c = db.query("SELECT * FROM " + DatabaseHelper.TRAINING_PLAN_TABLE_NAME, null);
 
-            while(c.moveToNext())
+            while (c.moveToNext())
             {
                 Log.i(TAG, "plan name: " + c.getString(1));
             }
@@ -654,21 +669,18 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
                 case GlobalVariables.EXPERIENCE_BEGINNER:
                     startingMiles = 1;
                     sundayMiles = 2;
-                    bumpMileageUp = 1;
                     break;
                 case GlobalVariables.EXPERIENCE_INTERMEDIATE:
                     startingMiles = 3;
                     sundayMiles = 3;
-                    bumpMileageUp = 1;
                     break;
                 case GlobalVariables.EXPERIENCE_EXPERT:
                     startingMiles = 3;
                     sundayMiles = 5;
-                    bumpMileageUp = 1;
                     break;
             }
 
-            switch(racer.raceType)
+            switch (racer.raceType)
             {
                 case GlobalVariables.RACE_5K:
                     mProgressBarDialog.setMax(GlobalVariables.PROGRESS_MAX_5K);
@@ -676,13 +688,15 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
                     goalMiles = 5;
                     tuesThursMileCap = 2;
                     wedMileCap = 3;
+                    sunMileCap = 4;
                     break;
                 case GlobalVariables.RACE_10K:
                     mProgressBarDialog.setMax(GlobalVariables.PROGRESS_MAX_10K);
                     weeksOfTraining = 12;
                     goalMiles = 7;
                     tuesThursMileCap = 3;
-                    wedMileCap = 5;
+                    wedMileCap = 4;
+                    sunMileCap = 5;
                     break;
                 case GlobalVariables.RACE_HALF:
                     mProgressBarDialog.setMax(GlobalVariables.PROGRESS_MAX_HALF);
@@ -690,6 +704,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
                     goalMiles = 13;
                     tuesThursMileCap = 5;
                     wedMileCap = 7;
+                    sunMileCap = 12;
                     break;
                 case GlobalVariables.RACE_MARATHON:
                     mProgressBarDialog.setMax(GlobalVariables.PROGRESS_MAX_MARATHON);
@@ -703,11 +718,13 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
                     goalMiles = 26;
                     tuesThursMileCap = 6;
                     wedMileCap = 10;
+                    sunMileCap = 22;
                     break;
             }
 
             startDate = new Date(racer.date.getTime() - (604800000L * weeksOfTraining));
-            tuesday = startDate;
+            Date tuesday = startDate;
+            SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
 
             // push tuesday to correct day of week
             while (!sdf.format(tuesday).equals("Tuesday"))
@@ -724,111 +741,61 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
             wednesdayMiles = startingMiles + 1;
             thursdayMiles = startingMiles;
 
-            /**
-             * All of these for loops are separated to be able to be put into separate threads,
-             * I just havent set it up yet so it's ugly.
-             */
-            int recovery = 0;
-            for (int i = 0; i < weeksOfTraining; i++)
-            {
-                // every fourth week decrease mileage
-                if (i % 3 == 0 && tuesday.getTime()   < raceDate.getTime())
-                {
-                    double recoveryMiles = tuesdayMiles - recovery;
-                    mProgressBarDialog.setProgress(++progress);
-                    createEventInAPI(calID, tuesday, Double.toString(recoveryMiles) + "M");
-                    if (recovery < (tuesThursMileCap/2))
-                    {
-                        recovery++;
-                    }
-
-                } else if (tuesday.getTime()   < raceDate.getTime())
-                {
-                    mProgressBarDialog.setProgress(++progress);
-                    createEventInAPI(calID, tuesday, Double.toString(tuesdayMiles) + "M");
-                }
-
-                if (tuesdayMiles < goalMiles && tuesdayMiles < tuesThursMileCap) { tuesdayMiles = tuesdayMiles + (bumpMileageUp / 2); }
-                tuesday   = getOneWeekLater(tuesday);
-                if (tuesday.getTime() > raceDate.getTime()) break;
-            }
-
-            recovery = 0;
-            for (int i = 0; i < weeksOfTraining; i++)
-            {
-                if (i % 3 == 0 && wednesday.getTime()   < raceDate.getTime())
-                {
-                    double recoveryMiles = wednesdayMiles - recovery;
-                    mProgressBarDialog.setProgress(++progress);
-                    createEventInAPI(calID, wednesday, Double.toString(recoveryMiles) + "M");
-
-                    if (recovery < (wedMileCap/2))
-                    {
-                        recovery++;
-                    }
-                } else if (wednesday.getTime()   < raceDate.getTime())
-                {
-                    mProgressBarDialog.setProgress(++progress);
-                    createEventInAPI(calID, wednesday, Double.toString(wednesdayMiles) + "M");
-                }
-
-                if (wednesdayMiles < goalMiles && wednesdayMiles < wedMileCap) { wednesdayMiles = wednesdayMiles + (bumpMileageUp / 2); }
-                wednesday   = getOneWeekLater(wednesday);
-                if (wednesday.getTime() > raceDate.getTime()) break;
-            }
-
-            recovery = 0;
-            for (int i = 0; i < weeksOfTraining; i++)
-            {
-                if (i % 3 == 0 && thursday.getTime()   < raceDate.getTime())
-                {
-                    double recoveryMiles = thursdayMiles - recovery;
-                    mProgressBarDialog.setProgress(++progress);
-                    createEventInAPI(calID, thursday, Double.toString(recoveryMiles) + "M");
-
-                    if (recovery < (tuesThursMileCap/2))
-                    {
-                        recovery++;
-                    }
-
-                } else if (thursday.getTime()   < raceDate.getTime())
-                {
-                    mProgressBarDialog.setProgress(++progress);
-                    createEventInAPI(calID, thursday, Double.toString(thursdayMiles) + "M");
-                }
-
-                if (thursdayMiles < goalMiles && thursdayMiles < tuesThursMileCap) { thursdayMiles = thursdayMiles + (bumpMileageUp / 2); }
-                thursday   = getOneWeekLater(thursday);
-                if (thursday.getTime() > raceDate.getTime()) break;
-            }
-
-            recovery = 0;
-            for (int i = 0; i < weeksOfTraining; i++)
-            {
-                if (i % 3 == 0 && sunday.getTime()   < raceDate.getTime())
-                {
-                    double recoveryMiles = sundayMiles - recovery;
-                    mProgressBarDialog.setProgress(++progress);
-                    createEventInAPI(calID, sunday, Double.toString(recoveryMiles) + "M");
-                    if (recovery < 4)
-                    {
-                        recovery++;
-                    }
-                } else if (sunday.getTime()   < raceDate.getTime())
-                {
-                    mProgressBarDialog.setProgress(++progress);
-                    createEventInAPI(calID, sunday, Double.toString(sundayMiles) + "M");
-                }
-
-                if (sundayMiles < goalMiles) { sundayMiles = sundayMiles + 1; }
-                sunday   = getOneWeekLater(sunday);
-                if (sunday.getTime() > raceDate.getTime()) break;
-            }
+            createRunsForDayOfWeek(tuesday, weeksOfTraining, tuesdayMiles, tuesThursMileCap, goalMiles, .5);
+            createRunsForDayOfWeek(wednesday, weeksOfTraining, wednesdayMiles, wedMileCap, goalMiles, .5);
+            createRunsForDayOfWeek(thursday, weeksOfTraining, thursdayMiles, tuesThursMileCap, goalMiles, .5);
+            createRunsForDayOfWeek(sunday, weeksOfTraining, sundayMiles, sunMileCap, goalMiles, 1);
 
             mProgressBarDialog.setProgress(++progress);
             // create event for race
             createEventInAPI(calID, raceDate, "RACE DAY!!!");
             Log.e(TAG, "TOTAL PROGRESS: " + progress);
+        }
+
+        private void createRunsForDayOfWeek(Date date, int weeksOfTraining, double tuesdayMiles,
+                                            int tuesThursMileCap, double goalMiles, double increment)
+        {
+            String calID = racer.calendarID;
+            Date tuesday = date;
+
+            // TUESDAY
+            int recovery = 0;
+            for (int i = 0; i < weeksOfTraining; i++)
+            {
+                try
+                {
+                    if (i == weeksOfTraining - 1) // decrease mileage week before race
+                    {
+                        tuesdayMiles = tuesdayMiles / 2;
+                        mProgressBarDialog.setProgress(++progress);
+                        createEventInAPI(calID, tuesday, Double.toString(tuesdayMiles) + "M");
+                    } else if (i % 3 == 0 && tuesday.getTime() < raceDate.getTime())
+                    {
+                        double recoveryMiles = tuesdayMiles - recovery;
+                        mProgressBarDialog.setProgress(++progress);
+                        createEventInAPI(calID, tuesday, Double.toString(recoveryMiles) + "M");
+                        if (recovery < (tuesThursMileCap / 2))
+                        {
+                            recovery++;
+                        }
+
+                    } else if (tuesday.getTime() < raceDate.getTime())
+                    {// check if event takes place before race date
+                        mProgressBarDialog.setProgress(++progress);
+                        createEventInAPI(calID, tuesday, Double.toString(tuesdayMiles) + "M");
+                    }
+
+                    if (tuesdayMiles < goalMiles && tuesdayMiles < tuesThursMileCap)
+                    {
+                        tuesdayMiles = tuesdayMiles + increment;
+                    }
+                    tuesday = getOneWeekLater(tuesday);
+                    if (tuesday.getTime() > raceDate.getTime()) break;
+                } catch (IOException e)
+                {
+                    Log.e(TAG, "IOException: ", e);
+                }
+            }
         }
 
         private Date getOneWeekLater(Date date)
@@ -838,35 +805,35 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
 
         private void createEventInAPI(String calID, Date date, String eventName) throws IOException
         {
-                try
-                {
-                    Event event = new Event()
-                            .setSummary(eventName)
-                            .setDescription("run-planner");
+            try
+            {
+                Event event = new Event()
+                        .setSummary(eventName)
+                        .setDescription("run-planner");
 
-                    Date startDate = date;
-                    Date endDate = new Date(startDate.getTime() + 86400000);
+                Date startDate = date;
+                Date endDate = new Date(startDate.getTime() + 86400000);
 
-                    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
-                    DateTime startDateTime = new DateTime(dateFormat.format(startDate));
-                    DateTime endDateTime = new DateTime(dateFormat.format(endDate));
+                DateTime startDateTime = new DateTime(dateFormat.format(startDate));
+                DateTime endDateTime = new DateTime(dateFormat.format(endDate));
 
-                    EventDateTime startEventDateTime = new EventDateTime().setDate(startDateTime);
-                    EventDateTime endEventDateTime = new EventDateTime().setDate(endDateTime);
+                EventDateTime startEventDateTime = new EventDateTime().setDate(startDateTime);
+                EventDateTime endEventDateTime = new EventDateTime().setDate(endDateTime);
 
-                    event.setStart(startEventDateTime);
-                    event.setEnd(endEventDateTime);
-                    // insert event into Calendar via API
-                    event = mService.events().insert(racer.calendarID, event).execute();
+                event.setStart(startEventDateTime);
+                event.setEnd(endEventDateTime);
+                // insert event into Calendar via API
+                event = mService.events().insert(racer.calendarID, event).execute();
 
-                    // insert event info into database
-                    db.insertEventToDatabase(racer.databaseID, event.getId(), racer.calendarID);
+                // insert event info into database
+                db.insertEventToDatabase(racer.databaseID, event.getId(), racer.calendarID);
 
-                } catch (IOException e)
-                {
-                    Log.e(TAG, "IOException: ", e);
-                }
+            } catch (IOException e)
+            {
+                Log.e(TAG, "IOException: ", e);
+            }
         }
 
         @Override
@@ -938,9 +905,11 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
 
     /**
      * Checks whether the device currently has a network connection.
+     *
      * @return true if the device has a network connection, false otherwise.
      */
-    private boolean isDeviceOnline() {
+    private boolean isDeviceOnline()
+    {
         ConnectivityManager connMgr =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -949,10 +918,12 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
 
     /**
      * Check that Google Play services APK is installed and up to date.
+     *
      * @return true if Google Play Services is available and up to
-     *     date on this device; false otherwise.
+     * date on this device; false otherwise.
      */
-    private boolean isGooglePlayServicesAvailable() {
+    private boolean isGooglePlayServicesAvailable()
+    {
         GoogleApiAvailability apiAvailability =
                 GoogleApiAvailability.getInstance();
         final int connectionStatusCode =
@@ -964,12 +935,14 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
      * Attempt to resolve a missing, out-of-date, invalid or disabled Google
      * Play Services installation via a user dialog, if possible.
      */
-    private void acquireGooglePlayServices() {
+    private void acquireGooglePlayServices()
+    {
         GoogleApiAvailability apiAvailability =
                 GoogleApiAvailability.getInstance();
         final int connectionStatusCode =
                 apiAvailability.isGooglePlayServicesAvailable(this);
-        if (apiAvailability.isUserResolvableError(connectionStatusCode)) {
+        if (apiAvailability.isUserResolvableError(connectionStatusCode))
+        {
             showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode);
         }
     }
@@ -977,11 +950,13 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
     /**
      * Display an error dialog showing that Google Play Services is missing
      * or out of date.
+     *
      * @param connectionStatusCode code describing the presence (or lack of)
-     *     Google Play Services on this device.
+     *                             Google Play Services on this device.
      */
     void showGooglePlayServicesAvailabilityErrorDialog(
-            final int connectionStatusCode) {
+            final int connectionStatusCode)
+    {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
         Dialog dialog = apiAvailability.getErrorDialog(
                 AuthenticateAndCallAPI.this,
@@ -994,32 +969,39 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
      * Called when an activity launched here (specifically, AccountPicker
      * and authorization) exits, giving you the requestCode you started it with,
      * the resultCode it returned, and any additional data from it.
+     *
      * @param requestCode code indicating which activity result is incoming.
-     * @param resultCode code indicating the result of the incoming
-     *     activity result.
-     * @param data Intent (containing result data) returned by incoming
-     *     activity result.
+     * @param resultCode  code indicating the result of the incoming
+     *                    activity result.
+     * @param data        Intent (containing result data) returned by incoming
+     *                    activity result.
      */
     @Override
     protected void onActivityResult(
-            int requestCode, int resultCode, Intent data) {
+            int requestCode, int resultCode, Intent data)
+    {
         super.onActivityResult(requestCode, resultCode, data);
-        switch(requestCode) {
+        switch (requestCode)
+        {
             case REQUEST_GOOGLE_PLAY_SERVICES:
-                if (resultCode != RESULT_OK) {
+                if (resultCode != RESULT_OK)
+                {
                     Log.e(TAG,
                             "This app requires Google Play Services. Please install " +
                                     "Google Play Services on your device and relaunch this app.");
-                } else {
+                } else
+                {
                     callAPI();
                 }
                 break;
             case REQUEST_ACCOUNT_PICKER:
                 if (resultCode == RESULT_OK && data != null &&
-                        data.getExtras() != null) {
+                        data.getExtras() != null)
+                {
                     String accountName =
                             data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-                    if (accountName != null) {
+                    if (accountName != null)
+                    {
                         SharedPreferences settings =
                                 PreferenceManager.getDefaultSharedPreferences(this);
                         SharedPreferences.Editor editor = settings.edit();
@@ -1031,7 +1013,8 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
                 }
                 break;
             case REQUEST_AUTHORIZATION:
-                if (resultCode == RESULT_OK) {
+                if (resultCode == RESULT_OK)
+                {
                     callAPI();
                 }
                 break;

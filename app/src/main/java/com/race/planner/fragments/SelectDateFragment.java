@@ -72,11 +72,12 @@ public class SelectDateFragment extends Fragment
         mListener.passDate(date);
 
 
-
         datePicker = (DatePicker) view.findViewById(R.id.date_picker_widget);
-        datePicker.init(year, month, day, new DatePicker.OnDateChangedListener() {
+        datePicker.init(year, month, day, new DatePicker.OnDateChangedListener()
+        {
             @Override
-            public void onDateChanged(DatePicker datePicker, int i, int i1, int i2) {
+            public void onDateChanged(DatePicker datePicker, int i, int i1, int i2)
+            {
                 date = new GregorianCalendar(i, i1, i2).getTime();
                 mListener.passDate(date);
                 Log.i(getActivity().getLocalClassName(), date.toString());
