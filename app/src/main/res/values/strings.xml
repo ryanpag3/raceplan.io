@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
     <string name="app_name">raceplan.io</string>
-    <string name="string_main_intro_1">Welcome! raceplan.io creates unique training plans for runners of all different experience levels, training for all types of distances. Please choose one of the options below to get started.</string>
-    <string name="string_main_intro_2">If you need to uninstall the app, it is highly recommended to delete all training plans first. If you do not do this, you will need to do it through Google Calendar, which could potentially take a long time.\n\n Thanks again for using Run Planner and please send all feedback to runplannerapp@gmail.com</string>
+
+    <string name="string_main_intro_1">Welcome to raceplan.io! Please take a moment to swipe through
+        the hints and tips for using this app properly.</string>
+    <string name="string_main_intro_2">Click create plan below, and raceplan.io will prompt you for your race information.</string>
+    <string name="string_main_intro_3">raceplan.io will automatically generate a training plan that caters to your needs.</string>
+    <string name="string_main_intro_4">Once your plan has been created, you should refresh your google calendar app and see your runs.</string>
+    <string name="string_main_intro_5">If you would like to delete your training plan, click list plans below and then click the white trash can.</string>
+    <string name="string_main_intro_6">If you have any feedback, please feel free to contact me on twitter @ryanpagedev</string>
+
+
+    <string name="string_main_intro_X">If you need to uninstall the app, it is highly recommended
+        to delete all training plans first. If you do not do this, you will need to do it through
+        Google Calendar, which could potentially take a long time.\n\n Thanks again for using
+        raceplan.io and please send all feedback to raceplanapp@gmail.com</string>
 
 
     <string name="name_instructions">Please enter a name for your training plan.</string>

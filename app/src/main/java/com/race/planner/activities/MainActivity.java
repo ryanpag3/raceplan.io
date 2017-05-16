@@ -14,6 +14,7 @@ import android.content.pm.PackageManager;
 import android.media.Image;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -119,56 +120,6 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
         // TODO: check location, possibly move it to bottom of onCreate()
         requestPermissions();
 
-//        backViewPagers = (ImageButton) findViewById(R.id.button_back_view_pager);
-//        backViewPagers.setVisibility(View.INVISIBLE); // invisible until on 2nd view, as defined in adapter
-//        backViewPagers.setOnClickListener(new View.OnClickListener()
-//        {
-//            @Override
-//            public void onClick(View v)
-//            {
-//                // back on view pager
-//                viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
-//                if (viewPager.getCurrentItem() == VIEW_PAGER_FIRST_ELEMENT)
-//                {
-//                    backViewPagers.setVisibility(View.INVISIBLE);
-//                }
-//
-//                if (viewPager.getCurrentItem() == VIEW_PAGER_LAST_ELEMENT - 1)
-//                {
-//                    forwardViewPager.setVisibility(View.VISIBLE);
-//                }
-//            }
-//        });
-//
-//        forwardViewPager = (ImageButton) findViewById(R.id.button_forward_view_pager);
-//        forwardViewPager.setOnClickListener(new View.OnClickListener()
-//        {
-//            @Override
-//            public void onClick(View v)
-//            {
-//                if (!isHintTextFaded)
-//                {
-//                    viewMoreTextHint.startAnimation(AnimationUtils.loadAnimation(MainActivity.this, android.R.anim.fade_out));
-//                    viewMoreTextHint.setVisibility(View.INVISIBLE);
-//                    isHintTextFaded = true;
-//                }
-//                // forward on view pager
-//                viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
-//                if (viewPager.getCurrentItem() == VIEW_PAGER_FIRST_ELEMENT + 1)
-//                {
-//                    backViewPagers.setVisibility(View.VISIBLE);
-//                }
-//
-//                if (viewPager.getCurrentItem() == VIEW_PAGER_LAST_ELEMENT)
-//                {
-//                    forwardViewPager.setVisibility(View.INVISIBLE);
-//                }
-//
-//
-//            }
-//        });
-
-
         // instantiate button for creating a new training plan
         Button openSelectTrainingPlanActivity = (Button) findViewById(R.id.button_open_select_training_plan_activity);
         openSelectTrainingPlanActivity.setOnClickListener(new View.OnClickListener()
@@ -195,26 +146,6 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
                 startActivity(intent);
             }
         });
-//
-//        Handler handler = new Handler();
-//        handler.postDelayed(new Runnable()
-//        {
-//            @Override
-//            public void run()
-//            {
-//                viewPager.beginFakeDrag();
-//                viewPager.fakeDragBy(100000);
-//                Handler handler1 = new Handler();
-//                handler1.postDelayed(new Runnable()
-//                {
-//                    @Override
-//                    public void run()
-//                    {
-//                        viewPager.endFakeDrag();
-//                    }
-//                }, 1000);
-//            }
-//        }, 1000);
     }
 
     /**
@@ -459,12 +390,18 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
                 case 1:
                     resId = R.id.view_pager_slide_2;
                     break;
-//                case 2:
-//                    resId = R.id.string_main_intro_3;
-//                    break;
-//                case 3:
-//                    resId = R.id.string_main_intro_4;
-//                    break;
+                case 2:
+                    resId = R.id.view_pager_slide_3;
+                    break;
+                case 3:
+                    resId = R.id.view_pager_slide_4;
+                    break;
+                case 4:
+                    resId = R.id.view_pager_slide_5;
+                    break;
+                case 5:
+                    resId = R.id.view_pager_slide_6;
+                    break;
             }
             return findViewById(resId);
         }
@@ -481,7 +418,7 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
         @Override
         public int getCount()
         {
-            return 2;
+            return 6;
         }
 
         // checks to see if the current view on the view pager is from the object called

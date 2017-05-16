@@ -32,15 +32,20 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.batch.BatchRequest;
+import com.google.api.client.googleapis.batch.json.JsonBatchCallback;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.google.api.client.googleapis.json.GoogleJsonError;
+import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.services.calendar.model.Calendar;
 import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.Event;
@@ -133,6 +138,8 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
+
+
 
         Button buttonUndo = (Button) findViewById(R.id.button_undo);
         buttonUndo.setOnClickListener(new View.OnClickListener()
@@ -644,10 +651,6 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
             long dayInMillis = 86400000;
             int weeksOfTraining = -1;
             Date startDate; // amount of millis in a week * 8 weeks
-//            Date tuesday;
-            Log.e(TAG, "YOOOOOOO THIS IS THE NAME: " + racer.nameOfPlan);
-            //DatabaseHelper db = new DatabaseHelper(context);
-            //Log.i(TAG, racer.nameOfPlan + " " + racer.getDate() + " " + racer.raceType + " " + racer.experienceLevel);
 
             Log.e(TAG, "inside createPlan: " + racer.calendarID);
             db.insertNewPlanToDatabase(racer);
@@ -809,7 +812,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
             {
                 Event event = new Event()
                         .setSummary(eventName)
-                        .setDescription("run-planner");
+                        .setDescription("raceplan.io");
 
                 Date startDate = date;
                 Date endDate = new Date(startDate.getTime() + 86400000);
@@ -847,6 +850,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
         @Override
         protected void onPostExecute(Void output)
         {
+
             // set ui as interactable
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
             mProgressBarDialog.hide();
