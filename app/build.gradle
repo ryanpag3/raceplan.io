@@ -16,6 +16,8 @@ android {
             storeFile file('C:/Users/dev/Google Drive/keystores/raceplannerkey.jks')
             storePassword '5Fr3OngJfumP'
         }
+        debug {
+        }
     }
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
@@ -23,8 +25,8 @@ android {
         applicationId "com.race.planner"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 5
-        versionName "1.0.2"
+        versionCode 6
+        versionName "1.0.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -33,7 +35,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.debug
         }
     }
 }
