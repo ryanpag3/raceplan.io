@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.race.planner.R;
 import com.race.planner.activities.MainActivity;
 import com.race.planner.activities.SelectTrainingPlan;
+import com.race.planner.utils.ActivityListenerInferface;
 import com.race.planner.utils.FragmentListenerInterface;
 
 import java.util.Calendar;
@@ -30,10 +31,12 @@ import java.util.GregorianCalendar;
  * Use the {@link SelectDateFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SelectDateFragment extends Fragment
+public class SelectDateFragment extends Fragment implements ActivityListenerInferface
 {
     FragmentListenerInterface mListener;
     private DatePicker datePicker;
+    private String raceType;
+    private String experienceLevel;
     Date date;
 
     public SelectDateFragment()
@@ -91,7 +94,10 @@ public class SelectDateFragment extends Fragment
             @Override
             public void onClick(View v)
             {
-                mListener.onFragmentClicked(SelectDateFragment.class.getName());
+                if (dateQualifies())
+                {
+                    mListener.onFragmentClicked(SelectDateFragment.class.getName());
+                }
             }
         });
 
@@ -121,6 +127,11 @@ public class SelectDateFragment extends Fragment
         return view;
     }
 
+    private boolean dateQualifies()
+    {
+
+    }
+
     @Override
     public void onAttach(Context context)
     {
@@ -140,5 +151,29 @@ public class SelectDateFragment extends Fragment
     {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void passName(String n)
+    {
+        // do nothing
+    }
+
+    @Override
+    public void passRaceType(String r)
+    {
+        raceType = r;
+    }
+
+    @Override
+    public void passExperienceLevel(String e)
+    {
+        experienceLevel = e;
+    }
+
+    @Override
+    public void passDate(Date d)
+    {
+        // do nothing
     }
 }
