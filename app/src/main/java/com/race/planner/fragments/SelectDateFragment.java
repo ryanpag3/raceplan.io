@@ -94,10 +94,8 @@ public class SelectDateFragment extends Fragment implements ActivityListenerInfe
             @Override
             public void onClick(View v)
             {
-                if (dateQualifies())
-                {
+
                     mListener.onFragmentClicked(SelectDateFragment.class.getName());
-                }
             }
         });
 
@@ -125,11 +123,6 @@ public class SelectDateFragment extends Fragment implements ActivityListenerInfe
             }
         });
         return view;
-    }
-
-    private boolean dateQualifies()
-    {
-
     }
 
     @Override
