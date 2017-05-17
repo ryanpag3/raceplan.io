@@ -107,7 +107,13 @@ public class SelectTrainingPlan extends Activity implements FragmentListenerInte
             fragmentTransaction.replace(R.id.fragment_swap, selectExperienceLevelFragment, tag);
         } else if (nameOfCurrentFragment.equals(SelectExperienceLevelFragment.class.getName()))
         {
+            // pass racetype and experiencelevel to fragment so it can check that the date is correct
+            Bundle args = new Bundle();
+            args.putString("raceType", racer.raceType);
+            args.putString("experienceLevel", racer.experienceLevel);
+
             SelectDateFragment selectDateFragment = new SelectDateFragment();
+            selectDateFragment.setArguments(args);
             tag = selectDateFragment.toString();
             fragmentTransaction.replace(R.id.fragment_swap, selectDateFragment, tag);
 

@@ -1,10 +1,13 @@
 package com.race.planner.fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,16 +15,19 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.race.planner.R;
 import com.race.planner.activities.MainActivity;
-import com.race.planner.activities.SelectTrainingPlan;
 import com.race.planner.utils.ActivityListenerInferface;
 import com.race.planner.utils.FragmentListenerInterface;
+import com.race.planner.data_models.GlobalVariables;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+
+import javax.microedition.khronos.opengles.GL;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -65,15 +71,31 @@ public class SelectDateFragment extends Fragment implements ActivityListenerInfe
                              Bundle savedInstanceState)
     {
         View view = inflater.inflate(R.layout.fragment_select_date, container, false);
-        final String fragmentName = SelectDateFragment.class.getName();
+        raceType = this.getArguments().getString("raceType");
+        experienceLevel = this.getArguments().getString("experienceLevel");
+
+        // get current date
         final Calendar cal = Calendar.getInstance();
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH);
         int day = cal.get(Calendar.DAY_OF_MONTH);
         date = cal.getTime();
+
+        // adjust default datepicker widget date to X amount of weeks from current date based on race
+        date.setTime(date.getTime() + getPlanLengthInMillis(raceType, experienceLevel));
+        cal.setTime(date);
+        year = cal.get(Calendar.YEAR); // kinda looks confusing but saves memory usage
+        month = cal.get(Calendar.MONTH);
+        day = cal.get(Calendar.DAY_OF_MONTH);
+
+        // display toast explaining the chosen date
+        Toast toast = Toast.makeText(getActivity(), "Date has been set to the minimum recommended training plan length. Feel free to adjust if necessary.", Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 590);
+        toast.show();
+
+
         // set default race date to avoid crashing on pressing back button
         mListener.passDate(date);
-
 
         datePicker = (DatePicker) view.findViewById(R.id.date_picker_widget);
         datePicker.init(year, month, day, new DatePicker.OnDateChangedListener()
@@ -94,9 +116,16 @@ public class SelectDateFragment extends Fragment implements ActivityListenerInfe
             @Override
             public void onClick(View v)
             {
-
+                if (trainingPlanHasTime())
+                {
                     mListener.onFragmentClicked(SelectDateFragment.class.getName());
+                } else
+                {
+                    // dialog display
+                    promptYesNoDialog();
+                }
             }
+
         });
 
 
@@ -123,6 +152,67 @@ public class SelectDateFragment extends Fragment implements ActivityListenerInfe
             }
         });
         return view;
+    }
+
+    private void promptYesNoDialog()
+    {
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                switch(which)
+                {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        mListener.onFragmentClicked(SelectDateFragment.class.getName());
+                        break;
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        break;
+                }
+            }
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage("Selecting this date might not give enough time to properly train for the selected race. Would you like to continue?")
+                .setPositiveButton("Yes", dialogClickListener)
+                .setNegativeButton("No", dialogClickListener).show();
+    }
+
+
+    private boolean trainingPlanHasTime()
+    {
+        long trainingPlanLength = getPlanLengthInMillis(raceType, experienceLevel);
+        Date currentDate = new Date();
+        return (date.getTime() - currentDate.getTime()) > trainingPlanLength;
+    }
+
+    private long getPlanLengthInMillis(String raceType, String experienceLevel)
+    {
+        long planLengthInMillis = 0;
+        switch (raceType)
+        {
+            case GlobalVariables.RACE_5K:
+                planLengthInMillis = GlobalVariables.WEEKS_OF_TRAINING_5K * 604800000L;
+                break;
+            case GlobalVariables.RACE_10K:
+                planLengthInMillis = GlobalVariables.WEEKS_OF_TRAINING_10K * 604800000L;
+                break;
+            case GlobalVariables.RACE_HALF:
+                planLengthInMillis = GlobalVariables.WEEKS_OF_TRAINING_HALF * 604800000L;
+                break;
+            case GlobalVariables.RACE_MARATHON:
+                if (experienceLevel.equals(GlobalVariables.EXPERIENCE_BEGINNER))
+                {
+                    planLengthInMillis = GlobalVariables.WEEKS_OF_TRAINING_MARATHON_BEGINNER * 604800000L;
+                } else
+                {
+                    planLengthInMillis = GlobalVariables.WEEKS_OF_TRAINING_MARATHON * 604800000L;
+                }
+                break;
+
+        }
+
+        return planLengthInMillis;
     }
 
     @Override

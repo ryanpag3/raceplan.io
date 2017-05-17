@@ -687,7 +687,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
             {
                 case GlobalVariables.RACE_5K:
                     mProgressBarDialog.setMax(GlobalVariables.PROGRESS_MAX_5K);
-                    weeksOfTraining = 8;
+                    weeksOfTraining = GlobalVariables.WEEKS_OF_TRAINING_5K;
                     goalMiles = 5;
                     tuesThursMileCap = 2;
                     wedMileCap = 3;
@@ -695,7 +695,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
                     break;
                 case GlobalVariables.RACE_10K:
                     mProgressBarDialog.setMax(GlobalVariables.PROGRESS_MAX_10K);
-                    weeksOfTraining = 12;
+                    weeksOfTraining = GlobalVariables.WEEKS_OF_TRAINING_10K;
                     goalMiles = 7;
                     tuesThursMileCap = 3;
                     wedMileCap = 4;
@@ -703,7 +703,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
                     break;
                 case GlobalVariables.RACE_HALF:
                     mProgressBarDialog.setMax(GlobalVariables.PROGRESS_MAX_HALF);
-                    weeksOfTraining = 12;
+                    weeksOfTraining = GlobalVariables.WEEKS_OF_TRAINING_HALF;
                     goalMiles = 13;
                     tuesThursMileCap = 5;
                     wedMileCap = 7;
@@ -711,11 +711,11 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
                     break;
                 case GlobalVariables.RACE_MARATHON:
                     mProgressBarDialog.setMax(GlobalVariables.PROGRESS_MAX_MARATHON);
-                    weeksOfTraining = 18;
+                    weeksOfTraining = GlobalVariables.WEEKS_OF_TRAINING_MARATHON;
                     // increase training length if beginner
                     if (racer.experienceLevel.equals(GlobalVariables.EXPERIENCE_BEGINNER))
                     {
-                        weeksOfTraining = 22;
+                        weeksOfTraining = GlobalVariables.WEEKS_OF_TRAINING_MARATHON_BEGINNER;
                         mProgressBarDialog.setMax(GlobalVariables.PROGRESS_MAX_MARATHON + 16);
                     }
                     goalMiles = 26;
