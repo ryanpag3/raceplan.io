@@ -1,4 +1,4 @@
-# **raceplan.io - a training plan builder for runners**
+# **raceplan.io - an android training plan builder for runners**
 
 ## **about raceplan.io**
 raceplan.io allows runners to quickly and efficiently generate training plans by dynamically scaling the plan based on the length of the race being trained for and the experience level of the runner. This training plan gets automatically pushed and organized on the users google calendar, and raceplan.io keeps a database of all active training plans. 
