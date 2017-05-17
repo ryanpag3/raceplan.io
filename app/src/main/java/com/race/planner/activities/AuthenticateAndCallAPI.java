@@ -808,6 +808,7 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
 
         private void createEventInAPI(String calID, Date date, String eventName) throws IOException
         {
+            Date currentDate = new Date();
             try
             {
                 Event event = new Event()
@@ -817,21 +818,28 @@ public class AuthenticateAndCallAPI extends Activity implements EasyPermissions.
                 Date startDate = date;
                 Date endDate = new Date(startDate.getTime() + 86400000);
 
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                // skip events that take place before the present
+                if (currentDate.getTime() < startDate.getTime())
+                {
+                    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
-                DateTime startDateTime = new DateTime(dateFormat.format(startDate));
-                DateTime endDateTime = new DateTime(dateFormat.format(endDate));
+                    DateTime startDateTime = new DateTime(dateFormat.format(startDate));
+                    DateTime endDateTime = new DateTime(dateFormat.format(endDate));
 
-                EventDateTime startEventDateTime = new EventDateTime().setDate(startDateTime);
-                EventDateTime endEventDateTime = new EventDateTime().setDate(endDateTime);
+                    EventDateTime startEventDateTime = new EventDateTime().setDate(startDateTime);
+                    EventDateTime endEventDateTime = new EventDateTime().setDate(endDateTime);
 
-                event.setStart(startEventDateTime);
-                event.setEnd(endEventDateTime);
-                // insert event into Calendar via API
-                event = mService.events().insert(racer.calendarID, event).execute();
+                    event.setStart(startEventDateTime);
+                    event.setEnd(endEventDateTime);
+                    // insert event into Calendar via API
+                    event = mService.events().insert(racer.calendarID, event).execute();
 
-                // insert event info into database
-                db.insertEventToDatabase(racer.databaseID, event.getId(), racer.calendarID);
+                    // insert event info into database
+                    db.insertEventToDatabase(racer.databaseID, event.getId(), racer.calendarID);
+                } else
+                {
+                    Log.i(TAG, "Current date is after run date, skipping...");
+                }
 
             } catch (IOException e)
             {
