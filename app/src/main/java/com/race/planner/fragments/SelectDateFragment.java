@@ -173,7 +173,7 @@ public class SelectDateFragment extends Fragment implements ActivityListenerInfe
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage("Selecting this date might not give enough time to properly train for the selected race. Would you like to continue?")
+        builder.setMessage("Selecting this date might not give you enough time to properly train for the selected race. Would you like to continue?")
                 .setPositiveButton("Yes", dialogClickListener)
                 .setNegativeButton("No", dialogClickListener).show();
     }
