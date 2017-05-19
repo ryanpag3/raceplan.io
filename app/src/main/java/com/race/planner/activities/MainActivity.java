@@ -5,9 +5,11 @@ import android.accounts.AccountManager;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -22,6 +24,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.Html;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -52,6 +55,7 @@ import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
 import com.race.planner.data_models.*;
+import com.race.planner.fragments.SelectDateFragment;
 import com.race.planner.utils.WrapContentViewPager;
 
 import org.w3c.dom.Text;
@@ -82,6 +86,7 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
     ViewPager viewPager;
     TextView viewMoreTextHint;
     Boolean isHintTextFaded = false;
+    Boolean permissionsExplained = false;
 
 
     @Override
@@ -175,14 +180,46 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_SYNC_SETTINGS) != PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED)
         {
+            if (permissionsExplained)
+            {
 
-            ActivityCompat.requestPermissions(MainActivity.this,
-                    new String[]{Manifest.permission.READ_CALENDAR,
-                            Manifest.permission.WRITE_CALENDAR,
-                            Manifest.permission.READ_SYNC_SETTINGS,
-                            Manifest.permission.GET_ACCOUNTS},
-                    GlobalVariables.MY_PERMISSIONS_REQUEST_READ_CALENDAR);
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.READ_CALENDAR,
+                                Manifest.permission.WRITE_CALENDAR,
+                                Manifest.permission.READ_SYNC_SETTINGS,
+                                Manifest.permission.GET_ACCOUNTS},
+                        GlobalVariables.MY_PERMISSIONS_REQUEST_READ_CALENDAR);
+            } else
+            {
+                explainPermissions();
+            }
         }
+    }
+
+    private void explainPermissions()
+    {
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                switch(which)
+                {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        requestPermissions();
+                        break;
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        MainActivity.this.finishAffinity();
+                        break;
+                }
+            }
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setMessage(Html.fromHtml("\t\t\t\t\t\t" + "<big><b>" + "raceplan.io" + "</b></big>" + " requires contact and calendar permissions in order to retrieve your google account information for exporting the training plan. If you choose not to accept these permissions, this app will not work correctly. Would you like to proceed?"))
+                .setPositiveButton("Yes", dialogClickListener)
+                .setNegativeButton("No", dialogClickListener).show();
+
     }
 
 
