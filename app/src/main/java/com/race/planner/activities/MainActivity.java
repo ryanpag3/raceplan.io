@@ -206,6 +206,7 @@ public class MainActivity extends Activity implements EasyPermissions.Permission
                 switch(which)
                 {
                     case DialogInterface.BUTTON_POSITIVE:
+                        permissionsExplained = true;
                         requestPermissions();
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:
