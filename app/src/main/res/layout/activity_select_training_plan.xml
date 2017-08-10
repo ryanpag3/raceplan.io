@@ -17,33 +17,32 @@
     <!--android:padding="8dp"-->
     <!--android:background="@color/text_box_background"/>-->
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <ImageView
-            android:id="@+id/img_selection_stage_bar"
-            android:src="@drawable/selection_stage_bar_white"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:alpha=".5"/>
+    <!--<RelativeLayout-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content">-->
+        <!--<ImageView-->
+            <!--android:id="@+id/img_selection_stage_bar"-->
+            <!--android:src="@drawable/selection_stage_bar_white"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginLeft="40dp"-->
+            <!--android:layout_marginRight="40dp"-->
+            <!--android:alpha=".5"/>-->
 
-        <ImageView
-            android:id="@+id/logo_icon"
-            android:src="@drawable/logo_icon"
-            android:layout_alignLeft="@+id/img_selection_stage_bar"
-            android:layout_marginTop="3dp"
-            android:layout_marginLeft="-12dp"
-            android:layout_width="48dp"
-            android:layout_height="48dp"/>
-    </RelativeLayout>
+        <!--<ImageView-->
+            <!--android:id="@+id/logo_icon"-->
+            <!--android:src="@drawable/logo_icon"-->
+            <!--android:layout_alignLeft="@+id/img_selection_stage_bar"-->
+            <!--android:layout_marginTop="3dp"-->
+            <!--android:layout_marginLeft="-12dp"-->
+            <!--android:layout_width="48dp"-->
+            <!--android:layout_height="48dp"/>-->
+    <!--</RelativeLayout>-->
 
 
 
     <FrameLayout
         android:id="@+id/fragment_swap"
-        android:layout_below="@id/img_selection_stage_bar"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
     </FrameLayout>

@@ -90,7 +90,7 @@ public class SelectDateFragment extends Fragment implements ActivityListenerInfe
 
         // display toast explaining the chosen date
         Toast toast = Toast.makeText(getActivity(), "Date has been set to the minimum recommended training plan length. Feel free to adjust if necessary.", Toast.LENGTH_LONG);
-        toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 590);
+        toast.setGravity(Gravity.CENTER|Gravity.BOTTOM, 0, 0);
         toast.show();
 
 
@@ -183,7 +183,9 @@ public class SelectDateFragment extends Fragment implements ActivityListenerInfe
     {
         long trainingPlanLength = getPlanLengthInMillis(raceType, experienceLevel);
         Date currentDate = new Date();
-        return (date.getTime() - currentDate.getTime()) > trainingPlanLength;
+        // if race date - current date is greater than the training plan length
+        // 60 secs added to allow user time to decide
+        return (date.getTime() - currentDate.getTime() + 60000) > trainingPlanLength;
     }
 
     private long getPlanLengthInMillis(String raceType, String experienceLevel)

@@ -10,10 +10,6 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 
 import com.race.planner.R;
 import com.race.planner.utils.FragmentListenerInterface;
@@ -22,7 +18,6 @@ public class DisplayFinalInfo extends Fragment
 {
     private FragmentListenerInterface mListener;
     ViewPager viewPager;
-    private AdView mAdView;
 
     public DisplayFinalInfo()
     {
@@ -57,21 +52,6 @@ public class DisplayFinalInfo extends Fragment
         View view = inflater.inflate(R.layout.fragment_display_final_info, container, false);
 
         // TextView finalText = (TextView) view.findViewById(R.id.text_el_fin);
-
-        mAdView = (AdView) view.findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
-
-        AdView mAdView = (AdView) view.findViewById(R.id.adView);
-
-        // for ad testing
-//        String android_id = Settings.Secure.getString(getActivity().getContentResolver(),
-//                Settings.Secure.ANDROID_ID);
-//        AdRequest request = new AdRequest.Builder()
-//                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)        // All emulators
-//                .addTestDevice(android_id)  // My Galaxy Nexus test phone
-//                .build();
-//        mAdView.loadAd(request );
 
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter();
         viewPager = (ViewPager) view.findViewById(R.id.pager);

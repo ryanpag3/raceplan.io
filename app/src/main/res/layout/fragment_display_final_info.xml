@@ -6,16 +6,6 @@
     android:layout_height="match_parent"
     tools:context="com.race.planner.fragments.DisplayFinalInfo">
 
-    <com.google.android.gms.ads.AdView
-        android:id="@+id/adView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentTop="true"
-        ads:adSize="SMART_BANNER"
-        ads:adUnitId="@string/banner_ad_unit_id">
-    </com.google.android.gms.ads.AdView>
-
     <com.race.planner.utils.CustomTextViewPacifico
         android:id="@+id/text_el_fin"
         android:text="El Fin"

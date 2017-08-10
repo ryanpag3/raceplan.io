@@ -6,7 +6,7 @@
 
     <TextView
         android:id="@+id/date_title_text"
-        android:text="calendar"
+        android:text=""
         android:textColor="@color/textPrimary"
         android:textSize="14sp"
         android:layout_width="wrap_content"

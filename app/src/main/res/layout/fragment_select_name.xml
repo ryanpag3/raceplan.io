@@ -11,7 +11,7 @@
 
     <TextView
         android:id="@+id/name_title"
-        android:text="Race Name"
+        android:text=""
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/textPrimary"

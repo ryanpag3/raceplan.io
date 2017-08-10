@@ -7,7 +7,7 @@
                 android:background="@android:color/transparent">
     <TextView
         android:id="@+id/date_title_text"
-        android:text="date"
+        android:text=""
         android:textColor="@color/textPrimary"
         android:textSize="14sp"
         android:layout_width="wrap_content"

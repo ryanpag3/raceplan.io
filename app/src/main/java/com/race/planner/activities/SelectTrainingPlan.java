@@ -7,9 +7,11 @@ import android.app.FragmentTransaction;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.media.Image;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -44,7 +46,7 @@ public class SelectTrainingPlan extends Activity implements FragmentListenerInte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_training_plan);
 
-        progressIcon = (ImageView) findViewById(R.id.logo_icon);
+//        progressIcon = (ImageView) findViewById(R.id.logo_icon);
 
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -92,7 +94,7 @@ public class SelectTrainingPlan extends Activity implements FragmentListenerInte
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left, R.animator.enter_from_left, R.animator.exit_to_right);
-        moveProgressIconRight();
+//        moveProgressIconRight();
 
 
         if (nameOfCurrentFragment.equals(SelectNameFragment.class.getName()))
@@ -142,23 +144,46 @@ public class SelectTrainingPlan extends Activity implements FragmentListenerInte
     @Override
     public void onBackButtonClicked()
     {
-        moveProgressIconLeft();
+//        moveProgressIconLeft();
         String t = String.valueOf(getFragmentManager().getBackStackEntryCount());
-        Log.e(TAG, "backstack count " + t);
         getFragmentManager().popBackStack();
     }
 
     @Override
     public void moveProgressIconRight()
     {
-        ObjectAnimator animXIcon = ObjectAnimator.ofFloat(progressIcon, "x", progressIcon.getX() + 215);
+        ObjectAnimator animXIcon = ObjectAnimator.ofFloat(progressIcon, "x",
+                getPositionInDp(progressIcon.getX()) + (getScreenWidthInDp()));
         animXIcon.start();
     }
 
     @Override
     public void moveProgressIconLeft()
     {
-        ObjectAnimator animXIcon = ObjectAnimator.ofFloat(progressIcon, "x", progressIcon.getX() - 215);
+        ObjectAnimator animXIcon = ObjectAnimator.ofFloat(progressIcon, "x",
+                getPositionInDp(progressIcon.getX()) - (getScreenWidthInDp()));
         animXIcon.start();
+    }
+
+    // helper methods
+    private float getScreenWidthInDp()
+    {
+        DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        return dpWidth;
+    }
+
+    private float getPositionInDp(float pos)
+    {
+        DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
+        float xPosInDp = pos / displayMetrics.density;
+        return xPosInDp;
+    }
+
+    private float getYPositionInDp(float pos)
+    {
+        DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
+        float yPosInDp = pos / displayMetrics.density;
+        return yPosInDp;
     }
 }

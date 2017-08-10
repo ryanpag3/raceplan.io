@@ -10,7 +10,7 @@
         android:id="@+id/name_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="experience level"
+        android:text=""
         android:textSize="14sp"
         android:textColor="@color/textPrimary"
         android:layout_marginLeft="128dp"
