@@ -12,9 +12,9 @@ android {
     signingConfigs {
         release {
             keyAlias 'RacePlannerKeyAlias'
-            keyPassword '5Fr3OngJfumP'
+            keyPassword 'NO PEEKING'
             storeFile file('C:/Users/dev/Google Drive/keystores/raceplannerkey.jks')
-            storePassword '5Fr3OngJfumP'
+            storePassword 'NO PEEKING'
         }
         debug {
         }
