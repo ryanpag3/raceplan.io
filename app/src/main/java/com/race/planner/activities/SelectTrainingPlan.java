@@ -53,7 +53,8 @@ public class SelectTrainingPlan extends Activity implements FragmentListenerInte
         SelectNameFragment selectNameFragment = new SelectNameFragment();
         String tag = selectNameFragment.toString();
         fragmentTransaction.replace(R.id.fragment_swap, selectNameFragment, tag);
-        fragmentTransaction.addToBackStack(tag);
+        // don't add first fragment to back stack so we don't see blank activity
+        // fragmentTransaction.addToBackStack(tag);
         fragmentTransaction.commit();
     }
 
